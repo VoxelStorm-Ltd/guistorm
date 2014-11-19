@@ -160,6 +160,7 @@ void base::set_label(std::string const &newlabel) {
     return;                   // skip updating if we're making no changes
   }
   label_text = newlabel;
+  label_lines.clear();        // necessary to force rearrangement
   setup_buffer();             // refresh the buffer
 }
 
