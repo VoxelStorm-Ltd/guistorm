@@ -22,6 +22,7 @@ class gui : public container {
   friend class base;
   friend class line;
   friend class lineshape;
+  friend class progressbar;
 protected:
   static GLuint shader;                                     // the shader for rendering all gui elements
   freetypeglxx::TextureAtlas *font_atlas = nullptr;         // texture atlas containing all font glyphs we use
@@ -76,6 +77,7 @@ public:
                 size_t memory_size,
                 unsigned int font_size,
                 std::string const &glyphs_to_load = "");
+  void add_font(font *thisfont);
   font *get_font_by_size(           float size);
   font *get_font_by_size_or_nearest(float size);
   font *get_font_by_size_or_smaller(float size);

@@ -232,6 +232,11 @@ void gui::add_font(std::string const &name,
   /// Font factory that sets up font ownership with this GUI
   fonts.emplace_back(new font(this, name, memory_offset, memory_size, font_size, glyphs_to_load));
 }
+void gui::add_font(font *thisfont) {
+  /// Take ownership of an existing font
+  /// NOTE: guistorm will now free this font, do not try to delete it manually
+  fonts.emplace_back(thisfont);
+}
 
 void gui::set_windowsize(coordtype const &new_windowsize) {
   /// Cache the window size and refresh buffers if it's changed
