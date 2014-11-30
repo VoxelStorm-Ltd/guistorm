@@ -138,7 +138,10 @@ void fit(targettype target, GLfloat margin) {
     target.set_size_nodpiscale(target.parent_gui->windowsize - (margin * 2.0));
   }
 }
-
+void move(targettype target, coordtype offset) {
+  /// Offset the element's position relative to what it previously was
+  target.set_position_nodpiscale(target.get_position_nodpiscale() + offset);
+}
 #ifndef NDEBUG
   void test_null(targettype target __attribute__((__unused__))) {
     /// Test action that reports and does nothing else

@@ -141,27 +141,3 @@ void lineshape::render() {
 }
 
 }
-
-    // draw a cursor
-    /**
-    int constexpr cursorsize = 8;
-    glColor4f(1.0, 1.0, 1.0, 0.75);
-    glBegin(GL_LINES);
-    glVertex2i(player.gui.cursor_position.x - cursorsize,     player.gui.cursor_position.y - cursorsize);       // square
-    glVertex2i(player.gui.cursor_position.x - cursorsize,     player.gui.cursor_position.y - cursorsize / 2);
-    glVertex2i(player.gui.cursor_position.x - cursorsize,     player.gui.cursor_position.y + cursorsize);
-    glVertex2i(player.gui.cursor_position.x - cursorsize,     player.gui.cursor_position.y + cursorsize / 2);
-    glVertex2i(player.gui.cursor_position.x + cursorsize,     player.gui.cursor_position.y - cursorsize);
-    glVertex2i(player.gui.cursor_position.x + cursorsize,     player.gui.cursor_position.y - cursorsize / 2);
-    glVertex2i(player.gui.cursor_position.x + cursorsize,     player.gui.cursor_position.y + cursorsize);
-    glVertex2i(player.gui.cursor_position.x + cursorsize,     player.gui.cursor_position.y + cursorsize / 2);
-    glVertex2i(player.gui.cursor_position.x - cursorsize,     player.gui.cursor_position.y - cursorsize);
-    glVertex2i(player.gui.cursor_position.x - cursorsize / 2, player.gui.cursor_position.y - cursorsize);
-    glVertex2i(player.gui.cursor_position.x + cursorsize,     player.gui.cursor_position.y - cursorsize);
-    glVertex2i(player.gui.cursor_position.x + cursorsize / 2, player.gui.cursor_position.y - cursorsize);
-    glVertex2i(player.gui.cursor_position.x - cursorsize,     player.gui.cursor_position.y + cursorsize);
-    glVertex2i(player.gui.cursor_position.x - cursorsize / 2, player.gui.cursor_position.y + cursorsize);
-    glVertex2i(player.gui.cursor_position.x + cursorsize,     player.gui.cursor_position.y + cursorsize);
-    glVertex2i(player.gui.cursor_position.x + cursorsize / 2, player.gui.cursor_position.y + cursorsize);
-    glEnd();
-    **/

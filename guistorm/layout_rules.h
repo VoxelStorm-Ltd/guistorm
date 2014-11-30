@@ -4,6 +4,7 @@
 #include <functional>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "types.h"
 
 namespace guistorm {
 
@@ -35,6 +36,7 @@ void offset_top(      targettype target, GLfloat distance = 0.0f);
 void fit_horizontally(targettype target, GLfloat margin   = 0.0f);
 void fit_vertically(  targettype target, GLfloat margin   = 0.0f);
 void fit(             targettype target, GLfloat margin   = 0.0f);
+void move(            targettype target, coordtype offset);
 #ifndef NDEBUG
   void test_null(targettype target);
   void test_text(targettype target, std::string text);

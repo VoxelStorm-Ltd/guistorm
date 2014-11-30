@@ -27,7 +27,6 @@ gui::~gui() {
     delete it;
   }
   fonts.clear();
-  delete cursor;
 }
 
 void gui::init() {
@@ -176,9 +175,6 @@ void gui::destroy_fonts() {
 void gui::refresh() {
   /// Re-create the buffers of all elements in this gui
   container::refresh();
-  if(cursor) {
-    cursor->refresh();
-  }
   picked_element = get_picked(cursor_position);       // traverse the tree to update the currently picked element
 }
 
@@ -195,10 +191,6 @@ void gui::render() {
   glBindTexture(GL_TEXTURE_2D, font_atlas->id());
 
   container::render();
-
-  if(cursor) {
-    cursor->render();
-  }
 
   glBindBuffer(GL_ARRAY_BUFFER,         0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

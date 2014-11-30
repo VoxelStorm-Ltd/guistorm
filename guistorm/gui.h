@@ -52,7 +52,7 @@ public:
 
   base *picked_element = nullptr;                           // what element we're currently hovering over, if any
 
-  lineshape *cursor = nullptr;                              // what shape is acting as this gui's current cursor, if any
+  base *cursor = nullptr;                                   // what entity is acting as this gui's current cursor, if any
 
 public:
   gui();
