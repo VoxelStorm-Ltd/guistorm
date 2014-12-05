@@ -52,4 +52,10 @@ base *group::get_picked(coordtype const &cursor_position) {
   }
 #endif // DEBUG_GUISTORM
 
+#ifndef NDEBUG
+  void group::set_label(std::string const &newlabel) {
+    std::cout << "WARNING: called " << __PRETTY_FUNCTION__ << " with label \"" << newlabel << "\" although group does not have a visible label!" << std::endl;
+  }
+#endif // NDEBUG
+
 }

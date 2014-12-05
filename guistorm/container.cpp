@@ -23,6 +23,10 @@ unsigned int container::add(base *element) {
       std::cout << "ERROR: " << __PRETTY_FUNCTION__ << ": attempted to add a nullptr element" << std::endl;
       return 0;
     }
+    if(lock_iterating) {
+      std::cout << "GUIStorm: ERROR: attempting to add to a container while iterating through it!  This must never happen!" << std::endl;
+      abort();
+    }
   #endif
   elements.emplace_back(element);
   elements.back()->parent = this;
@@ -43,6 +47,18 @@ void container::remove(unsigned int index) {
     }
   #endif
   elements.erase(elements.begin() + index);
+}
+void container::remove(base const *const thiselement) {
+  /// Remove an element from this gui by its address
+  #ifndef NDEBUG
+    if(lock_iterating) {
+      std::cout << "GUIStorm: ERROR: attempting to remove an element from a container while iterating through it!  This must never happen!" << std::endl;
+      abort();
+    }
+  #endif
+  //elements.erase(elements.begin() + index);
+  //elements.erase(std::remove_if(elements.begin(), elements.end(), is_purchased_plot), elements.end());
+  elements.erase(std::find(elements.begin(), elements.end(), thiselement));
 }
 
 base *container::get(unsigned int index) const {
@@ -78,6 +94,9 @@ base *container::get_picked(coordtype const &cursor_position) {
   for(auto & element : boost::adaptors::reverse(elements)) {        // we iterate in reverse so most on-top object from equal tiers appears first
     base *picked_element(element->get_picked(cursor_position));
     if(picked_element) {
+      #ifndef NDEBUG
+        lock_iterating = false;
+      #endif
       return picked_element;        // early exit on the first positive result
     }
   }

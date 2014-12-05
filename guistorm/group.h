@@ -24,6 +24,10 @@ public:
   public:
     void render() override final;
   #endif // DEBUG_GUISTORM
+
+  #ifndef NDEBUG
+    void set_label(std::string const &newlabel) override final;
+  #endif
 };
 
 }

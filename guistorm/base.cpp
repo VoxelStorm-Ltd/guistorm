@@ -1,4 +1,5 @@
 #include "base.h"
+#include <boost/range/iterator_range.hpp>
 #include "gui.h"
 #include "colourgroup.h"
 #include "colourset.h"
@@ -88,12 +89,12 @@ void base::scale(coordtype const &factor) {
   size *= factor;
 }
 
-void base::stretch_to_label(GLfloat margin) {
+void base::stretch_to_label() {
   /// Expand the size of this object to encompass its label contents plus margin
-  stretch_to_label_horizontally(margin);
-  stretch_to_label_vertically(margin);
+  stretch_to_label_horizontally();
+  stretch_to_label_vertically();
 }
-void base::stretch_to_label_horizontally(GLfloat margin) {
+void base::stretch_to_label_horizontally() {
   /// Expand the width of this object to encompass its label contents plus margin
   // setup_label must have been run for this to operate
   #ifndef NDEBUG
@@ -102,31 +103,34 @@ void base::stretch_to_label_horizontally(GLfloat margin) {
       return;
     }
   #endif
-  if(label_size.x + margin > size.x) {
-    size.x = label_size.x + margin;
+  if(label_size.x + (label_margin.x * 2) > size.x) {
+    size.x = label_size.x + (label_margin.x * 2);
   }
 }
-void base::stretch_to_label_vertically(GLfloat margin) {
+void base::stretch_to_label_vertically() {
   /// Expand the height of this object to encompass its label contents plus margin
-  if(label_size.y + margin > size.y) {
-    size.y = label_size.y + margin;
+  GLfloat const targetsize = label_size.y + (label_margin.y * 2) + get_label_font().metrics_height;
+  if(targetsize > size.y) {
+    size.y = targetsize;
   }
 }
-void base::shrink_to_label(GLfloat margin) {
+void base::shrink_to_label() {
   /// Shrink the size of this object so it is no larger than its label contents plus margin
-  shrink_to_label_horizontally(margin);
-  shrink_to_label_vertically(margin);
+  shrink_to_label_horizontally();
+  shrink_to_label_vertically();
 }
-void base::shrink_to_label_horizontally(GLfloat margin) {
+void base::shrink_to_label_horizontally() {
   /// Shrink the width of this object so it is no larger than the widest point of its label contents plus margin
-  if(label_size.x + margin < size.x) {
-    size.x = label_size.x + margin;
+  GLfloat const targetsize = label_size.x + (label_margin.x * 2);
+  if(targetsize < size.x) {
+    size.x = targetsize;
   }
 }
-void base::shrink_to_label_vertically(GLfloat margin) {
+void base::shrink_to_label_vertically() {
   /// Shrink the height of this object so it is no larger than the height point of its label contents plus margin
-  if(label_size.y + margin < size.y) {
-    size.y = label_size.y + margin;
+  GLfloat const targetsize = label_size.y + (label_margin.y * 2) + get_label_font().metrics_height;
+  if(targetsize < size.y) {
+    size.y = targetsize;
   }
 }
 
@@ -153,6 +157,39 @@ void base::set_colour_focus(colourtype const &background, colourtype const &outl
 void base::set_colour_active(colourtype const &background, colourtype const &outline, colourtype const &content) {
   /// Update the colour to fade to when activated, i.e. clicked or dragged or text has been entered
   colours.active.assign(background, outline, content);
+}
+
+font &base::get_label_font() {
+  /// Safely return a reference to the font we use for this object, whether it's
+  /// its own specific label font or the gui's default or another fallback
+  /// Note - this cannot fail to return a valid font, otherwise it exits fatally
+  font *thisfont = label_font;
+  if(!thisfont) {                                     // check our font is valid
+    thisfont = parent_gui->font_default;              // otherwise try to use the default font
+    if(!thisfont) {
+      std::cout << "GUIStorm: WARNING: No default font set, and " << __PRETTY_FUNCTION__ << " is trying to query it." << std::endl;
+      if(!parent_gui->fonts.empty()) {
+        thisfont = *(parent_gui->fonts.begin());      // no default available, so select the first one from the available list
+        std::cout << "GUIStorm: WARNING: Defaulting to first entry: " << thisfont->name << " size " << thisfont->font_size << std::endl;
+      }
+      if(!thisfont) {
+        std::cout << "GUIStorm: ERROR: No font available for " << __PRETTY_FUNCTION__ << std::endl;
+        abort();                                        // bail out!
+      }
+    }
+  }
+  if(!parent_gui->font_atlas) {
+    #ifdef DEBUG_GUISTORM
+      std::cout << "GUIStorm: DEBUG: parent_gui->font_atlas not yet loaded when arranging label" << std::endl;
+    #endif
+    parent_gui->load_fonts();
+  }
+  thisfont->load_if_needed(parent_gui->font_atlas);
+  #ifdef DEBUG_GUISTORM
+    //std::cout << "GUIStorm: DEBUG: parent_gui->font_atlas->id() = " << parent_gui->font_atlas->id() << std::endl;
+  #endif
+  //font_atlas_id = parent_gui->font_atlas->id();       // cache the font atlas ID for this font
+  return *thisfont;
 }
 
 void base::set_label(std::string const &newlabel) {
@@ -285,6 +322,7 @@ void base::destroy_buffer() {
   glDeleteBuffers(1, &ibo_label);
   if(label_font) {
     label_font->unload();
+    label_font = nullptr;
   }
   vbo = 0;
   ibo = 0;
@@ -324,66 +362,59 @@ void base::setup_buffer() {
 
 void base::arrange_label() {
   /// Called by setup_label, but can be called manually to just update text.
-  font *this_label_font = label_font;
-  if(!this_label_font) {                                  // check our font is valid
-    this_label_font = parent_gui->font_default;           // otherwise try to use the default font
-    if(!this_label_font) {
-      std::cout << "GUIStorm: WARNING: No default font set, and " << __PRETTY_FUNCTION__ << " is trying to query it." << std::endl;
-      if(!parent_gui->fonts.empty()) {
-        this_label_font = *(parent_gui->fonts.begin());   // no default available, so select the first one from the available list
-        std::cout << "GUIStorm: WARNING: Defaulting to first entry: " << this_label_font->name << " size " << this_label_font->font_size << std::endl;
-      }
-      if(!this_label_font) {
-        std::cout << "GUIStorm: ERROR: No font available for " << __PRETTY_FUNCTION__ << std::endl;
-        return;
-      }
-    }
-  }
-  if(!parent_gui->font_atlas) {
-    #ifdef DEBUG_GUISTORM
-      std::cout << "GUIStorm: DEBUG: parent_gui->font_atlas not yet loaded when arranging label" << std::endl;
-    #endif
-    parent_gui->load_fonts();
-  }
-  this_label_font->load_if_needed(parent_gui->font_atlas);
-  #ifdef DEBUG_GUISTORM
-    std::cout << "GUIStorm: DEBUG: parent_gui->font_atlas->id() = " << parent_gui->font_atlas->id() << std::endl;
-  #endif
-  //font_atlas_id = parent_gui->font_atlas->id();         // cache the font atlas ID for this font
-
+  font &this_label_font(get_label_font());
   // compose the text layout in the abstract first
-  label_line_spacing = this_label_font->metrics_height;
+  label_line_spacing = this_label_font.metrics_height;
   label_lines.clear();
   label_lines.emplace_back();                           // create a default first line
 
   std::vector<font::word> words;
   words.emplace_back();
   for(size_t i = 0; i != label_text.length(); ++i) {
-    font::glyph const *tempglyph = this_label_font->getglyph(label_text[i]);
+    font::glyph const *tempglyph = this_label_font.getglyph(label_text[i]);
     if(!tempglyph) {
       std::cout << "GUIStorm: WARNING: Requested unmapped character \"" << label_text[i] << "\" (ascii " << static_cast<int>(label_text[i]) << ")" << std::endl;
-      tempglyph = this_label_font->getglyph(' ');       // replace unknown characters with space
+      tempglyph = this_label_font.getglyph(' ');       // replace unknown characters with space
     }
     //if(tempglyph.advance.y > label_line_spacing) {
     //  label_line_spacing = tempglyph.advance.y;         // update uniform minimum line spacing
     //}
+    bool wordbreak_here = false;
+    bool printchar_here = true;
     if(tempglyph->linebreak) {                          // newline or carriage return
       words.back().linebreak = true;
       //words.back().advance.x = 0.0f;
       if(!label_merge_newlines) {
-        words.emplace_back();                           // add newlines if we aren't merging them
+        wordbreak_here = true;                          // add newlines if we aren't merging them
       }
+      printchar_here = false;
     } else {
       if(i != 0) {                                      // don't check for word breaks if this is the first character
-        if(words.back().glyphs.back()->is_blank) {      // if the last character was invisible...
+        if(!words.back().glyphs.empty() &&              // if the last word has any characters...
+           words.back().glyphs.back()->is_blank) {      // ...and the last character was invisible...
           if(!tempglyph->is_blank ||                    // ...and this one is visible,
              !label_merge_whitespace) {                 // ...or we aren't merging whitespace, then
-            words.emplace_back();                       // ...start a new word
+            wordbreak_here = true;                      // ...start a new word
           }
         }
       }
     }
-    words.back().glyphs.emplace_back(tempglyph);
+    if(wordbreak_here) {
+      #ifdef DEBUG_GUISTORM
+        words.back().glyphs.emplace_back(this_label_font.getglyph(']'));
+      #endif
+      words.emplace_back();
+      #ifdef DEBUG_GUISTORM
+        words.back().glyphs.emplace_back(this_label_font.getglyph('['));
+      #endif
+    }
+    if(printchar_here) {
+      words.back().glyphs.emplace_back(tempglyph);
+    } else {
+      #ifdef DEBUG_GUISTORM
+        words.back().glyphs.emplace_back(this_label_font.getglyph('/'));
+      #endif
+    }
   }
 
   // carry out word-wrapping
@@ -418,7 +449,7 @@ void base::arrange_label() {
     label_size.x = hpos;                                // this line is the longest (for centering calculations)
   }
   #ifdef DEBUG_GUISTORM
-    std::cout << "GUIStorm: DEBUG: words wrapped to " << label_lines.size() << " lines max size " << label_size << std::endl;
+    //std::cout << "GUIStorm: DEBUG: words wrapped to " << label_lines.size() << " lines max size " << label_size << std::endl;
   #endif // DEBUG_GUISTORM
 
   // calculate and cache the max line length of each line and the max overall
@@ -430,15 +461,21 @@ void base::arrange_label() {
   }
 
   // carry out justification if required
-  if(label_justify_horizontal) {
-    for(auto &thisline : label_lines) {
+  if(label_justify_horizontal && label_lines.size() > 1) {              // don't justify anything consisting of one line (or none)
+    for(auto &thisline : boost::make_iterator_range(label_lines.begin(), --label_lines.end())) {    // don't justify the last line
       if(!thisline.linebreak && thisline.words.size() > 1) {            // don't try to justify one-word lines or lines that are intentionally split
         thisline.spacing = (label_size.x - thisline.size.x) / static_cast<float>(thisline.words.size() - 1);
       }
       #ifdef DEBUG_GUISTORM
-        std::cout << "GUIStorm: DEBUG: line justification spacing " << thisline.spacing << std::endl;
+        //std::cout << "GUIStorm: DEBUG: line justification spacing " << thisline.spacing << std::endl;
       #endif // DEBUG_GUISTORM
     }
+  }
+  if(label_stretch_vertical) {
+    stretch_to_label_vertically();
+  }
+  if(label_shrink_vertical) {
+    shrink_to_label_vertically();
   }
 }
 
@@ -471,7 +508,7 @@ void base::update_label_alignment() {
   case aligntype::TOP:
   case aligntype::TOP_LEFT:
   case aligntype::TOP_RIGHT:
-    label_origin.y = label_position.y - (label_margin.y * parent_gui->dpi_scale) + size.y + label_size.y;
+    label_origin.y = label_position.y - (label_margin.y * parent_gui->dpi_scale) + size.y - get_label_font().metrics_height;
     break;
   case aligntype::BOTTOM:
   case aligntype::BOTTOM_LEFT:

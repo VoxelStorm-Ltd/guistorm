@@ -15,7 +15,7 @@ public:
   std::vector<base*> elements;                  // container for all child elements
 private:
   #ifndef NDEBUG
-    bool lock_iterating = false;                // safety interlock in to catch any attempts to modify the container while iterating through it
+    volatile bool lock_iterating = false;       // safety interlock in to catch any attempts to modify the container while iterating through it
   #endif
 protected:
   container();
@@ -24,6 +24,7 @@ public:
 
   unsigned int add(base *element);
   void remove(unsigned int index);
+  void remove(base const *const thiselement);
   base *get(unsigned int index) const;
   void clear();
 

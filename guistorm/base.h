@@ -74,7 +74,9 @@ public:
   bool label_wordwrap           = true;         // whether to wrap words to new lines when they exceed the width of the containing box
   bool label_justify_horizontal = true;         // whether to justify each line horizontally
   bool label_justify_vertical   = false;        // whether to justify the whole text to fill the vertical space
-  font *label_font = nullptr;                   // the font chosen for this label
+  bool label_stretch_vertical   = false;        // whether to stretch the container vertically to fit the label if the label is taller
+  bool label_shrink_vertical    = false;        // whether to shrink the container vertically to fit the label if the label is shorter
+  font *label_font = nullptr;                   // the font chosen for this label - this may be nullptr, use get_label_font() to get one safely
 
   // layout rules
   std::vector<layout::rule> layout_rules;       // container for layout rules in the order in which they're applied to determine the element's position
@@ -105,19 +107,20 @@ public:
   void grow(  coordtype const &increase);
   void shrink(coordtype const &decrease);
   void scale( coordtype const &factor);
-  void stretch_to_label(             GLfloat margin = 0.0);
-  void stretch_to_label_horizontally(GLfloat margin = 0.0);
-  void stretch_to_label_vertically(  GLfloat margin = 0.0);
-  void shrink_to_label(              GLfloat margin = 0.0);
-  void shrink_to_label_horizontally( GLfloat margin = 0.0);
-  void shrink_to_label_vertically(   GLfloat margin = 0.0);
+  void stretch_to_label();
+  void stretch_to_label_horizontally();
+  void stretch_to_label_vertically();
+  void shrink_to_label();
+  void shrink_to_label_horizontally();
+  void shrink_to_label_vertically();
   void set_colours(colourset const &new_colours);
   void set_colour(        colourtype const &background, colourtype const &outline, colourtype const &content);
   void set_colour_default(colourtype const &background, colourtype const &outline, colourtype const &content);
   void set_colour_hover(  colourtype const &background, colourtype const &outline, colourtype const &content);
   void set_colour_focus(  colourtype const &background, colourtype const &outline, colourtype const &content);
   void set_colour_active( colourtype const &background, colourtype const &outline, colourtype const &content);
-  void set_label(std::string const &newlabel);
+  font &get_label_font();
+  virtual void set_label(std::string const &newlabel);
 protected:
   virtual coordtype const get_absolute_position() const;
 public:
