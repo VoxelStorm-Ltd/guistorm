@@ -21,8 +21,10 @@ public:
               float scale = 1.0,
               coordtype const &size     = coordtype(),
               coordtype const &position = coordtype());
+protected:
   virtual ~progressbar() override;
 
+public:
   void init_buffer()    override final;
   void destroy_buffer() override final;
   void setup_buffer()   override final;

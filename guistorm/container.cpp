@@ -81,7 +81,7 @@ void container::clear() {
     }
   #endif
   for(auto & element : elements) {
-    delete element;
+    ::delete element;                       // call the default delete operator explicitly to avoid our overridden warning deleter
   }
   elements.clear();
 }

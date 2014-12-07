@@ -76,67 +76,91 @@ void window::stretch_horizontal(std::vector<base*>::const_iterator first,
   set_size(newsize);
 }
 
-void window::layout_vertical(GLfloat margin) {
+void window::layout_vertical(GLfloat margin,
+                             aligntype alignment) {
   /// Distribute all contained elements to fill the whole available space vertically with a set margin
-  layout_vertical(elements.begin(), elements.end(), margin);                        // wrapper: adding element range
+  layout_vertical(elements.begin(), elements.end(), margin, alignment);                     // wrapper: adding element range
 }
 void window::layout_vertical(coordtype const &bottomleft,
-                             coordtype const &topright) {
+                             coordtype const &topright,
+                             aligntype alignment) {
   /// Distribute all contained elements to fill the selected space vetically
   if(topright.x == 0.0 && topright.y == 0.0) {
-    layout_vertical(elements.begin(), elements.end(), bottomleft, get_size());      // wrapper: adding element range, default size
+    layout_vertical(elements.begin(), elements.end(), bottomleft, get_size(), alignment);   // wrapper: adding element range, default size
   } else {
-    layout_vertical(elements.begin(), elements.end(), bottomleft, topright);        // wrapper: adding element range
+    layout_vertical(elements.begin(), elements.end(), bottomleft, topright, alignment);     // wrapper: adding element range
   }
 }
 void window::layout_vertical(std::vector<base*>::const_iterator first,
                              std::vector<base*>::const_iterator last,
-                             GLfloat margin) {
+                             GLfloat margin,
+                             aligntype alignment) {
   /// Distribute the selected contained elements to fill the whole available space vertically with a set margin
-  layout_vertical(first, last, coordtype(margin, margin), get_size() - margin);     // wrapper: convert margin to coords
+  layout_vertical(first, last, coordtype(margin, margin), get_size() - margin, alignment);    // wrapper: convert margin to coords
 }
 void window::layout_vertical(std::vector<base*>::const_iterator first,
                              std::vector<base*>::const_iterator last,
                              coordtype const &bottomleft,
-                             coordtype const &topright) {
+                             coordtype const &topright,
+                             aligntype alignment) {
   /// Distribute the selected contained elements to fill the selected space vertically
-  GLfloat totalheight = 0.0;                                                        // calculate total heights
+  GLfloat totalheight = 0.0;                                                                  // calculate total heights
   for(auto it = first; it != last; ++it) {
     totalheight += (*it)->get_size().y;
   }
   GLfloat const range = topright.y - bottomleft.y;
-  GLfloat const margin = (range - totalheight) / (std::distance(first, last) - 1);  // take 1 to allow marginless fitting
+  GLfloat const margin = (range - totalheight) / (std::distance(first, last) - 1);            // take 1 to allow marginless fitting
   GLfloat pen = topright.y;
-  for(auto it = first; it != last; ++it) {                                          // distribute evenly within the space
+  for(auto it = first; it != last; ++it) {                                                    // distribute evenly within the space
     pen -= (*it)->get_size().y;
-    (*it)->set_position((((topright.x - bottomleft.x) - (*it)->get_size().x) / 2.0) + bottomleft.x, pen);  // centre each element
+    switch(alignment) {                                                                       // horizontal alignment only
+    case aligntype::CENTRE:
+    case aligntype::TOP:
+    case aligntype::BOTTOM:
+      (*it)->set_position((((topright.x - bottomleft.x) - (*it)->get_size().x) / 2.0) + bottomleft.x, pen);  // centre each element
+      break;
+    case aligntype::LEFT:
+    case aligntype::TOP_LEFT:
+    case aligntype::BOTTOM_LEFT:
+        (*it)->set_position(bottomleft.x, pen);                                               // align to left
+      break;
+    case aligntype::RIGHT:
+    case aligntype::TOP_RIGHT:
+    case aligntype::BOTTOM_RIGHT:
+      (*it)->set_position(topright.x - (*it)->get_size().x, pen);                             // align to right
+      break;
+    }
     pen -= margin;
-  }
+  }     // note: this is not optimal (the loop should be inside the switch) but -funswitch-loops should hoist this for us, so save duplicate copy-pasting
 }
 
-void window::layout_horizontal(GLfloat margin) {
+void window::layout_horizontal(GLfloat margin,
+                               aligntype alignment) {
   /// Distribute all contained elements to fill the whole available space horizontally with a set margin
-  layout_horizontal(elements.begin(), elements.end(), margin);                      // wrapper: adding element range
+  layout_horizontal(elements.begin(), elements.end(), margin, alignment);                     // wrapper: adding element range
 }
 void window::layout_horizontal(coordtype const &bottomleft,
-                               coordtype const &topright) {
+                               coordtype const &topright,
+                               aligntype alignment) {
   /// Distribute all contained elements to fill the selected space horizontally
   if(topright.x == 0.0 && topright.y == 0.0) {
-    layout_horizontal(elements.begin(), elements.end(), bottomleft, get_size());    // wrapper: adding element range, default size
+    layout_horizontal(elements.begin(), elements.end(), bottomleft, get_size(), alignment);   // wrapper: adding element range, default size
   } else {
-    layout_horizontal(elements.begin(), elements.end(), bottomleft, topright);      // wrapper: adding element range
+    layout_horizontal(elements.begin(), elements.end(), bottomleft, topright, alignment);     // wrapper: adding element range
   }
 }
 void window::layout_horizontal(std::vector<base*>::const_iterator first,
                                std::vector<base*>::const_iterator last,
-                               GLfloat margin) {
+                               GLfloat margin,
+                               aligntype alignment) {
   /// Distribute the selected contained elements to fill the whole available space horizontally with a set margin
-  layout_horizontal(first, last, coordtype(margin, margin), get_size() - margin);   // wrapper: convert margin to coords
+  layout_horizontal(first, last, coordtype(margin, margin), get_size() - margin, alignment);  // wrapper: convert margin to coords
 }
 void window::layout_horizontal(std::vector<base*>::const_iterator first,
                                std::vector<base*>::const_iterator last,
                                coordtype const &bottomleft,
-                               coordtype const &topright) {
+                               coordtype const &topright,
+                               aligntype alignment) {
   /// Distribute the selected contained elements to fill the selected space horizontally
   GLfloat totalwidth = 0.0;                                                         // calculate total heights
   for(auto it = first; it != last; ++it) {
@@ -146,9 +170,25 @@ void window::layout_horizontal(std::vector<base*>::const_iterator first,
   GLfloat const margin = (range - totalwidth) / (std::distance(first, last) - 1);   // take 1 to allow marginless fitting
   GLfloat pen = bottomleft.x;
   for(auto it = first; it != last; ++it) {                                          // distribute evenly within the space
-    (*it)->set_position(pen, (((topright.y - bottomleft.y) - (*it)->get_size().y) / 2.0) + bottomleft.y); // centre each element
+    switch(alignment) {                                                             // vertical alignment only
+    case aligntype::CENTRE:
+    case aligntype::LEFT:
+    case aligntype::RIGHT:
+      (*it)->set_position(pen, (((topright.y - bottomleft.y) - (*it)->get_size().y) / 2.0) + bottomleft.y); // centre each element
+      break;
+    case aligntype::TOP:
+    case aligntype::TOP_LEFT:
+    case aligntype::TOP_RIGHT:
+      (*it)->set_position(pen, topright.y - (*it)->get_size().y);                   // align to top
+      break;
+    case aligntype::BOTTOM:
+    case aligntype::BOTTOM_LEFT:
+    case aligntype::BOTTOM_RIGHT:
+      (*it)->set_position(pen, bottomleft.y);                                       // align to bottom
+      break;
+    }
     pen += (*it)->get_size().x + margin;
-  }
+  }     // note: this is not optimal (the loop should be inside the switch) but -funswitch-loops should hoist this for us, so save duplicate copy-pasting
 }
 
 void window::destroy_buffer() {

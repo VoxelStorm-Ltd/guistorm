@@ -13,6 +13,7 @@ public:
          font *label_font = nullptr,
          coordtype const &size     = coordtype(),
          coordtype const &position = coordtype());
+protected:
   ~widget();
 };
 

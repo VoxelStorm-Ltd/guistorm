@@ -19,8 +19,10 @@ public:
             colourset const &colours,
             std::vector<std::pair<coordtype, coordtype>> const &lines,
             coordtype const &thisposition = coordtype(0.0f, 0.0f));
+protected:
   virtual ~lineshape() override;
 
+public:
   void upload_shape(std::vector<std::pair<coordtype, coordtype>> const &lines);
 
   base *get_picked(coordtype const &cursor_position) override final;

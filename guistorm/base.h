@@ -13,6 +13,7 @@ class gui;                                      // forward declarations
 class container;
 
 class base {
+  friend class container;                       // needed to allow deletion by container
 protected:
   // OpenGL rendering
   struct vertex {
@@ -88,9 +89,11 @@ protected:
        font *label_font = nullptr,
        coordtype const &size     = coordtype(),
        coordtype const &position = coordtype());
-public:
   virtual ~base();
+public:
+  static void operator delete(void *p);
 
+public:
   // control
   void show();
   void hide();

@@ -15,8 +15,10 @@ public:
         font *label_font = nullptr,
         coordtype const &size     = coordtype(),
         coordtype const &position = coordtype());
+protected:
   virtual ~label() override;
 
+public:
   #ifndef DEBUG_GUISTORM
     void init_buffer() override final;
   protected:

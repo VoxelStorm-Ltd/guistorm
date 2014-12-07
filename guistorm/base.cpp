@@ -20,9 +20,19 @@ base::base(container *parent,
     label_text(thislabel),
     label_font(label_font) {
   /// Specific constructor
-  if(parent) {
-    parent->add(this);
-  }
+  #ifndef NDEBUG
+    if(!parent) {
+      std::cout << "GUIStorm: ERROR: " << __PRETTY_FUNCTION__ << " must not be initialised with no parent" << std::endl;
+      return;
+    }
+  #endif
+  parent->add(this);                          // this also assigns the parent_gui pointer
+  #ifndef NDEBUG
+    if(!parent_gui) {                         // but check this for safety
+      std::cout << "GUIStorm: ERROR: " << __PRETTY_FUNCTION__ << " parent chain failed to assign parent_gui, make sure the top level container's parent is a guistorm::gui object" << std::endl;
+      return;
+    }
+  #endif
   position *= parent_gui->get_dpi_scale();    // these must come after parent gui assignment
   size     *= parent_gui->get_dpi_scale();
 }
@@ -30,6 +40,11 @@ base::base(container *parent,
 base::~base() {
   /// Default destructor
   destroy_buffer();
+}
+
+void base::operator delete(void *p __attribute__((__unused__))) {
+  /// guistorm garbage-collects all owned entities, so warn the user on attempting to delete directly
+  std::cout << "GUIStorm: WARNING: GUIStorm owned objects should not be deleted manually!" << std::endl;
 }
 
 void base::show() {
@@ -203,16 +218,12 @@ void base::set_label(std::string const &newlabel) {
 
 coordtype const base::get_absolute_position() const {
   /// Return the absolute internal coords of the origin of this element (not converted to screen dpi)
-  if(parent) {
-    coordtype parent_origin(0, 0);
-    base *parent_base(dynamic_cast<base*>(parent));
-    if(parent_base) {
-      return position + parent_base->get_absolute_position();       // obtain its parent position recursively
-    } else {
-      return position;                                              // its parent is not a base type so has no position of its own
-    }
+  coordtype parent_origin(0, 0);
+  base *parent_base(dynamic_cast<base*>(parent));
+  if(parent_base) {
+    return position + parent_base->get_absolute_position();       // obtain its parent position recursively
   } else {
-    return position;                                                // it is positioned absolutely
+    return position;                                              // its parent is not a base type so has no position of its own
   }
 }
 coordtype base::get_position() const {

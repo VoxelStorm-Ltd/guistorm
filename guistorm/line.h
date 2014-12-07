@@ -12,8 +12,10 @@ public:
        colourset const &colours,
        coordtype const &size     = coordtype(),
        coordtype const &position = coordtype());
+protected:
   ~line();
 
+public:
   void init_buffer() override final;
   void destroy_buffer() override final;
 protected:

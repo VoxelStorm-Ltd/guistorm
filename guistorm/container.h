@@ -19,9 +19,9 @@ private:
   #endif
 protected:
   container();
-public:
   virtual ~container();
 
+public:
   unsigned int add(base *element);
   void remove(unsigned int index);
   void remove(base const *const thiselement);

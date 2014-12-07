@@ -18,8 +18,10 @@ public:
          font *label_font = nullptr,
          coordtype const &size     = coordtype(),
          coordtype const &position = coordtype());
+protected:
   virtual ~button() override;
 
+public:
   //void on_press()   override final;
   void on_release() override final;
 
