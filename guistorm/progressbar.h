@@ -3,7 +3,6 @@
 
 #include "base.h"
 #include <vector>
-#include <vector>
 
 namespace guistorm {
 

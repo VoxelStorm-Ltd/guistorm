@@ -21,6 +21,11 @@ label::~label() {
   /// Default destructor
 }
 
+base *label::get_picked(coordtype const &cursor_position __attribute__((__unused__))) {
+  /// Labels are never clickable
+  return nullptr;
+}
+
 #ifndef DEBUG_GUISTORM
   void label::init_buffer() {
     /// Generate the buffers for this object

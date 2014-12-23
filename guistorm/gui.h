@@ -23,6 +23,7 @@ class gui : public container {
   friend class line;
   friend class lineshape;
   friend class progressbar;
+  friend class graph_line;
 protected:
   static GLuint shader;                                     // the shader for rendering all gui elements
   freetypeglxx::TextureAtlas *font_atlas = nullptr;         // texture atlas containing all font glyphs we use

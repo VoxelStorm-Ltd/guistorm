@@ -35,7 +35,11 @@ base *window::get_picked(coordtype const &cursor_position) {
   if(picked_element) {
     return picked_element;            // we're picking a child element in this window
   } else {
-    return this;                      // we're picking the window itself
+    if(capture_click) {
+      return this;                    // we're picking the window itself, but only react if it's focusable
+    } else {
+      return nullptr;
+    }
   }
 }
 
@@ -123,7 +127,7 @@ void window::layout_vertical(std::vector<base*>::const_iterator first,
     case aligntype::LEFT:
     case aligntype::TOP_LEFT:
     case aligntype::BOTTOM_LEFT:
-        it->set_position(bottomleft.x, pen);                                                  // align to left
+      it->set_position(bottomleft.x, pen);                                                    // align to left
       break;
     case aligntype::RIGHT:
     case aligntype::TOP_RIGHT:

@@ -412,18 +412,18 @@ void base::arrange_label() {
     }
     if(wordbreak_here) {
       #ifdef DEBUG_GUISTORM
-        words.back().glyphs.emplace_back(this_label_font.getglyph(']'));
+        //words.back().glyphs.emplace_back(this_label_font.getglyph(']'));
       #endif
       words.emplace_back();
       #ifdef DEBUG_GUISTORM
-        words.back().glyphs.emplace_back(this_label_font.getglyph('['));
+        //words.back().glyphs.emplace_back(this_label_font.getglyph('['));
       #endif
     }
     if(printchar_here) {
       words.back().glyphs.emplace_back(tempglyph);
     } else {
       #ifdef DEBUG_GUISTORM
-        words.back().glyphs.emplace_back(this_label_font.getglyph('/'));
+        //words.back().glyphs.emplace_back(this_label_font.getglyph('/'));
       #endif
     }
   }
