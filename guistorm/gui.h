@@ -91,6 +91,7 @@ public:
   void set_dpi(GLfloat newdpi);
   void set_dpi_scale(GLfloat newscale);
   void set_cursor_position(coordtype const &new_cursor_position);
+  void update_cursor_pick();
   void set_mouse_pressed();
   void set_mouse_released();
 

@@ -80,7 +80,7 @@ void progressbar::render() {
     setup_buffer();
   }
   if(numverts != 0) {
-    if(colours.current.background.a != 0.0) {                           // skip drawing fully transparent parts
+    if(colours.current.background.a != 0.0f) {                          // skip drawing fully transparent parts
       glBindBuffer(GL_ARRAY_BUFFER,         vbo_fill);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
       glVertexAttribPointer(parent_gui->attrib_coords,    2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
@@ -92,7 +92,7 @@ void progressbar::render() {
                   colours.current.background.a);
       glDrawElements(GL_TRIANGLE_FAN, numverts, GL_UNSIGNED_INT, 0);    // background
     }
-    if(colours.current.outline.a != 0.0) {                              // skip drawing fully transparent parts
+    if(colours.current.outline.a != 0.0f) {                             // skip drawing fully transparent parts
       glBindBuffer(GL_ARRAY_BUFFER,         vbo);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
       glVertexAttribPointer(parent_gui->attrib_coords,    2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));

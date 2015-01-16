@@ -113,7 +113,7 @@ void base::stretch_to_label_horizontally() {
   /// Expand the width of this object to encompass its label contents plus margin
   // setup_label must have been run for this to operate
   #ifndef NDEBUG
-    if(size.x == 0.0) {
+    if(size.x == 0.0f) {
       std::cout << "GUIStorm: WARNING: " << __PRETTY_FUNCTION__ << " attempted to operate with zero width label; has setup_label been called yet?" << std::endl;
       return;
     }
@@ -622,7 +622,7 @@ void base::render() {
     glVertexAttribPointer(parent_gui->attrib_coords,    2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
     glVertexAttribPointer(parent_gui->attrib_texcoords, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::texcoords)));
 
-    if(colours.current.background.a != 0.0) {                           // skip drawing fully transparent parts
+    if(colours.current.background.a != 0.0f) {                          // skip drawing fully transparent parts
       glUniform4f(parent_gui->uniform_colour,
                   colours.current.background.r,
                   colours.current.background.g,
@@ -630,7 +630,7 @@ void base::render() {
                   colours.current.background.a);
       glDrawElements(GL_TRIANGLE_FAN, numverts, GL_UNSIGNED_INT, 0);    // background
     }
-    if(colours.current.outline.a != 0.0) {                              // skip drawing fully transparent parts
+    if(colours.current.outline.a != 0.0f) {                             // skip drawing fully transparent parts
       glUniform4f(parent_gui->uniform_colour,
                   colours.current.outline.r,
                   colours.current.outline.g,

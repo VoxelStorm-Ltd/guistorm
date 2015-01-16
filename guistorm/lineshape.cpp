@@ -90,11 +90,12 @@ void lineshape::setup_buffer() {
   for(vertex &v : vbodata_shifted) {
     v.coords += position_transformed;
   }
+  numverts = ibodata.size();
 
   #ifdef DEBUG_GUISTORM
-    std::cout << "GUIStorm: Lineshape: Uploading " << vbodata.size() << " " << sizeof(vertex) << "B verts, " << numverts_label << " indices to vbo ("
+    std::cout << "GUIStorm: Lineshape: Uploading " << vbodata.size() << " " << sizeof(vertex) << "B verts, " << numverts << " indices to vbo ("
               << (vbodata.size() * sizeof(vertex)) << "B, "
-              << (numverts_label * sizeof(GLuint)) << "B)"
+              << (numverts * sizeof(GLuint)) << "B)" << std::endl;
   #endif // DEBUG_GUISTORM
 
   glBindBuffer(GL_ARRAY_BUFFER,         vbo);

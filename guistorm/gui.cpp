@@ -236,13 +236,17 @@ void gui::set_windowsize(coordtype const &new_windowsize) {
     std::cout << "GUIStorm: Window resized to " << new_windowsize << std::endl;
   #endif // DEBUG_GUISTORM
   if(windowsize == new_windowsize) {
-    windowsize = new_windowsize;
+    return;
+  }
+  windowsize = new_windowsize;
+  update_layout();                          // reposition any window-relative GUI elements
+  // update all buffers
+  if(glfwGetCurrentContext() != NULL) {     // make sure we're in a valid opengl context before we try to refresh
+    refresh();
   } else {
-    windowsize = new_windowsize;
-    // update all buffers
-    if(glfwGetCurrentContext() != NULL) {     // make sure we're in a valid opengl context before we try to refresh
-      refresh();
-    }
+    #ifdef DEBUG_GUISTORM
+      std::cout << "GUIStorm: Window resize called outside opengl context" << std::endl;
+    #endif
   }
 }
 
@@ -324,8 +328,13 @@ void gui::set_cursor_position(coordtype const &new_cursor_position) {
   cursor_position = new_cursor_position;
   if(cursor) {
     cursor->set_position_nodpiscale(cursor_position); // don't call the dpi scaler function
-    cursor->refresh();
+    cursor->refresh_position_only();
   }
+  update_cursor_pick();
+}
+
+void gui::update_cursor_pick() {
+  /// Update what the cursor is picking, for instance if windows have changed under the cursor without it having moved
   picked_element = get_picked(cursor_position);       // traverse the tree to update the currently picked element
 }
 
@@ -340,8 +349,8 @@ void gui::set_mouse_released() {
 
 coordtype gui::coord_transform(coordtype const &coord) {
   /// Helper to transform screen coordinates into screen space suitable for feeding to the shader without further transformation
-  return coordtype((coord.x * 2 / windowsize.x) - 1.0,
-                   (coord.y * 2 / windowsize.y) - 1.0);
+  return coordtype((coord.x * 2 / windowsize.x) - 1.0f,
+                   (coord.y * 2 / windowsize.y) - 1.0f);
 }
 
 }

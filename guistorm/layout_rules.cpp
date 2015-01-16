@@ -9,7 +9,7 @@ void centre_horizontally(layout::targettype target) {
   /// Position this element centered horizontally to its parent
   base *parent_base = dynamic_cast<base*>(target.parent);
   if(parent_base) {
-    target.set_position_nodpiscale((parent_base->get_size_nodpiscale().x - target.get_size_nodpiscale().x) / 2.0, target.get_position_nodpiscale().y);
+    target.set_position_nodpiscale((parent_base->get_size_nodpiscale().x - target.get_size_nodpiscale().x) / 2.0f, target.get_position_nodpiscale().y);
   } else {
     #ifndef NDEBUG
       if(!target.parent_gui) {
@@ -17,7 +17,7 @@ void centre_horizontally(layout::targettype target) {
         return;
       }
     #endif // NDEBUG
-    target.set_position_nodpiscale((target.parent_gui->windowsize.x - target.get_size_nodpiscale().x) / 2.0, target.get_position_nodpiscale().y);
+    target.set_position_nodpiscale((target.parent_gui->windowsize.x - target.get_size_nodpiscale().x) / 2.0f, target.get_position_nodpiscale().y);
   }
 }
 
@@ -25,7 +25,7 @@ void centre_vertically(layout::targettype target) {
   /// Position this element centered vertically to its parent
   base *parent_base = dynamic_cast<base*>(target.parent);
   if(parent_base) {
-    target.set_position_nodpiscale(target.get_position_nodpiscale().x, (parent_base->get_size_nodpiscale().y - target.get_size_nodpiscale().y) / 2.0);
+    target.set_position_nodpiscale(target.get_position_nodpiscale().x, (parent_base->get_size_nodpiscale().y - target.get_size_nodpiscale().y) / 2.0f);
   } else {
     #ifndef NDEBUG
       if(!target.parent_gui) {
@@ -33,14 +33,14 @@ void centre_vertically(layout::targettype target) {
         return;
       }
     #endif // NDEBUG
-    target.set_position_nodpiscale(target.get_position_nodpiscale().x, (target.parent_gui->windowsize.y - target.get_size_nodpiscale().y) / 2.0);
+    target.set_position_nodpiscale(target.get_position_nodpiscale().x, (target.parent_gui->windowsize.y - target.get_size_nodpiscale().y) / 2.0f);
   }
 }
 void centre(layout::targettype target) {
   /// Position this element centered on both axes to its parent
   base *parent_base = dynamic_cast<base*>(target.parent);
   if(parent_base) {
-    target.set_position_nodpiscale((parent_base->get_size_nodpiscale() - target.get_size_nodpiscale()) / 2.0);
+    target.set_position_nodpiscale((parent_base->get_size_nodpiscale() - target.get_size_nodpiscale()) / 2.0f);
   } else {
     #ifndef NDEBUG
       if(!target.parent_gui) {
@@ -48,7 +48,7 @@ void centre(layout::targettype target) {
         return;
       }
     #endif // NDEBUG
-    target.set_position_nodpiscale((target.parent_gui->windowsize - target.get_size_nodpiscale()) / 2.0);
+    target.set_position_nodpiscale((target.parent_gui->windowsize - target.get_size_nodpiscale()) / 2.0f);
   }
 }
 void offset_left(layout::targettype target, GLfloat distance) {
@@ -95,7 +95,7 @@ void fit_horizontally(targettype target, GLfloat margin) {
   base *parent_base = dynamic_cast<base*>(target.parent);
   target.set_position_nodpiscale(margin, target.get_position_nodpiscale().y);
   if(parent_base) {
-    target.set_size_nodpiscale(parent_base->get_size_nodpiscale().x - (margin * 2.0), target.get_size_nodpiscale().y);
+    target.set_size_nodpiscale(parent_base->get_size_nodpiscale().x - (margin * 2.0f), target.get_size_nodpiscale().y);
   } else {
     #ifndef NDEBUG
       if(!target.parent_gui) {
@@ -103,7 +103,7 @@ void fit_horizontally(targettype target, GLfloat margin) {
         return;
       }
     #endif // NDEBUG
-    target.set_size_nodpiscale(target.parent_gui->windowsize.x - (margin * 2.0), target.get_size_nodpiscale().y);
+    target.set_size_nodpiscale(target.parent_gui->windowsize.x - (margin * 2.0f), target.get_size_nodpiscale().y);
   }
 }
 void fit_vertically(targettype target, GLfloat margin) {
@@ -111,7 +111,7 @@ void fit_vertically(targettype target, GLfloat margin) {
   base *parent_base = dynamic_cast<base*>(target.parent);
   target.set_position_nodpiscale(target.get_position_nodpiscale().x, margin);
   if(parent_base) {
-    target.set_size_nodpiscale(target.get_size_nodpiscale().x, parent_base->get_size_nodpiscale().y - (margin * 2.0));
+    target.set_size_nodpiscale(target.get_size_nodpiscale().x, parent_base->get_size_nodpiscale().y - (margin * 2.0f));
   } else {
     #ifndef NDEBUG
       if(!target.parent_gui) {
@@ -119,7 +119,7 @@ void fit_vertically(targettype target, GLfloat margin) {
         return;
       }
     #endif // NDEBUG
-    target.set_size_nodpiscale(target.get_size_nodpiscale().x, target.parent_gui->windowsize.y - (margin * 2.0));
+    target.set_size_nodpiscale(target.get_size_nodpiscale().x, target.parent_gui->windowsize.y - (margin * 2.0f));
   }
 }
 void fit(targettype target, GLfloat margin) {
@@ -127,7 +127,7 @@ void fit(targettype target, GLfloat margin) {
   base *parent_base = dynamic_cast<base*>(target.parent);
   target.set_position_nodpiscale(margin, margin);
   if(parent_base) {
-    target.set_size_nodpiscale(parent_base->get_size_nodpiscale() - (margin * 2.0));
+    target.set_size_nodpiscale(parent_base->get_size_nodpiscale() - (margin * 2.0f));
   } else {
     #ifndef NDEBUG
       if(!target.parent_gui) {
@@ -135,7 +135,7 @@ void fit(targettype target, GLfloat margin) {
         return;
       }
     #endif // NDEBUG
-    target.set_size_nodpiscale(target.parent_gui->windowsize - (margin * 2.0));
+    target.set_size_nodpiscale(target.parent_gui->windowsize - (margin * 2.0f));
   }
 }
 void move(targettype target, coordtype offset) {
