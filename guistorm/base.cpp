@@ -62,6 +62,7 @@ void base::toggle() {
 void base::set_position(coordtype const &new_position) {
   /// Update this element's relative position to its parent element or the screen centre if parentless, lower left corner
   position = new_position * parent_gui->get_dpi_scale();
+  refresh_position_only();
 }
 void base::set_position(GLfloat new_position_x, GLfloat new_position_y) {
   set_position(coordtype(new_position_x, new_position_y));    // wrapper
@@ -69,6 +70,7 @@ void base::set_position(GLfloat new_position_x, GLfloat new_position_y) {
 void base::set_position_nodpiscale(coordtype const &new_position) {
   /// Update this element's relative position to its parent element or the screen centre if parentless, lower left corner - not scaled by dpi
   position = new_position;
+  refresh_position_only();
 }
 void base::set_position_nodpiscale(GLfloat new_position_x, GLfloat new_position_y) {
   set_position_nodpiscale(coordtype(new_position_x, new_position_y));    // wrapper
@@ -76,6 +78,7 @@ void base::set_position_nodpiscale(GLfloat new_position_x, GLfloat new_position_
 void base::set_size(coordtype const &new_size) {
   /// Update this element's size
   size = new_size * parent_gui->get_dpi_scale();
+  refresh_position_only();
 }
 void base::set_size(GLfloat new_size_x, GLfloat new_size_y) {
   set_size(coordtype(new_size_x, new_size_y));                // wrapper
@@ -83,6 +86,7 @@ void base::set_size(GLfloat new_size_x, GLfloat new_size_y) {
 void base::set_size_nodpiscale(coordtype const &new_size) {
   /// Update this element's size - not scaled by dpi
   size = new_size;
+  refresh_position_only();
 }
 void base::set_size_nodpiscale(GLfloat new_size_x, GLfloat new_size_y) {
   set_size_nodpiscale(coordtype(new_size_x, new_size_y));                // wrapper
@@ -90,18 +94,22 @@ void base::set_size_nodpiscale(GLfloat new_size_x, GLfloat new_size_y) {
 void base::move(coordtype const &offset) {
   /// Move this element relative to its existing position
   position += offset * parent_gui->get_dpi_scale();
+  refresh_position_only();
 }
 void base::grow(coordtype const &increase) {
   /// Scale this element up by a specified increase
   size += increase * parent_gui->get_dpi_scale();
+  refresh_position_only();
 }
 void base::shrink(coordtype const &decrease) {
   /// Scale this element down by a specified decrease
   size -= decrease * parent_gui->get_dpi_scale();
+  refresh_position_only();
 }
 void base::scale(coordtype const &factor) {
   /// Scale this element by a specified factor in each direction
   size *= factor;
+  refresh_position_only();
 }
 
 void base::stretch_to_label() {
@@ -120,6 +128,7 @@ void base::stretch_to_label_horizontally() {
   #endif
   if(label_size.x + (label_margin.x * 2) > size.x) {
     size.x = label_size.x + (label_margin.x * 2);
+    refresh_position_only();
   }
 }
 void base::stretch_to_label_vertically() {
@@ -127,6 +136,7 @@ void base::stretch_to_label_vertically() {
   GLfloat const targetsize = label_size.y + (label_margin.y * 2) + get_label_font().metrics_height;
   if(targetsize > size.y) {
     size.y = targetsize;
+    refresh_position_only();
   }
 }
 void base::shrink_to_label() {
@@ -139,6 +149,7 @@ void base::shrink_to_label_horizontally() {
   GLfloat const targetsize = label_size.x + (label_margin.x * 2);
   if(targetsize < size.x) {
     size.x = targetsize;
+    refresh_position_only();
   }
 }
 void base::shrink_to_label_vertically() {
@@ -146,6 +157,7 @@ void base::shrink_to_label_vertically() {
   GLfloat const targetsize = label_size.y + (label_margin.y * 2) + get_label_font().metrics_height;
   if(targetsize < size.y) {
     size.y = targetsize;
+    refresh_position_only();
   }
 }
 
@@ -212,8 +224,7 @@ void base::set_label(std::string const &newlabel) {
     return;                   // skip updating if we're making no changes
   }
   label_text = newlabel;
-  label_lines.clear();        // necessary to force rearrangement
-  setup_buffer();             // refresh the buffer
+  refresh();                  // refresh the buffer (this also clears label lines)
 }
 
 coordtype const base::get_absolute_position() const {
@@ -331,10 +342,6 @@ void base::destroy_buffer() {
   glDeleteBuffers(1, &ibo);
   glDeleteBuffers(1, &vbo_label);
   glDeleteBuffers(1, &ibo_label);
-  if(label_font) {
-    label_font->unload();
-    label_font = nullptr;
-  }
   vbo = 0;
   ibo = 0;
   vbo_label = 0;
@@ -361,10 +368,10 @@ void base::setup_buffer() {
 
   glBindBuffer(GL_ARRAY_BUFFER,         vbo);
   glBufferData(GL_ARRAY_BUFFER,         vbodata.size() * sizeof(vertex), &vbodata[0], GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER,         0);
+  //glBindBuffer(GL_ARRAY_BUFFER,         0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, numverts       * sizeof(GLuint), &ibodata[0], GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   setup_label();                          // set up the label buffer
 
@@ -583,10 +590,10 @@ void base::setup_label() {
 
   glBindBuffer(GL_ARRAY_BUFFER,         vbo_label);
   glBufferData(GL_ARRAY_BUFFER,         vbodata.size() * sizeof(vertex), &vbodata[0], GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER,         0);
+  //glBindBuffer(GL_ARRAY_BUFFER,         0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_label);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, numverts_label * sizeof(GLuint), &ibodata[0], GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void base::update_layout() {
@@ -595,17 +602,20 @@ void base::update_layout() {
   for(auto const &thisrule : layout_rules) {
     thisrule();
   }
+  if(!layout_rules.empty()) {
+    refresh_position_only();
+  }
 }
 
 void base::refresh() {
   /// Refresh this object's visual state
   label_lines.clear();        // ensure the label buffer arrangement also gets refreshed
-  setup_buffer();
+  refresh_position_only();    // refresh the outline shape
 }
 
 void base::refresh_position_only() {
   /// Refresh this object's position and size only, don't refresh text content
-  setup_buffer();
+  initialised = false;
 }
 
 void base::render() {

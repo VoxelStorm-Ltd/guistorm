@@ -79,6 +79,7 @@ public:
                 unsigned int font_size,
                 std::string const &glyphs_to_load = "");
   void add_font(font *thisfont);
+  void clear_fonts();
   font *get_font_by_size(           float size);
   font *get_font_by_size_or_nearest(float size);
   font *get_font_by_size_or_smaller(float size);

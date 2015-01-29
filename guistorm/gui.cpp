@@ -22,11 +22,8 @@ gui::gui() {
 gui::~gui() {
   /// Default destructor
   clear();
+  clear_fonts();
   destroy();
-  for(auto &it : fonts) {
-    delete it;
-  }
-  fonts.clear();
 }
 
 void gui::init() {
@@ -168,6 +165,9 @@ void gui::upload_fonts() {
 
 void gui::destroy_fonts() {
   /// Clean up the font atlas in preparation for exit or context switch
+  for(auto f : fonts) {
+    f->unload();
+  }
   delete font_atlas;
   font_atlas = nullptr;
 }
@@ -192,12 +192,12 @@ void gui::render() {
 
   container::render();
 
-  glBindBuffer(GL_ARRAY_BUFFER,         0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  glUseProgram(0);
   glDisableVertexAttribArray(attrib_coords);
   glDisableVertexAttribArray(attrib_texcoords);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  //glBindBuffer(GL_ARRAY_BUFFER,         0);
+  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  //glUseProgram(0);
+  //glBindTexture(GL_TEXTURE_2D, 0);
   glEnable(GL_DEPTH_TEST);
 
   mouse_released = false;
@@ -223,11 +223,24 @@ void gui::add_font(std::string const &name,
                    std::string const &glyphs_to_load) {
   /// Font factory that sets up font ownership with this GUI
   fonts.emplace_back(new font(this, name, memory_offset, memory_size, font_size, glyphs_to_load));
+  #ifdef DEBUG_GUISTORM
+    std::cout << "GUIStorm: added font " << name << " size " << font_size << ", " << fonts.size() << " total" << std::endl;
+  #endif // DEBUG_GUISTORM
 }
 void gui::add_font(font *thisfont) {
   /// Take ownership of an existing font
   /// NOTE: guistorm will now free this font, do not try to delete it manually
   fonts.emplace_back(thisfont);
+}
+void gui::clear_fonts() {
+  /// Clear the loaded fonts list
+  #ifdef DEBUG_GUISTORM
+    std::cout << "GUIStorm: clearing " << fonts.size() << " fonts" << std::endl;
+  #endif // DEBUG_GUISTORM
+  for(auto &it : fonts) {
+    delete it;
+  }
+  fonts.clear();
 }
 
 void gui::set_windowsize(coordtype const &new_windowsize) {
@@ -252,38 +265,65 @@ void gui::set_windowsize(coordtype const &new_windowsize) {
 
 font *gui::get_font_by_size(float size) {
   /// Attempt to find a font of the specified size, and return nullptr if not found
+  #ifdef DEBUG_GUISTORM
+    std::cout << "GUIStorm: requested font size " << size << std::endl;
+  #endif // DEBUG_GUISTORM
   for(auto const &f : fonts) {
     if(f->font_size == size) {
+      #ifdef DEBUG_GUISTORM
+        std::cout << "GUIStorm: found font size " << size << " (" << f->name << ")" << std::endl;
+      #endif // DEBUG_GUISTORM
       return f;
     }
   }
+  #ifdef DEBUG_GUISTORM
+    std::cout << "GUIStorm: unable to find font size " << size << ", using default" << std::endl;
+  #endif // DEBUG_GUISTORM
   return nullptr;
 }
 font *gui::get_font_by_size_or_nearest(float size) {
   /// Attempt to find a font of the specified size, and return the nearest in size, or nullptr if no others found
+  #ifdef DEBUG_GUISTORM
+    std::cout << "GUIStorm: requested font nearest to size " << size << std::endl;
+  #endif // DEBUG_GUISTORM
   font *f = nullptr;
   for(auto const &thisfont : fonts) {
     if(f) {
       if(std::abs(thisfont->font_size - size) < std::abs(f->font_size - size)) {      // compare to get the smallest difference in font size
         f = thisfont;
+        #ifdef DEBUG_GUISTORM
+          std::cout << "GUIStorm: found new nearest font size " << f->font_size << " (" << f->name << ")" << std::endl;
+        #endif // DEBUG_GUISTORM
       }
     } else {
       f = thisfont;
+      #ifdef DEBUG_GUISTORM
+        std::cout << "GUIStorm: defaulted to font size " << f->font_size << " (" << f->name << ")" << std::endl;
+      #endif // DEBUG_GUISTORM
     }
   }
   return f;
 }
 font *gui::get_font_by_size_or_smaller(float size) {
   /// Attempt to find a font of the specified size, and return the next smallest in size, or nullptr if none smaller found
+  #ifdef DEBUG_GUISTORM
+    std::cout << "GUIStorm: requested font same or smaller than size " << size << std::endl;
+  #endif // DEBUG_GUISTORM
   font *f = nullptr;
   for(auto const &thisfont : fonts) {
     if(thisfont->font_size <= size) {                     // filter for same size or smaller fonts only
       if(f) {
         if(thisfont->font_size > f->font_size) {          // compare to get the biggest font size of the filtered fonts
           f = thisfont;
+          #ifdef DEBUG_GUISTORM
+            std::cout << "GUIStorm: found new nearest font size " << f->font_size << " (" << f->name << ")" << std::endl;
+          #endif // DEBUG_GUISTORM
         }
       } else {
         f = thisfont;
+        #ifdef DEBUG_GUISTORM
+          std::cout << "GUIStorm: defaulted to font size " << f->font_size << " (" << f->name << ")" << std::endl;
+        #endif // DEBUG_GUISTORM
       }
     }
   }
@@ -291,15 +331,24 @@ font *gui::get_font_by_size_or_smaller(float size) {
 }
 font *gui::get_font_by_size_or_bigger(float size) {
   /// Attempt to find a font of the specified size, and return the next biggest in size, or nullptr if none bigger found
+  #ifdef DEBUG_GUISTORM
+    std::cout << "GUIStorm: requested font same or bigger than size " << size << std::endl;
+  #endif // DEBUG_GUISTORM
   font *f = nullptr;
   for(auto const &thisfont : fonts) {
     if(thisfont->font_size >= size) {                     // filter for same size or bigger fonts only
       if(f) {
         if(thisfont->font_size < f->font_size) {          // compare to get the smalleset font size of the filtered fonts
           f = thisfont;
+          #ifdef DEBUG_GUISTORM
+            std::cout << "GUIStorm: found new nearest font size " << f->font_size << " (" << f->name << ")" << std::endl;
+          #endif // DEBUG_GUISTORM
         }
       } else {
         f = thisfont;
+        #ifdef DEBUG_GUISTORM
+          std::cout << "GUIStorm: defaulted to font size " << f->font_size << " (" << f->name << ")" << std::endl;
+        #endif // DEBUG_GUISTORM
       }
     }
   }
