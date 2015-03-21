@@ -9,14 +9,17 @@ namespace guistorm {
 
 GLfloat font::glyph::get_kerning(char charcode_last) const {
   /// Return the kerning for this glyph when preceded by the specified previous glyph
-  GLfloat result = 0.0;
+  if(charcode_last == '\0') {
+    return 0.0f;
+  }
+  GLfloat result = 0.0f;
   try {
     #ifdef DEBUG_GUISTORM
       //std::cout << "GUIStorm: DEBUG: kerning from \"" << charcode_last << "\" (ascii " << static_cast<int>(charcode_last) << ")" << " to \"" << charcode << "\" (ascii " << static_cast<int>(charcode) << ")" << std::endl;
     #endif
     result = kerning.at(charcode_last);
   } catch(std::out_of_range const &e) {
-    result = 0.0;
+    result = 0.0f;
   }
   return result;
 }
