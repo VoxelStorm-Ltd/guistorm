@@ -8,8 +8,8 @@
 namespace guistorm {
 
 // types
-typedef Vector2<GLfloat> coordtype;
-typedef Vector4<GLfloat> colourtype;
+using coordtype  = Vector2<GLfloat>;
+using colourtype = Vector4<GLfloat>;
 
 enum class aligntype : char {                 // the coordinate origin and size are relative to which part of the parent
   CENTRE,

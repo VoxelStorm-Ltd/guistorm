@@ -23,8 +23,8 @@ namespace layout {
   *
   **/
 
-typedef guistorm::base &targettype;
-typedef std::function<void()> rule;
+using targettype = guistorm::base&;
+using rule = std::function<void()>;
 
 void centre_horizontally(targettype target);
 void centre_vertically(targettype target);
