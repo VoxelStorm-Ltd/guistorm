@@ -1,7 +1,7 @@
 #include "font.h"
 #include <iostream>
 #include <ft2build.h>
-#include <freetype/freetype.h>
+#include FT_FREETYPE_H
 #include "gui.h"
 
 namespace guistorm {
