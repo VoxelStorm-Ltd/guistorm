@@ -115,7 +115,7 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
   }
 
   // cache the overall metrics
-  FT_Size_Metrics metrics = face->size->metrics;
+  FT_Size_Metrics const &metrics = face->size->metrics;
   metrics_ascender  = metrics.ascender  >> 6;
   metrics_descender = metrics.descender >> 6;
   metrics_height    = metrics.height    >> 6;
@@ -125,8 +125,8 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
   #endif // DEBUG_GUISTORM
 
   // load each glyph
-  for(size_t i = 0; i != charcodes.size(); ++i) {
-    FT_UInt glyph_index = FT_Get_Char_Index(face, charcodes[i]);
+  for(auto const &thischar : charcodes) {
+    FT_UInt glyph_index = FT_Get_Char_Index(face, thischar);
     FT_Int32 flags = 0;
     //flags |= FT_LOAD_NO_BITMAP;           // freetype-gl default when using outlines
     flags |= FT_LOAD_RENDER;                // freetype-gl default when using normal rendering
@@ -154,7 +154,7 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
     font_atlas->SetRegion(region.x, region.y, bitmap_size.x, bitmap_size.y, ft_bitmap.buffer, ft_bitmap.pitch);
 
     glyph *tempglyph = new glyph;
-    tempglyph->charcode    = charcodes[i];
+    tempglyph->charcode    = thischar;
     tempglyph->offset.x    = face->glyph->bitmap_left;
     tempglyph->offset.y    = static_cast<GLfloat>(face->glyph->bitmap_top) - bitmap_size.y;
     tempglyph->size.x      = bitmap_size.x;
@@ -167,18 +167,18 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
     tempglyph->advance.x   = face->glyph->advance.x / hres;
     tempglyph->advance.y   = face->glyph->advance.y / hres;
 
-    if(charcodes[i] == L' ') {                                    // if we're drawing whitespace, skip adding the quad - every little helps
+    if(thischar == L' ') {                                        // if we're drawing whitespace, skip adding the quad - every little helps
       tempglyph->is_blank = true;
-    } else if(charcodes[i] == L'\t') {                            // tab
+    } else if(thischar == L'\t') {                                // tab
       tempglyph->is_blank = true;
       tempglyph->advance.x = 4.0f * getglyph(' ')->advance.x;     // use four spaces for a tab - yes lame
-    } else if(charcodes[i] == L'\n' || charcodes[i] == L'\r') {   // newline or carriage return
+    } else if(thischar == L'\n' || thischar == L'\r') {           // newline or carriage return
       tempglyph->is_blank = true;
       tempglyph->linebreak = true;
       ///tempglyph->advance.x = 0.0f;                                // newlines do not advance the cursor
     }
 
-    glyphs.emplace(charcodes[i], tempglyph);
+    glyphs.emplace(thischar, tempglyph);
   }
 
   // calculate kerning for each glyph pair
