@@ -1,9 +1,5 @@
 #include "base.h"
-#include <boost/range/iterator_range.hpp>
 #include "gui.h"
-#include "colourgroup.h"
-#include "colourset.h"
-#include "layout_rules.h"
 
 namespace guistorm {
 

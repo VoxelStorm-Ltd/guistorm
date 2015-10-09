@@ -1,5 +1,4 @@
 #include "group.h"
-#include "container.h"
 
 namespace guistorm {
 

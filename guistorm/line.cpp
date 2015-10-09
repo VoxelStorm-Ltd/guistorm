@@ -1,6 +1,5 @@
 #include "line.h"
 #include "gui.h"
-#include "container.h"
 
 namespace guistorm {
 

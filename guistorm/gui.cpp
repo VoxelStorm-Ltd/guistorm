@@ -1,11 +1,8 @@
 #include "gui.h"
-#include <algorithm>
 #include <boost/algorithm/clamp.hpp>
 #include <freetype-gl/texture-atlas.h>
 #include "blob_loader.h"
 #include "shader_load.h"
-#include "base.h"
-#include "font.h"
 #include "lineshape.h"
 
 namespace guistorm {

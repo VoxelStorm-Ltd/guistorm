@@ -1,5 +1,4 @@
 #include "window.h"
-#include <boost/range/iterator_range.hpp>
 #include "gui.h"
 
 namespace guistorm {
