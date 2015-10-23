@@ -2,13 +2,13 @@
 
 namespace guistorm {
 
-label::label(container *parent,
+label::label(container *newparent,
              colourset const &newcolours,
-             std::string const &label,
-             font *label_font,
+             std::string const &newlabel,
+             font *newlabel_font,
              coordtype const &thissize,
              coordtype const &thisposition)
-  : widget(parent, newcolours, label, label_font, thissize, thisposition) {
+  : widget(newparent, newcolours, newlabel, newlabel_font, thissize, thisposition) {
   /// Specific constructor
   focusable = false;
   #ifdef DEBUG_GUISTORM

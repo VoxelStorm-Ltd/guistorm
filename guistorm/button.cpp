@@ -2,14 +2,14 @@
 
 namespace guistorm {
 
-button::button(container *parent,
-               colourset const &colours,
-               std::string const &label,
+button::button(container *newparent,
+               colourset const &newcolours,
+               std::string const &newlabel,
                std::function<void()> callback_function,
-               font *label_font,
+               font *newlabel_font,
                coordtype const &thissize,
                coordtype const &thisposition)
-  : widget(parent, colours, label, label_font, thissize, thisposition),
+  : widget(newparent, newcolours, newlabel, newlabel_font, thissize, thisposition),
     function(callback_function) {
   /// Specific constructor
   focusable = true;

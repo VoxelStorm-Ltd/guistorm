@@ -30,12 +30,12 @@ public:
   void render()         override final;
 
   void set_value(float new_value);
-  float const &get_value() const;
+  float const &get_value() const __attribute__((__const__));
   void set_scale(float new_scale);
-  float const &get_scale() const;
+  float const &get_scale() const __attribute__((__const__));
   void set_value_and_scale(float new_value, float new_scale);
   void set_percentage(float new_percentage);
-  float get_percentage() const;
+  float get_percentage() const __attribute__((__pure__));
 };
 
 }

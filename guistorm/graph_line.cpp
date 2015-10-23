@@ -3,13 +3,13 @@
 
 namespace guistorm {
 
-graph_line::graph_line(container *parent,
-                       colourset const &colours,
+graph_line::graph_line(container *newparent,
+                       colourset const &newcolours,
                        float thismin,
                        float thismax,
                        coordtype const &thissize,
                        coordtype const &thisposition)
-  : base(parent, colours, "", nullptr, thissize, thisposition),
+  : base(newparent, newcolours, "", nullptr, thissize, thisposition),
     min(thismin),
     max(thismax) {
   /// Specific constructor

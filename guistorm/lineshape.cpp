@@ -3,11 +3,11 @@
 
 namespace guistorm {
 
-lineshape::lineshape(container *parent,
-                     colourset const &colours,
+lineshape::lineshape(container *newparent,
+                     colourset const &newcolours,
                      std::vector<std::pair<coordtype, coordtype>> const &lines,
                      coordtype const &thisposition)
-  : base(parent, colours, "", nullptr, coordtype(), thisposition) {
+  : base(newparent, newcolours, "", nullptr, coordtype(), thisposition) {
   /// Specific constructor
   upload_shape(lines);
 }

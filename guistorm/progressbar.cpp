@@ -3,13 +3,13 @@
 
 namespace guistorm {
 
-progressbar::progressbar(container *parent,
-                         colourset const &colours,
+progressbar::progressbar(container *newparent,
+                         colourset const &newcolours,
                          float thisvalue,
                          float thisscale,
                          coordtype const &thissize,
                          coordtype const &thisposition)
-  : base(parent, colours, "", nullptr, thissize, thisposition),
+  : base(newparent, newcolours, "", nullptr, thissize, thisposition),
     value(thisvalue),
     scale(thisscale) {
   /// Specific constructor

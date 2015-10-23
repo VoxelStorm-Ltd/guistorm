@@ -3,16 +3,16 @@
 
 namespace guistorm {
 
-base::base(container *parent,
-           colourset const &colours,
+base::base(container *newparent,
+           colourset const &newcolours,
            std::string const &thislabel,
            font *label_font,
            coordtype const &thissize,
            coordtype const &thisposition)
-  : parent(parent),
+  : parent(newparent),
     position(thisposition),
     size(thissize),
-    colours(colours),
+    colours(newcolours),
     label_text(thislabel),
     label_font(label_font) {
   /// Specific constructor

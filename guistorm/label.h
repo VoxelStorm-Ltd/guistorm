@@ -19,7 +19,7 @@ protected:
   virtual ~label() override;
 
 public:
-  base *get_picked(coordtype const &cursor_position) override final;
+  base *get_picked(coordtype const &cursor_position) override final __attribute__((__const__));
 
   #ifndef DEBUG_GUISTORM
     void init_buffer() override final;

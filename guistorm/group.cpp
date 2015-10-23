@@ -2,10 +2,10 @@
 
 namespace guistorm {
 
-group::group(container *parent,
+group::group(container *newparent,
              coordtype const &thissize,
              coordtype const &thisposition)
-  : window(parent, colourset(), "", nullptr, thissize, thisposition) {
+  : window(newparent, colourset(), "", nullptr, thissize, thisposition) {
   /// Specific constructor
   focusable = false;
   #ifdef DEBUG_GUISTORM

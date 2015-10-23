@@ -3,11 +3,11 @@
 
 namespace guistorm {
 
-line::line(container *parent,
-           colourset const &colours,
+line::line(container *newparent,
+           colourset const &newcolours,
            coordtype const &thissize,
            coordtype const &thisposition)
-  : base(parent, colours, "", nullptr, thissize, thisposition) {
+  : base(newparent, newcolours, "", nullptr, thissize, thisposition) {
   /// Specific constructor
   focusable = false;
 }

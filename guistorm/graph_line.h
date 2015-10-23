@@ -36,9 +36,9 @@ public:
   void render()         override final;
 
   void set_min(float new_min);
-  float const &get_min() const;
+  float const &get_min() const __attribute__((__const__));
   void set_max(float new_max);
-  float const &get_max() const;
+  float const &get_max() const __attribute__((__const__));
   void set_min_and_max(float new_min, float new_max);
   void set_min_auto();
   void set_max_auto();

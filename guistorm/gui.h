@@ -87,8 +87,8 @@ public:
 
   // environment and input control
   void set_windowsize(coordtype const &new_windowsize);
-  GLfloat get_dpi() const;
-  GLfloat get_dpi_scale() const;
+  GLfloat get_dpi() const __attribute__((__pure__));
+  GLfloat get_dpi_scale() const __attribute__((__pure__));
   void set_dpi(GLfloat newdpi);
   void set_dpi_scale(GLfloat newscale);
   void set_cursor_position(coordtype const &new_cursor_position);

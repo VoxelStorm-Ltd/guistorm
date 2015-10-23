@@ -2,13 +2,13 @@
 
 namespace guistorm {
 
-widget::widget(container *parent,
-               colourset const &colours,
-               std::string const &label,
-               font *label_font,
+widget::widget(container *newparent,
+               colourset const &newcolours,
+               std::string const &newlabel,
+               font *newlabel_font,
                coordtype const &thissize,
                coordtype const &thisposition)
-  : base(parent, colours, label, label_font, thissize, thisposition) {
+  : base(newparent, newcolours, newlabel, newlabel_font, thissize, thisposition) {
   /// Specific constructor
 }
 
