@@ -44,20 +44,20 @@ GLfloat font::line::length() const {
   return length;
 }
 
-font::font(gui *parent_gui,
-           std::string const &name,
-           const unsigned char* memory_offset,
-           size_t memory_size,
-           float font_size,
+font::font(gui *new_parent_gui,
+           std::string const &new_name,
+           const unsigned char* new_memory_offset,
+           size_t new_memory_size,
+           float new_font_size,
            std::string const &charcodes_to_load,
-           bool suppress_horizontal_hint)
-  : parent_gui(parent_gui),
-    name(name),
-    memory_offset(memory_offset),
-    memory_size(memory_size),
-    font_size(font_size),
+           bool new_suppress_horizontal_hint)
+  : parent_gui(new_parent_gui),
+    name(new_name),
+    memory_offset(new_memory_offset),
+    memory_size(new_memory_size),
+    font_size(new_font_size),
     charcodes(charcodes_to_load),
-    suppress_horizontal_hint(suppress_horizontal_hint) {
+    suppress_horizontal_hint(new_suppress_horizontal_hint) {
   /// Default specific constructor
   #ifndef NDEBUG
     if(!parent_gui) {
@@ -159,10 +159,10 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
     tempglyph->offset.y    = static_cast<GLfloat>(face->glyph->bitmap_top) - bitmap_size.y;
     tempglyph->size.x      = bitmap_size.x;
     tempglyph->size.y      = bitmap_size.y;
-    tempglyph->texcoord0.x =  region.x                  / static_cast<GLfloat>(font_atlas->width());
-    tempglyph->texcoord0.y = (region.y + bitmap_size.y) / static_cast<GLfloat>(font_atlas->height()); // y is flipped for texture coords
-    tempglyph->texcoord1.x = (region.x + bitmap_size.x) / static_cast<GLfloat>(font_atlas->width());
-    tempglyph->texcoord1.y =  region.y                  / static_cast<GLfloat>(font_atlas->height()); // y is flipped for texture coords
+    tempglyph->texcoord0.x = static_cast<GLfloat>( region.x                 ) / static_cast<GLfloat>(font_atlas->width());
+    tempglyph->texcoord0.y = static_cast<GLfloat>((region.y + bitmap_size.y)) / static_cast<GLfloat>(font_atlas->height()); // y is flipped for texture coords
+    tempglyph->texcoord1.x = static_cast<GLfloat>((region.x + bitmap_size.x)) / static_cast<GLfloat>(font_atlas->width());
+    tempglyph->texcoord1.y = static_cast<GLfloat>( region.y                 ) / static_cast<GLfloat>(font_atlas->height()); // y is flipped for texture coords
     FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);                          // discard hinting to get advance
     tempglyph->advance.x   = face->glyph->advance.x / hres;
     tempglyph->advance.y   = face->glyph->advance.y / hres;

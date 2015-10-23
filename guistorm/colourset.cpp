@@ -6,16 +6,16 @@ colourset::colourset() {
   /// Default constructor
 }
 
-colourset::colourset(colourgroup const &current,
-                     colourgroup const &idle,
-                     colourgroup const &hover,
-                     colourgroup const &focus,
-                     colourgroup const &active)
-  : current(current),
-    idle(idle),
-    hover(hover),
-    focus(focus),
-    active(active) {
+colourset::colourset(colourgroup const &colour_current,
+                     colourgroup const &colour_idle,
+                     colourgroup const &colour_hover,
+                     colourgroup const &colour_focus,
+                     colourgroup const &colour_active)
+  : current(colour_current),
+    idle(colour_idle),
+    hover(colour_hover),
+    focus(colour_focus),
+    active(colour_active) {
   /// Specific constructor
 }
 

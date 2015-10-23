@@ -62,7 +62,7 @@ public:
   void init();
   void destroy();
   void init_buffer();
-  void destroy_buffer();
+  virtual void destroy_buffer() override final;
   void load_shader();
   void destroy_shader();
   void load_fonts();

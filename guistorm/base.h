@@ -19,10 +19,10 @@ protected:
   struct vertex {
     coordtype coords;
     coordtype texcoords;
-    vertex(coordtype const &coords,
-           coordtype const &texcoords = coordtype(1.0, 1.0))
-    : coords(coords),
-      texcoords(texcoords) {
+    vertex(coordtype const &new_coords,
+           coordtype const &new_texcoords = coordtype(1.0, 1.0))
+    : coords(new_coords),
+      texcoords(new_texcoords) {
       /// Specific constructor
     }
   };

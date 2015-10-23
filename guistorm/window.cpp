@@ -113,7 +113,7 @@ void window::layout_vertical(std::vector<base*>::const_iterator first,
     totalheight += it->get_size().y;
   }
   GLfloat const range = topright.y - bottomleft.y;
-  GLfloat const margin = (range - totalheight) / (std::distance(first, last) - 1);            // take 1 to allow marginless fitting
+  GLfloat const margin = (range - totalheight) / static_cast<GLfloat>(std::distance(first, last) - 1);  // take 1 to allow marginless fitting
   GLfloat pen = topright.y;
   for(auto const &it : boost::make_iterator_range(first, last)) {                             // distribute evenly within the space
     pen -= it->get_size().y;
