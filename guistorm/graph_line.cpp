@@ -1,4 +1,5 @@
 #include "graph_line.h"
+#include "cast_if_required.h"
 #include "gui.h"
 
 namespace guistorm {
@@ -65,7 +66,7 @@ void graph_line::setup_buffer() {
     x += xstep;
     // TODO: populate the fill buffer
   }
-  numverts = ibodata.size();
+  numverts = cast_if_required<GLuint>(ibodata.size());
 
   glBindBuffer(GL_ARRAY_BUFFER,         vbo);
   glBufferData(GL_ARRAY_BUFFER,         vbodata.size() * sizeof(vertex), &vbodata[0], GL_STATIC_DRAW);

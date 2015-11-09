@@ -1,4 +1,5 @@
 #include "base.h"
+#include "cast_if_required.h"
 #include "gui.h"
 
 namespace guistorm {
@@ -552,7 +553,7 @@ void base::setup_label() {
         if(!thisglyph->is_blank) {                      // whitespace glyphs don't get added but still take up horizontal space
           coordtype const corner0(pen + thisglyph->offset);
           coordtype const corner1(corner0 + thisglyph->size);
-          unsigned int ibo_offset = vbodata.size();
+          unsigned int ibo_offset = cast_if_required<GLuint>(vbodata.size());
           vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner0.x, corner0.y)), coordtype(thisglyph->texcoord0.x, thisglyph->texcoord0.y));
           vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner1.x, corner0.y)), coordtype(thisglyph->texcoord1.x, thisglyph->texcoord0.y));
           vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner1.x, corner1.y)), coordtype(thisglyph->texcoord1.x, thisglyph->texcoord1.y));
@@ -573,7 +574,7 @@ void base::setup_label() {
     pen.x = label_origin.x;                             // carriage return
     pen.y -= label_line_spacing;                        // line feed
   }
-  numverts_label = ibodata.size();
+  numverts_label = cast_if_required<GLuint>(ibodata.size());
 
   #ifdef DEBUG_GUISTORM
     /*

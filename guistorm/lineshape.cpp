@@ -1,4 +1,5 @@
 #include "lineshape.h"
+#include "cast_if_required.h"
 #include "gui.h"
 
 namespace guistorm {
@@ -37,13 +38,13 @@ void lineshape::upload_shape(std::vector<std::pair<coordtype, coordtype>> const 
         ++thisindex;
       }
       // if we didn't find an index for this vertex then thisindex == vbodata.size() already which means we need to add a new entry
-      if(thisindex == vbodata.size()) {
+      if(thisindex == cast_if_required<GLuint>(vbodata.size())) {
         vbodata.emplace_back(*coord);
       }
       ibodata.emplace_back(thisindex);
     }
   }
-  numverts = ibodata.size();
+  numverts = cast_if_required<GLuint>(ibodata.size());
 
   vbodata.shrink_to_fit();
 
@@ -90,7 +91,7 @@ void lineshape::setup_buffer() {
   for(vertex &v : vbodata_shifted) {
     v.coords += position_transformed;
   }
-  numverts = ibodata.size();
+  numverts = cast_if_required<GLuint>(ibodata.size());
 
   #ifdef DEBUG_GUISTORM
     std::cout << "GUIStorm: Lineshape: Uploading " << vbodata.size() << " " << sizeof(vertex) << "B verts, " << numverts << " indices to vbo ("
