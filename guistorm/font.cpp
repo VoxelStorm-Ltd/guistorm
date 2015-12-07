@@ -46,7 +46,7 @@ GLfloat font::line::length() const {
 
 font::font(gui *new_parent_gui,
            std::string const &new_name,
-           const unsigned char* new_memory_offset,
+           unsigned char const *new_memory_offset,
            size_t new_memory_size,
            float new_font_size,
            std::string const &charcodes_to_load,
@@ -99,26 +99,34 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
     }
   #endif
   unload();
-  GLfloat constexpr hres = 64;                                                            // from #define HRES 64 - Freetype uses 1/64th of a point scale
+  GLfloat constexpr hres = 64;                                                  // from #define HRES 64 - Freetype uses 1/64th of a point scale
   FT_Library library;
-  FT_Init_FreeType(&library);                                                             // initialise library
+  FT_Init_FreeType(&library);                                                   // initialise library
   FT_Face face;
-  FT_New_Memory_Face(library, memory_offset, memory_size, 0, &face);                      // load face
-  FT_Select_Charmap(face, FT_ENCODING_UNICODE);                                           // select charmap
-  if(suppress_horizontal_hint) {                                                          // http://www.antigrain.com/research/font_rasterization/ http://jcgt.org/published/0002/01/04/
-    FT_Set_Char_Size(face, 0, font_size * hres, parent_gui->get_dpi() * horizontal_hint_suppression, parent_gui->get_dpi());    // stretched for hint suppression
-    FT_Matrix matrix = {static_cast<int>((1.0f / horizontal_hint_suppression) * 0x10000l), 0, 0, 0x10000l};                     // magic number for 16:16 fixed point
-    FT_Set_Transform(face, &matrix, nullptr);                                             // set transform matrix
+  FT_New_Memory_Face(library, memory_offset, memory_size, 0, &face);            // load face
+  FT_Select_Charmap(face, FT_ENCODING_UNICODE);                                 // select charmap
+  if(suppress_horizontal_hint) {                                                // http://www.antigrain.com/research/font_rasterization/ http://jcgt.org/published/0002/01/04/
+    FT_Set_Char_Size(face,
+                     0,
+                     static_cast<FT_F26Dot6>(font_size * hres),
+                     static_cast<FT_UInt>(parent_gui->get_dpi() * horizontal_hint_suppression),
+                     static_cast<FT_UInt>(parent_gui->get_dpi()));              // stretched for hint suppression
+    FT_Matrix matrix = {static_cast<int>((1.0f / horizontal_hint_suppression) * 0x10000l), 0, 0, 0x10000l}; // magic number for 16:16 fixed point
+    FT_Set_Transform(face, &matrix, nullptr);                                   // set transform matrix
   } else {
-    FT_Set_Char_Size(face, 0, font_size * hres, parent_gui->get_dpi(), parent_gui->get_dpi());                                  // set char size
-    FT_Set_Transform(face, nullptr, nullptr);                                             // set transform matrix - identity
+    FT_Set_Char_Size(face,
+                     0,
+                     static_cast<FT_F26Dot6>(font_size * hres),
+                     static_cast<FT_UInt>(parent_gui->get_dpi()),
+                     static_cast<FT_UInt>(parent_gui->get_dpi()));              // set char size
+    FT_Set_Transform(face, nullptr, nullptr);                                   // set transform matrix - identity
   }
 
   // cache the overall metrics
   FT_Size_Metrics const &metrics = face->size->metrics;
-  metrics_ascender  = metrics.ascender  >> 6;
-  metrics_descender = metrics.descender >> 6;
-  metrics_height    = metrics.height    >> 6;
+  metrics_ascender  = static_cast<GLfloat>(metrics.ascender  >> 6);
+  metrics_descender = static_cast<GLfloat>(metrics.descender >> 6);
+  metrics_height    = static_cast<GLfloat>(metrics.height    >> 6);
   metrics_linegap   = metrics_height - metrics_ascender + metrics_descender;
   #ifdef DEBUG_GUISTORM
     std::cout << "GUIStorm: Loading font " << name << " (" << memory_size / 1024 << "KB) size " << font_size << " (height " << metrics_height << ", " << glyphs.size() << " glyphs)" << std::endl;
@@ -155,17 +163,17 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
 
     glyph *tempglyph = new glyph;
     tempglyph->charcode    = thischar;
-    tempglyph->offset.x    = face->glyph->bitmap_left;
-    tempglyph->offset.y    = static_cast<GLfloat>(face->glyph->bitmap_top) - bitmap_size.y;
-    tempglyph->size.x      = bitmap_size.x;
-    tempglyph->size.y      = bitmap_size.y;
+    tempglyph->offset.x    = static_cast<GLfloat>(face->glyph->bitmap_left);
+    tempglyph->offset.y    = static_cast<GLfloat>(face->glyph->bitmap_top) - static_cast<GLfloat>(bitmap_size.y);
+    tempglyph->size.x      = static_cast<GLfloat>(bitmap_size.x);
+    tempglyph->size.y      = static_cast<GLfloat>(bitmap_size.y);
     tempglyph->texcoord0.x = static_cast<GLfloat>( region.x                 ) / static_cast<GLfloat>(font_atlas->width());
     tempglyph->texcoord0.y = static_cast<GLfloat>((region.y + bitmap_size.y)) / static_cast<GLfloat>(font_atlas->height()); // y is flipped for texture coords
     tempglyph->texcoord1.x = static_cast<GLfloat>((region.x + bitmap_size.x)) / static_cast<GLfloat>(font_atlas->width());
     tempglyph->texcoord1.y = static_cast<GLfloat>( region.y                 ) / static_cast<GLfloat>(font_atlas->height()); // y is flipped for texture coords
     FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);                          // discard hinting to get advance
-    tempglyph->advance.x   = face->glyph->advance.x / hres;
-    tempglyph->advance.y   = face->glyph->advance.y / hres;
+    tempglyph->advance.x   = static_cast<GLfloat>(face->glyph->advance.x) / hres;
+    tempglyph->advance.y   = static_cast<GLfloat>(face->glyph->advance.y) / hres;
 
     if(thischar == L' ') {                                        // if we're drawing whitespace, skip adding the quad - every little helps
       tempglyph->is_blank = true;
@@ -189,7 +197,7 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
       FT_UInt prev_index = FT_Get_Char_Index(face, lastglyph.second->charcode);
       FT_Vector kerning;
       FT_Get_Kerning(face, prev_index, glyph_index, FT_KERNING_UNFITTED, &kerning);
-      thisglyph.second->kerning.emplace(lastglyph.second->charcode, kerning.x / (hres * hres));
+      thisglyph.second->kerning.emplace(lastglyph.second->charcode, static_cast<GLfloat>(kerning.x) / (hres * hres));
     }
   }
 

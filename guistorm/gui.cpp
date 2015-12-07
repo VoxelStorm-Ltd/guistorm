@@ -148,11 +148,11 @@ void gui::upload_fonts() {
   glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, font_atlas->width(), font_atlas->height(), 0, GL_ALPHA, GL_UNSIGNED_BYTE, atlas_self->data);
 
   // set the 1,0 to 1,1 texels of the font atlas texture to a 0.0-1.0 alpha gradient to use the shader for solid objects without texture switching
-  unsigned int const strip_height = 2;
+  unsigned int constexpr const strip_height = 2;
   GLfloat data[strip_height][font_atlas->width()];
   for(unsigned int y = 0; y != strip_height; ++y) {
     for(unsigned int x = 0; x != font_atlas->width(); ++x) {
-      data[y][x] = static_cast<GLfloat>(x) / (font_atlas->width() - 1);   // produce a gradient from 0 to 1 in unsigned byte form
+      data[y][x] = static_cast<GLfloat>(x) / static_cast<GLfloat>(font_atlas->width() - 1); // produce a gradient from 0 to 1 in unsigned byte form
     }
   }
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, font_atlas->height() - strip_height, font_atlas->width(), strip_height, GL_ALPHA, GL_FLOAT, data);
@@ -216,7 +216,7 @@ void gui::add_to_gui(base *element) {
 void gui::add_font(std::string const &name,
                    const unsigned char* memory_offset,
                    size_t memory_size,
-                   unsigned int font_size,
+                   float font_size,
                    std::string const &glyphs_to_load) {
   /// Font factory that sets up font ownership with this GUI
   fonts.emplace_back(new font(this, name, memory_offset, memory_size, font_size, glyphs_to_load));

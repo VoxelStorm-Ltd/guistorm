@@ -131,16 +131,16 @@ public:
   coordtype get_position_nodpiscale() const;
   coordtype get_size() const;
   coordtype get_size_nodpiscale() const;
-  bool const &is_visible() const;
-  bool const &is_active() const;
+  bool const &is_visible() const __attribute__((__const__));
+  bool const &is_active() const __attribute__((__const__));
   virtual base *get_picked(coordtype const &cursor_position);
-  std::string const &get_label();
+  std::string const &get_label() __attribute__((__const__));
   template<class T, class ...Args> void add_layout_rule(T thisrule, Args &&...args);
 
   // updating
   virtual void update();
-  virtual void on_press();
-  virtual void on_release();
+  virtual void on_press() __attribute__((__const__));
+  virtual void on_release() __attribute__((__const__));
   void centre_to_gui();
 
   // rendering

@@ -76,14 +76,30 @@ public:
   void add_font(std::string const &name,
                 const unsigned char* memory_offset,
                 size_t memory_size,
-                unsigned int font_size,
+                float font_size,
                 std::string const &glyphs_to_load = "");
   void add_font(font *thisfont);
   void clear_fonts();
-  font *get_font_by_size(           float size);
-  font *get_font_by_size_or_nearest(float size);
-  font *get_font_by_size_or_smaller(float size);
-  font *get_font_by_size_or_bigger( float size);
+  font *get_font_by_size(           float size)
+  #ifndef DEBUG_GUISTORM
+    __attribute__((__pure__))
+  #endif // DEBUG_GUISTORM
+  ;
+  font *get_font_by_size_or_nearest(float size)
+  #ifndef DEBUG_GUISTORM
+    __attribute__((__pure__))
+  #endif // DEBUG_GUISTORM
+  ;
+  font *get_font_by_size_or_smaller(float size)
+  #ifndef DEBUG_GUISTORM
+    __attribute__((__pure__))
+  #endif // DEBUG_GUISTORM
+  ;
+  font *get_font_by_size_or_bigger( float size)
+  #ifndef DEBUG_GUISTORM
+    __attribute__((__pure__))
+  #endif // DEBUG_GUISTORM
+  ;
 
   // environment and input control
   void set_windowsize(coordtype const &new_windowsize);

@@ -7,7 +7,7 @@ namespace guistorm {
 base::base(container *newparent,
            colourset const &newcolours,
            std::string const &thislabel,
-           font *label_font,
+           font *this_font,
            coordtype const &thissize,
            coordtype const &thisposition)
   : parent(newparent),
@@ -15,7 +15,7 @@ base::base(container *newparent,
     size(thissize),
     colours(newcolours),
     label_text(thislabel),
-    label_font(label_font) {
+    label_font(this_font) {
   /// Specific constructor
   #ifndef NDEBUG
     if(!parent) {
@@ -292,22 +292,22 @@ void base::update() {
       if(parent_gui->mouse_pressed) {
         active = true;
         on_press();
-        colours.blend_to_active(0.5);
+        colours.blend_to_active(0.5f);
       } else {
         if(parent_gui->mouse_released) {
           on_release();
         }
-        colours.blend_to_hover(0.5);
+        colours.blend_to_hover(0.5f);
       }
     } else {
       if(focused) {
-        colours.blend_to_focus(0.1);
+        colours.blend_to_focus(0.1f);
       } else {
-        colours.blend_to_idle(0.05);
+        colours.blend_to_idle(0.05f);
       }
     }
   } else {
-    colours.blend_to_idle(0.05);
+    colours.blend_to_idle(0.05f);
   }
 }
 

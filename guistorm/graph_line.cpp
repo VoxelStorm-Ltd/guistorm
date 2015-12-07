@@ -53,7 +53,7 @@ void graph_line::setup_buffer() {
   vbodata.reserve(data.size());
   ibodata.reserve(data.size());
 
-  float const xstep = size.x / data.size();
+  float const xstep = size.x / static_cast<float>(data.size());
   float vertical_scale = size.y / (max - min);
   if(std::isnan(vertical_scale)) {      // in case max and min are both zero
     vertical_scale = 0.0;

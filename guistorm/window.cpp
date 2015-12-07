@@ -3,13 +3,13 @@
 
 namespace guistorm {
 
-window::window(container *parent,
-               colourset const &colours,
-               std::string const &label,
-               font *label_font,
+window::window(container *this_parent,
+               colourset const &this_colours,
+               std::string const &this_label,
+               font *this_font,
                coordtype const &thissize,
                coordtype const &thisposition)
-  : base(parent, colours, label, label_font, thissize, thisposition) {
+  : base(this_parent, this_colours, this_label, this_font, thissize, thisposition) {
   /// Specific constructor
 }
 
@@ -27,15 +27,15 @@ void window::add_to_gui(base *element) {
 base *window::get_picked(coordtype const &cursor_position) {
   /// Return true if the mouse is over this element
   if(!base::get_picked(cursor_position)) {
-    return nullptr;                   // we're picking outside this window
+    return nullptr;                                                             // we're picking outside this window
   }
   // also run the check recursively on each child object
   base *picked_element(container::get_picked(cursor_position));
   if(picked_element) {
-    return picked_element;            // we're picking a child element in this window
+    return picked_element;                                                      // we're picking a child element in this window
   } else {
     if(capture_click) {
-      return this;                    // we're picking the window itself, but only react if it's focusable
+      return this;                                                              // we're picking the window itself, but only react if it's focusable
     } else {
       return nullptr;
     }
@@ -49,7 +49,7 @@ coordtype const window::get_absolute_position() const {
 
 void window::stretch_vertical(GLfloat margin) {
   /// Expand or shrink this window to include all its elements if fitted in layout_vertical()
-  stretch_vertical(elements.begin(), elements.end(), margin);                       // wrapper: adding element range
+  stretch_vertical(elements.begin(), elements.end(), margin);                   // wrapper: adding element range
 }
 void window::stretch_vertical(std::vector<base*>::const_iterator first,
                               std::vector<base*>::const_iterator last,
@@ -57,15 +57,15 @@ void window::stretch_vertical(std::vector<base*>::const_iterator first,
   /// Expand or shrink this window to include the selected elements if fitted in layout_vertical()
   coordtype newsize(0.0f, margin);
   for(auto const &it : boost::make_iterator_range(first, last)) {
-    newsize.y += it->get_size().y + margin;                                         // stack the verticals
-    newsize.x = std::max(newsize.x, it->get_size().x);                              // rubber-band to widest horizontal
+    newsize.y += it->get_size().y + margin;                                     // stack the verticals
+    newsize.x = std::max(newsize.x, it->get_size().x);                          // rubber-band to widest horizontal
   }
   newsize.x += margin * 2.0f;
   set_size(newsize);
 }
 void window::stretch_horizontal(GLfloat margin) {
   /// Expand or shrink this window to include all its elements if fitted in layout_horizontal()
-  stretch_horizontal(elements.begin(), elements.end(), margin);                     // wrapper: adding element range
+  stretch_horizontal(elements.begin(), elements.end(), margin);                 // wrapper: adding element range
 }
 void window::stretch_horizontal(std::vector<base*>::const_iterator first,
                                 std::vector<base*>::const_iterator last,
@@ -73,8 +73,8 @@ void window::stretch_horizontal(std::vector<base*>::const_iterator first,
   /// Expand or shrink this window to include the selected elements if fitted in layout_horizontal()
   coordtype newsize(margin, 0.0f);
   for(auto const &it : boost::make_iterator_range(first, last)) {
-    newsize.x += it->get_size().x + margin;                                         // stack the horizontals
-    newsize.y = std::max(newsize.y, it->get_size().y);                              // rubber-band to tallest vertical
+    newsize.x += it->get_size().x + margin;                                     // stack the horizontals
+    newsize.y = std::max(newsize.y, it->get_size().y);                          // rubber-band to tallest vertical
   }
   newsize.y += margin * 2.0f;
   set_size(newsize);
@@ -83,16 +83,16 @@ void window::stretch_horizontal(std::vector<base*>::const_iterator first,
 void window::layout_vertical(GLfloat margin,
                              aligntype alignment) {
   /// Distribute all contained elements to fill the whole available space vertically with a set margin
-  layout_vertical(elements.begin(), elements.end(), margin, alignment);                     // wrapper: adding element range
+  layout_vertical(elements.begin(), elements.end(), margin, alignment);         // wrapper: adding element range
 }
 void window::layout_vertical(coordtype const &bottomleft,
                              coordtype const &topright,
                              aligntype alignment) {
   /// Distribute all contained elements to fill the selected space vetically
   if(topright.x == 0.0f && topright.y == 0.0f) {
-    layout_vertical(elements.begin(), elements.end(), bottomleft, get_size(), alignment);   // wrapper: adding element range, default size
+    layout_vertical(elements.begin(), elements.end(), bottomleft, get_size(), alignment); // wrapper: adding element range, default size
   } else {
-    layout_vertical(elements.begin(), elements.end(), bottomleft, topright, alignment);     // wrapper: adding element range
+    layout_vertical(elements.begin(), elements.end(), bottomleft, topright, alignment); // wrapper: adding element range
   }
 }
 void window::layout_vertical(std::vector<base*>::const_iterator first,
@@ -100,7 +100,7 @@ void window::layout_vertical(std::vector<base*>::const_iterator first,
                              GLfloat margin,
                              aligntype alignment) {
   /// Distribute the selected contained elements to fill the whole available space vertically with a set margin
-  layout_vertical(first, last, coordtype(margin, margin), get_size() - margin, alignment);    // wrapper: convert margin to coords
+  layout_vertical(first, last, coordtype(margin, margin), get_size() - margin, alignment);  // wrapper: convert margin to coords
 }
 void window::layout_vertical(std::vector<base*>::const_iterator first,
                              std::vector<base*>::const_iterator last,
@@ -108,16 +108,16 @@ void window::layout_vertical(std::vector<base*>::const_iterator first,
                              coordtype const &topright,
                              aligntype alignment) {
   /// Distribute the selected contained elements to fill the selected space vertically
-  GLfloat totalheight = 0.0f;                                                                  // calculate total heights
+  GLfloat totalheight = 0.0f;                                                   // calculate total heights
   for(auto const &it : boost::make_iterator_range(first, last)) {
     totalheight += it->get_size().y;
   }
   GLfloat const range = topright.y - bottomleft.y;
   GLfloat const margin = (range - totalheight) / static_cast<GLfloat>(std::distance(first, last) - 1);  // take 1 to allow marginless fitting
   GLfloat pen = topright.y;
-  for(auto const &it : boost::make_iterator_range(first, last)) {                             // distribute evenly within the space
+  for(auto const &it : boost::make_iterator_range(first, last)) {               // distribute evenly within the space
     pen -= it->get_size().y;
-    switch(alignment) {                                                                       // horizontal alignment only
+    switch(alignment) {                                                         // horizontal alignment only
     case aligntype::CENTRE:
     case aligntype::TOP:
     case aligntype::BOTTOM:
@@ -126,12 +126,12 @@ void window::layout_vertical(std::vector<base*>::const_iterator first,
     case aligntype::LEFT:
     case aligntype::TOP_LEFT:
     case aligntype::BOTTOM_LEFT:
-      it->set_position(bottomleft.x, pen);                                                    // align to left
+      it->set_position(bottomleft.x, pen);                                      // align to left
       break;
     case aligntype::RIGHT:
     case aligntype::TOP_RIGHT:
     case aligntype::BOTTOM_RIGHT:
-      it->set_position(topright.x - it->get_size().x, pen);                                   // align to right
+      it->set_position(topright.x - it->get_size().x, pen);                     // align to right
       break;
     }
     pen -= margin;
@@ -141,16 +141,16 @@ void window::layout_vertical(std::vector<base*>::const_iterator first,
 void window::layout_horizontal(GLfloat margin,
                                aligntype alignment) {
   /// Distribute all contained elements to fill the whole available space horizontally with a set margin
-  layout_horizontal(elements.begin(), elements.end(), margin, alignment);                     // wrapper: adding element range
+  layout_horizontal(elements.begin(), elements.end(), margin, alignment);       // wrapper: adding element range
 }
 void window::layout_horizontal(coordtype const &bottomleft,
                                coordtype const &topright,
                                aligntype alignment) {
   /// Distribute all contained elements to fill the selected space horizontally
   if(topright.x == 0.0f && topright.y == 0.0f) {
-    layout_horizontal(elements.begin(), elements.end(), bottomleft, get_size(), alignment);   // wrapper: adding element range, default size
+    layout_horizontal(elements.begin(), elements.end(), bottomleft, get_size(), alignment); // wrapper: adding element range, default size
   } else {
-    layout_horizontal(elements.begin(), elements.end(), bottomleft, topright, alignment);     // wrapper: adding element range
+    layout_horizontal(elements.begin(), elements.end(), bottomleft, topright, alignment); // wrapper: adding element range
   }
 }
 void window::layout_horizontal(std::vector<base*>::const_iterator first,
@@ -166,33 +166,40 @@ void window::layout_horizontal(std::vector<base*>::const_iterator first,
                                coordtype const &topright,
                                aligntype alignment) {
   /// Distribute the selected contained elements to fill the selected space horizontally
-  GLfloat totalwidth = 0.0f;                                                        // calculate total heights
+  GLfloat totalwidth = 0.0f;                                                    // calculate total heights
   for(auto const &it : boost::make_iterator_range(first, last)) {
     totalwidth += it->get_size().x;
   }
   GLfloat const range = topright.x - bottomleft.x;
-  GLfloat const margin = (range - totalwidth) / (std::distance(first, last) - 1);   // take 1 to allow marginless fitting
+  GLfloat const margin = (range - totalwidth) / static_cast<GLfloat>(std::distance(first, last) - 1); // take 1 to allow marginless fitting
   GLfloat pen = bottomleft.x;
-  for(auto const &it : boost::make_iterator_range(first, last)) {                   // distribute evenly within the space
-    switch(alignment) {                                                             // vertical alignment only
-    case aligntype::CENTRE:
-    case aligntype::LEFT:
-    case aligntype::RIGHT:
+  // distribute evenly within the space
+  switch(alignment) {                                                           // vertical alignment only
+  case aligntype::CENTRE:
+  case aligntype::LEFT:
+  case aligntype::RIGHT:
+    for(auto const &it : boost::make_iterator_range(first, last)) {
       it->set_position(pen, (((topright.y - bottomleft.y) - it->get_size().y) / 2.0f) + bottomleft.y);  // centre each element
-      break;
-    case aligntype::TOP:
-    case aligntype::TOP_LEFT:
-    case aligntype::TOP_RIGHT:
-      it->set_position(pen, topright.y - it->get_size().y);                         // align to top
-      break;
-    case aligntype::BOTTOM:
-    case aligntype::BOTTOM_LEFT:
-    case aligntype::BOTTOM_RIGHT:
-      it->set_position(pen, bottomleft.y);                                          // align to bottom
-      break;
+      pen += it->get_size().x + margin;
     }
-    pen += it->get_size().x + margin;
-  }     // note: this is not optimal (the loop should be inside the switch) but -funswitch-loops should hoist this for us, so save duplicate copy-pasting
+    break;
+  case aligntype::TOP:
+  case aligntype::TOP_LEFT:
+  case aligntype::TOP_RIGHT:
+    for(auto const &it : boost::make_iterator_range(first, last)) {             // distribute evenly within the space
+      it->set_position(pen, topright.y - it->get_size().y);                     // align to top
+      pen += it->get_size().x + margin;
+    }
+    break;
+  case aligntype::BOTTOM:
+  case aligntype::BOTTOM_LEFT:
+  case aligntype::BOTTOM_RIGHT:
+    for(auto const &it : boost::make_iterator_range(first, last)) {             // distribute evenly within the space
+      it->set_position(pen, bottomleft.y);                                      // align to bottom
+      pen += it->get_size().x + margin;
+    }
+    break;
+  }
 }
 
 void window::destroy_buffer() {

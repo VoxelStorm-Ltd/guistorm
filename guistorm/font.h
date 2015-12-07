@@ -69,7 +69,7 @@ private:
 public:
   font(gui *parent_gui,
        std::string const &name,
-       const unsigned char* memory_offset,
+       unsigned char const *memory_offset,
        size_t memory_size,
        float font_size,
        std::string const &charcodes_to_load = "",
