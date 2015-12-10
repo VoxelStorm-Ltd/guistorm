@@ -1,5 +1,5 @@
-#ifndef GUISTORM_H_INCLUDED
-#define GUISTORM_H_INCLUDED
+#ifndef GUISTORM_GUI_H_INCLUDED
+#define GUISTORM_GUI_H_INCLUDED
 
 /// Extensible, fast, customisable window and widget display toolkit version 2.0
 /// by Eugene Hopkinson (SlowRiot) for VoxelStorm 2014
@@ -119,4 +119,4 @@ public:
 
 }
 
-#endif // GUISTORM_H_INCLUDED
+#endif // GUISTORM_GUI_H_INCLUDED
