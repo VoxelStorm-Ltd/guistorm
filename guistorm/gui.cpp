@@ -129,6 +129,8 @@ void gui::load_fonts() {
   upload_fonts();            // upload manually since we've reimplemented loadGlyphs' uploader and so not using font_atlas->Upload()
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
 void gui::upload_fonts() {
   /// Manually upload the texture as GL_ALPHA instead of not-always-supported GL_RED which is default in freetype-gl
   texture_atlas_t *atlas_self = static_cast<texture_atlas_t*>(font_atlas->RawGet());
@@ -159,6 +161,7 @@ void gui::upload_fonts() {
   glBindTexture(GL_TEXTURE_2D, 0);
   std::cout << "GUIStorm: Font atlas uploaded, " << (font_atlas->width() * font_atlas->height()) / 1024 << "KB, id=" << font_atlas->id() << std::endl;
 }
+#pragma GCC diagnostic pop
 
 void gui::destroy_fonts() {
   /// Clean up the font atlas in preparation for exit or context switch
