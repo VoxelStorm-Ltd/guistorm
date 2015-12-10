@@ -5,6 +5,7 @@
 /// by Eugene Hopkinson (SlowRiot) for VoxelStorm 2014
 ///
 /// Defines: GUISTORM_AVOIDQUADS - use triangles instead of deprecated GL_QUADS primitives even if quads are cheaper
+///          GUISTORM_UNBIND - unbind shader and buffers after rendering
 ///          DEBUG_GUISTORM - draw outlines of hidden gui elements and show advanced debugging messages
 
 #include <GL/glew.h>
