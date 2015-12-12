@@ -1,5 +1,5 @@
-#ifndef CONTAINER_H_INCLUDED
-#define CONTAINER_H_INCLUDED
+#ifndef GUISTORM_CONTAINER_H_INCLUDED
+#define GUISTORM_CONTAINER_H_INCLUDED
 
 #include <vector>
 #include <atomic>
@@ -44,4 +44,4 @@ public:
 
 }
 
-#endif // CONTAINER_H_INCLUDED
+#endif // GUISTORM_CONTAINER_H_INCLUDED

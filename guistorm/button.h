@@ -1,5 +1,5 @@
-#ifndef BUTTON_H_INCLUDED
-#define BUTTON_H_INCLUDED
+#ifndef GUISTORM_BUTTON_H_INCLUDED
+#define GUISTORM_BUTTON_H_INCLUDED
 
 #include "widget.h"
 #include <string>
@@ -30,4 +30,4 @@ public:
 
 }
 
-#endif // BUTTON_H_INCLUDED
+#endif // GUISTORM_BUTTON_H_INCLUDED

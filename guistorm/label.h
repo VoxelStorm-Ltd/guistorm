@@ -1,5 +1,5 @@
-#ifndef LABEL_H_INCLUDED
-#define LABEL_H_INCLUDED
+#ifndef GUISTORM_LABEL_H_INCLUDED
+#define GUISTORM_LABEL_H_INCLUDED
 
 #include "widget.h"
 #include <string>
@@ -32,4 +32,4 @@ public:
 
 }
 
-#endif // LABEL_H_INCLUDED
+#endif // GUISTORM_LABEL_H_INCLUDED

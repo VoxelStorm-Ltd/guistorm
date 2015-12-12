@@ -50,10 +50,14 @@ void line::setup_buffer() {
 
   glBindBuffer(GL_ARRAY_BUFFER,         vbo);
   glBufferData(GL_ARRAY_BUFFER,         vbodata.size() * sizeof(vertex), &vbodata[0], GL_STATIC_DRAW);
-  //glBindBuffer(GL_ARRAY_BUFFER,         0);
+  #ifdef GUISTORM_UNBIND
+    glBindBuffer(GL_ARRAY_BUFFER,         0);
+  #endif // GUISTORM_UNBIND
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, numverts       * sizeof(GLuint), &ibodata[0], GL_STATIC_DRAW);
-  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  #ifdef GUISTORM_UNBIND
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  #endif // GUISTORM_UNBIND
 
   initialised = true;
 }

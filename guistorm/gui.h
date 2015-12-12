@@ -1,13 +1,6 @@
 #ifndef GUISTORM_GUI_H_INCLUDED
 #define GUISTORM_GUI_H_INCLUDED
 
-/// Extensible, fast, customisable window and widget display toolkit version 2.0
-/// by Eugene Hopkinson (SlowRiot) for VoxelStorm 2014
-///
-/// Defines: GUISTORM_AVOIDQUADS - use triangles instead of deprecated GL_QUADS primitives even if quads are cheaper
-///          GUISTORM_UNBIND - unbind shader and buffers after rendering
-///          DEBUG_GUISTORM - draw outlines of hidden gui elements and show advanced debugging messages
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <freetype-gl++/texture-atlas.hpp>
@@ -18,9 +11,11 @@
 namespace guistorm {
 
 class lineshape;
+class input_text;
 
 class gui : public container {
   friend class base;
+  friend class input_text;
   friend class line;
   friend class lineshape;
   friend class progressbar;
@@ -56,6 +51,12 @@ public:
 
   base *cursor = nullptr;                                   // what entity is acting as this gui's current cursor, if any
 
+  // input field management
+  std::function<void(input_text&)> function_select_input   = [](input_text &this_input __attribute__((__unused__))){};  // what to call on a selected input field, for binding text input callbacks etc
+  std::function<void(input_text&)> function_deselect_input = [](input_text &this_input __attribute__((__unused__))){};  // what to call on a deselected input field, for unbinding etc
+  input_text *current_input_field = nullptr;                // what input field we have selected, if any
+
+
 public:
   gui();
   ~gui();
@@ -78,7 +79,7 @@ public:
                 const unsigned char* memory_offset,
                 size_t memory_size,
                 float font_size,
-                std::string const &glyphs_to_load = "");
+                std::u32string const &glyphs_to_load = U"");
   void add_font(font *thisfont);
   void clear_fonts();
   font *get_font_by_size(           float size)
@@ -115,6 +116,10 @@ public:
 
   // helpers
   coordtype coord_transform(coordtype const &coord);
+
+  // input field management
+  void select_input_field(input_text *new_input_field);
+  void deselect_input_field();
 };
 
 }

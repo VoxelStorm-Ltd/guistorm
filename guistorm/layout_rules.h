@@ -1,5 +1,5 @@
-#ifndef LAYOUT_RULES_H_INCLUDED
-#define LAYOUT_RULES_H_INCLUDED
+#ifndef GUISTORM_LAYOUT_RULES_H_INCLUDED
+#define GUISTORM_LAYOUT_RULES_H_INCLUDED
 
 #include <functional>
 #include <GL/glew.h>
@@ -46,4 +46,4 @@ void move(            targettype target, coordtype offset);
 
 }
 
-#endif // LAYOUT_RULES_H_INCLUDED
+#endif // GUISTORM_LAYOUT_RULES_H_INCLUDED

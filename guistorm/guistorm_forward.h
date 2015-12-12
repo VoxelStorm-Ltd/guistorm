@@ -9,6 +9,7 @@ namespace guistorm {
   class button;
   class graph_line;
   class group;
+  class input_text;
   class label;
   class line;
   class lineshape;

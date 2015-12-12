@@ -4,6 +4,7 @@
 #include "blob_loader.h"
 #include "shader_load.h"
 #include "lineshape.h"
+#include "input_text.h"
 
 namespace guistorm {
 
@@ -222,7 +223,7 @@ void gui::add_font(std::string const &name,
                    const unsigned char* memory_offset,
                    size_t memory_size,
                    float font_size,
-                   std::string const &glyphs_to_load) {
+                   std::u32string const &glyphs_to_load) {
   /// Font factory that sets up font ownership with this GUI
   fonts.emplace_back(new font(this, name, memory_offset, memory_size, font_size, glyphs_to_load));
   #ifdef DEBUG_GUISTORM
@@ -396,12 +397,44 @@ void gui::set_mouse_pressed() {
 void gui::set_mouse_released() {
   /// Tell the gui the mouse is being released
   mouse_pressed = false;
+  if(!picked_element) {
+    deselect_input_field();
+  }
 }
 
 coordtype gui::coord_transform(coordtype const &coord) {
   /// Helper to transform screen coordinates into screen space suitable for feeding to the shader without further transformation
   return coordtype((coord.x * 2 / windowsize.x) - 1.0f,
                    (coord.y * 2 / windowsize.y) - 1.0f);
+}
+
+void gui::select_input_field(input_text *new_input_field) {
+  /// Select an input field
+  if(current_input_field == new_input_field) {                                  // skip if already selected
+    return;
+  }
+  if(current_input_field != nullptr) {                                          // first deselect anything we have selected already
+    try {
+      function_deselect_input(*current_input_field);                            // call the deselect (unbind) function
+    } catch(const std::bad_function_call &e) {
+      std::cout << "GUIStorm: ERROR: input deselect for \"" << current_input_field->get_label() << "\" threw exception " << e.what() << std::endl;
+    }
+    current_input_field->deselected_as_input();                                 // tell the old one it it's been deselected
+  }
+  current_input_field = new_input_field;
+  if(current_input_field != nullptr) {                                          // only call selection function on non-null object
+    try {
+      function_select_input(*current_input_field);                              // call the select (bind) function
+    } catch(const std::bad_function_call &e) {
+      std::cout << "GUIStorm: ERROR: input select for \"" << current_input_field->get_label() << "\" threw exception " << e.what() << std::endl;
+    }
+    current_input_field->selected_as_input();                                   // tell the new one it it's been selected
+  }
+}
+
+void gui::deselect_input_field() {
+  /// Helper wrapper function to deselect any input field
+  select_input_field(nullptr);
 }
 
 }

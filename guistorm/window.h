@@ -1,5 +1,5 @@
-#ifndef WINDOW_H_INCLUDED
-#define WINDOW_H_INCLUDED
+#ifndef GUISTORM_WINDOW_H_INCLUDED
+#define GUISTORM_WINDOW_H_INCLUDED
 
 #include "base.h"
 #include "container.h"
@@ -49,4 +49,4 @@ public:
 
 }
 
-#endif // WINDOW_H_INCLUDED
+#endif // GUISTORM_WINDOW_H_INCLUDED

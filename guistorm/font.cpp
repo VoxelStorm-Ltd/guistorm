@@ -1,15 +1,13 @@
 #include "font.h"
 #include <iostream>
-#include <ft2build.h>
-#include FT_FREETYPE_H
 #include "gui.h"
 
 namespace guistorm {
 
 
-GLfloat font::glyph::get_kerning(char charcode_last) const {
+GLfloat font::glyph::get_kerning(char32_t charcode_last) const {
   /// Return the kerning for this glyph when preceded by the specified previous glyph
-  if(charcode_last == '\0') {
+  if(charcode_last == U'\0') {
     return 0.0f;
   }
   GLfloat result = 0.0f;
@@ -27,7 +25,7 @@ GLfloat font::glyph::get_kerning(char charcode_last) const {
 GLfloat font::word::length() const {
   /// Return the horizontal length of this word
   GLfloat length = 0.0f;
-  char charcode_last = ' ';
+  char32_t charcode_last = U' ';
   for(auto const &thisglyph : glyphs) {
     length += thisglyph->advance.x + thisglyph->get_kerning(charcode_last);
     charcode_last = thisglyph->charcode;
@@ -49,7 +47,7 @@ font::font(gui *new_parent_gui,
            unsigned char const *new_memory_offset,
            size_t new_memory_size,
            float new_font_size,
-           std::string const &charcodes_to_load,
+           std::u32string const &charcodes_to_load,
            bool new_suppress_horizontal_hint)
   : parent_gui(new_parent_gui),
     name(new_name),
@@ -64,10 +62,10 @@ font::font(gui *new_parent_gui,
       std::cout << "GUIStorm: Font: ERROR: attempting to create a font with no valid parent!" << std::endl;
     }
   #endif
-  if(charcodes.empty()) {        // no custom glyphs specified, so load a sensible default selection
+  if(charcodes.empty()) {                                                       // no custom glyphs specified, so load a sensible default selection
     // note: space needs to be the first character, as it's used for reference elsewhere
-    //charcodes = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,?!:/";    // common glyphs
-    charcodes = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\t\n\r";  // all lower ascii plus whitespace
+    //charcodes = U" ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,?!:/";    // common glyphs
+    charcodes = U" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\t\n\r";  // all lower ascii plus whitespace
   }
 }
 
@@ -89,17 +87,16 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
   /// Attempt to load this font into the specified font atlas
   /// Reimplemented form of TextureFont::LoadGlyphs which is a wrapper for texture_font_load_glyphs
   #ifndef NDEBUG
-    if(glfwGetCurrentContext() == NULL) {     // make sure we're in a valid opengl context before we try to refresh
+    if(glfwGetCurrentContext() == NULL) {                                       // make sure we're in a valid opengl context before we try to refresh
       std::cout << "GUIStorm: WARNING: Attempting to load fonts with no current GL context, ignoring." << std::endl;
       return false;
     }
-    if(!font_atlas) {                         // make sure we have a font atlas ready to populate
+    if(!font_atlas) {                                                           // make sure we have a font atlas ready to populate
       std::cout << "GUIStorm: WARNING: Attempting to load fonts with no font atlas loaded, creating one now..." << std::endl;
       return false;
     }
   #endif
   unload();
-  GLfloat constexpr hres = 64;                                                  // from #define HRES 64 - Freetype uses 1/64th of a point scale
   FT_Library library;
   FT_Init_FreeType(&library);                                                   // initialise library
   FT_Face face;
@@ -133,76 +130,82 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
   #endif // DEBUG_GUISTORM
 
   // load each glyph
-  for(auto const &thischar : charcodes) {
-    FT_UInt glyph_index = FT_Get_Char_Index(face, thischar);
-    FT_Int32 flags = 0;
-    //flags |= FT_LOAD_NO_BITMAP;           // freetype-gl default when using outlines
-    flags |= FT_LOAD_RENDER;                // freetype-gl default when using normal rendering
-    if(force_autohint) {
-      flags |= FT_LOAD_FORCE_AUTOHINT;      // freetype-gl default when hinting enabled
-    } else {
-      if(suppress_autohunt) {
-        flags |= FT_LOAD_NO_AUTOHINT;       // freetype-gl default when hinting disabled
-      }
-      if(suppress_hinting) {
-        flags |= FT_LOAD_NO_HINTING;        // freetype-gl default when hinting disabled
-      }
-    }
-    FT_Load_Glyph(face, glyph_index, flags);
-
-    FT_Bitmap ft_bitmap = face->glyph->bitmap;
-    // We want each glyph to be separated by at least one blank pixel (eg. shader in demo-subpixel.c)
-    Vector2<size_t> bitmap_size(ft_bitmap.width / font_atlas->depth() + 1, ft_bitmap.rows + 1);
-    freetypeglxx::ivec4 region = font_atlas->GetRegion(bitmap_size.x, bitmap_size.y);
-    if(region.x < 0) {
-      std::cout << "GUIStorm: WARNING: font load: no room in atlas for font " << name << " at size " << font_size << std::endl;
-      return false;                       // we've missed a glyph so drop out early to retry
-    }
-    bitmap_size -= 1;
-    font_atlas->SetRegion(region.x, region.y, bitmap_size.x, bitmap_size.y, ft_bitmap.buffer, ft_bitmap.pitch);
-
-    glyph *tempglyph = new glyph;
-    tempglyph->charcode    = thischar;
-    tempglyph->offset.x    = static_cast<GLfloat>(face->glyph->bitmap_left);
-    tempglyph->offset.y    = static_cast<GLfloat>(face->glyph->bitmap_top) - static_cast<GLfloat>(bitmap_size.y);
-    tempglyph->size.x      = static_cast<GLfloat>(bitmap_size.x);
-    tempglyph->size.y      = static_cast<GLfloat>(bitmap_size.y);
-    tempglyph->texcoord0.x = static_cast<GLfloat>( region.x                 ) / static_cast<GLfloat>(font_atlas->width());
-    tempglyph->texcoord0.y = static_cast<GLfloat>((region.y + bitmap_size.y)) / static_cast<GLfloat>(font_atlas->height()); // y is flipped for texture coords
-    tempglyph->texcoord1.x = static_cast<GLfloat>((region.x + bitmap_size.x)) / static_cast<GLfloat>(font_atlas->width());
-    tempglyph->texcoord1.y = static_cast<GLfloat>( region.y                 ) / static_cast<GLfloat>(font_atlas->height()); // y is flipped for texture coords
-    FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);                          // discard hinting to get advance
-    tempglyph->advance.x   = static_cast<GLfloat>(face->glyph->advance.x) / hres;
-    tempglyph->advance.y   = static_cast<GLfloat>(face->glyph->advance.y) / hres;
-
-    if(thischar == L' ') {                                        // if we're drawing whitespace, skip adding the quad - every little helps
-      tempglyph->is_blank = true;
-    } else if(thischar == L'\t') {                                // tab
-      tempglyph->is_blank = true;
-      tempglyph->advance.x = 4.0f * getglyph(' ')->advance.x;     // use four spaces for a tab - yes lame
-    } else if(thischar == L'\n' || thischar == L'\r') {           // newline or carriage return
-      tempglyph->is_blank = true;
-      tempglyph->linebreak = true;
-      ///tempglyph->advance.x = 0.0f;                                // newlines do not advance the cursor
-    }
-
-    glyphs.emplace(thischar, tempglyph);
+  if(!load_glyphs(font_atlas, face, charcodes)) {
+    return false;
   }
 
   // calculate kerning for each glyph pair
-  for(auto const &thisglyph : glyphs) {
-    thisglyph.second->kerning.clear();
-    FT_UInt glyph_index = FT_Get_Char_Index(face, thisglyph.second->charcode);
-    for(auto const &lastglyph : glyphs) {
-      FT_UInt prev_index = FT_Get_Char_Index(face, lastglyph.second->charcode);
-      FT_Vector kerning;
-      FT_Get_Kerning(face, prev_index, glyph_index, FT_KERNING_UNFITTED, &kerning);
-      thisglyph.second->kerning.emplace(lastglyph.second->charcode, static_cast<GLfloat>(kerning.x) / (hres * hres));
-    }
-  }
+  update_kerning(face);
 
   FT_Done_Face(face);
   FT_Done_FreeType(library);
+  return true;
+}
+
+bool font::load_glyphs(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, std::u32string const &codes_to_load) {
+  /// Load all glyphs specified in a string
+  for(auto const &thischar : codes_to_load) {
+    if(!load_glyph(font_atlas, face, thischar)) {
+      return false;
+    }
+  }
+  return true;
+}
+bool font::load_glyph(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, char32_t thischar) {
+  /// Load a glyph specified by one UTF32 codepoint
+  FT_UInt glyph_index = FT_Get_Char_Index(face, thischar);
+  FT_Int32 flags = 0;
+  //flags |= FT_LOAD_NO_BITMAP;                                                 // freetype-gl default when using outlines
+  flags |= FT_LOAD_RENDER;                                                      // freetype-gl default when using normal rendering
+  if(force_autohint) {
+    flags |= FT_LOAD_FORCE_AUTOHINT;                                            // freetype-gl default when hinting enabled
+  } else {
+    if(suppress_autohunt) {
+      flags |= FT_LOAD_NO_AUTOHINT;                                             // freetype-gl default when hinting disabled
+    }
+    if(suppress_hinting) {
+      flags |= FT_LOAD_NO_HINTING;                                              // freetype-gl default when hinting disabled
+    }
+  }
+  FT_Load_Glyph(face, glyph_index, flags);
+
+  FT_Bitmap ft_bitmap = face->glyph->bitmap;
+  // We want each glyph to be separated by at least one blank pixel (eg. shader in demo-subpixel.c)
+  Vector2<size_t> bitmap_size(ft_bitmap.width / font_atlas->depth() + 1, ft_bitmap.rows + 1);
+  freetypeglxx::ivec4 region = font_atlas->GetRegion(bitmap_size.x, bitmap_size.y);
+  if(region.x < 0) {
+    std::cout << "GUIStorm: WARNING: font load: no room in atlas for font " << name << " at size " << font_size << std::endl;
+    return false;                                                               // we've missed a glyph so drop out early to retry
+  }
+  bitmap_size -= 1;
+  font_atlas->SetRegion(region.x, region.y, bitmap_size.x, bitmap_size.y, ft_bitmap.buffer, ft_bitmap.pitch);
+
+  glyph *tempglyph = new glyph;
+  tempglyph->charcode    = thischar;
+  tempglyph->offset.x    = static_cast<GLfloat>(face->glyph->bitmap_left);
+  tempglyph->offset.y    = static_cast<GLfloat>(face->glyph->bitmap_top) - static_cast<GLfloat>(bitmap_size.y);
+  tempglyph->size.x      = static_cast<GLfloat>(bitmap_size.x);
+  tempglyph->size.y      = static_cast<GLfloat>(bitmap_size.y);
+  tempglyph->texcoord0.x = static_cast<GLfloat>( region.x                 ) / static_cast<GLfloat>(font_atlas->width());
+  tempglyph->texcoord0.y = static_cast<GLfloat>((region.y + bitmap_size.y)) / static_cast<GLfloat>(font_atlas->height()); // y is flipped for texture coords
+  tempglyph->texcoord1.x = static_cast<GLfloat>((region.x + bitmap_size.x)) / static_cast<GLfloat>(font_atlas->width());
+  tempglyph->texcoord1.y = static_cast<GLfloat>( region.y                 ) / static_cast<GLfloat>(font_atlas->height()); // y is flipped for texture coords
+  FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);        // discard hinting to get advance
+  tempglyph->advance.x   = static_cast<GLfloat>(face->glyph->advance.x) / hres;
+  tempglyph->advance.y   = static_cast<GLfloat>(face->glyph->advance.y) / hres;
+
+  if(thischar == U' ') {                                                        // if we're drawing whitespace, skip adding the quad - every little helps
+    tempglyph->is_blank = true;
+  } else if(thischar == U'\t') {                                                // tab
+    tempglyph->is_blank = true;
+    tempglyph->advance.x = 4.0f * getglyph(U' ')->advance.x;                    // use four spaces for a tab - yes lame
+  } else if(thischar == U'\n' || thischar == U'\r') {                           // newline or carriage return
+    tempglyph->is_blank = true;
+    tempglyph->linebreak = true;
+    //tempglyph->advance.x = 0.0f;                                                // newlines do not advance the cursor
+  }
+
+  glyphs.emplace(thischar, tempglyph);
   return true;
 }
 
@@ -215,13 +218,43 @@ void font::unload() {
   glyphs.clear();
 }
 
-font::glyph const *font::getglyph(char charcode) {
+void font::update_kerning(FT_Face const &face) {
+  /// Update the kerning between all glyphs
+  for(auto const &this_glyph : glyphs) {
+    update_kerning(face, *this_glyph.second);
+  }
+}
+void font::update_kerning(FT_Face const &face, glyph &this_glyph) {
+  /// Update the kerning between this glyph and all others preceding
+  this_glyph.kerning.clear();
+  for(auto const &last_glyph : glyphs) {
+    update_kerning(face, this_glyph, *last_glyph.second);
+  }
+}
+void font::update_kerning(FT_Face const &face, glyph &this_glyph, glyph const &last_glyph) {
+  /// Update the kerning between two glyphs
+  FT_UInt glyph_index = FT_Get_Char_Index(face, this_glyph.charcode);
+  FT_UInt prev_index  = FT_Get_Char_Index(face, last_glyph.charcode);
+  FT_Vector kerning;
+  FT_Get_Kerning(face, prev_index, glyph_index, FT_KERNING_UNFITTED, &kerning);
+  this_glyph.kerning.emplace(last_glyph.charcode, static_cast<GLfloat>(kerning.x) / (hres * hres));
+}
+
+font::glyph const *font::getglyph(char32_t charcode) {
   /// Reimplemented form of TextureFont::GetGlyph which is a wrapper for texture_font_load_glyphs
   font::glyph *tempglyph = nullptr;
   try {
     tempglyph = glyphs.at(charcode);
   } catch(std::out_of_range const &e) {
-    std::cout << "GUIStorm: WARNING: could not fetch glyph for character \"" << charcode << "\" (ascii " << static_cast<int>(charcode) << ")" << std::endl;
+    #ifdef GUISTORM_LOAD_MISSING_GLYPHS
+      std::cout << "GUIStorm: loading glyph for character \"" << charcode << "\" (ascii " << static_cast<unsigned int>(charcode) << ")" << std::endl;
+      unload();
+      charcodes += charcode;
+      parent_gui->load_fonts();                                                 // request a full font reload - expensive!
+      tempglyph = glyphs[charcode];
+    #else
+      std::cout << "GUIStorm: WARNING: could not fetch glyph for character \"" << charcode << "\" (ascii " << static_cast<unsigned int>(charcode) << ")" << std::endl;
+    #endif // GUISTORM_LOAD_MISSING_GLYPHS
   }
   return tempglyph;
 }

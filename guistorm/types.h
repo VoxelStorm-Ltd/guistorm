@@ -1,5 +1,5 @@
-#ifndef TYPES_H_INCLUDED
-#define TYPES_H_INCLUDED
+#ifndef GUISTORM_TYPES_H_INCLUDED
+#define GUISTORM_TYPES_H_INCLUDED
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -25,4 +25,4 @@ enum class aligntype : char {                 // the coordinate origin and size 
 
 }
 
-#endif // TYPES_H_INCLUDED
+#endif // GUISTORM_TYPES_H_INCLUDED

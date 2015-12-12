@@ -1,5 +1,5 @@
-#ifndef GRAPH_LINE_H_INCLUDED
-#define GRAPH_LINE_H_INCLUDED
+#ifndef GUISTORM_GRAPH_LINE_H_INCLUDED
+#define GUISTORM_GRAPH_LINE_H_INCLUDED
 
 #include "base.h"
 #include <vector>
@@ -58,4 +58,4 @@ template<class T> void graph_line::upload(T const &begin, T const &end) {
 
 }
 
-#endif // GRAPH_LINE_H_INCLUDED
+#endif // GUISTORM_GRAPH_LINE_H_INCLUDED

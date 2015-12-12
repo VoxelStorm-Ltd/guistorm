@@ -1,5 +1,5 @@
-#ifndef COLOURSET_H_INCLUDED
-#define COLOURSET_H_INCLUDED
+#ifndef GUISTORM_COLOURSET_H_INCLUDED
+#define GUISTORM_COLOURSET_H_INCLUDED
 
 #include "colourgroup.h"
 
@@ -38,4 +38,4 @@ public:
 
 }
 
-#endif // COLOURSET_H_INCLUDED
+#endif // GUISTORM_COLOURSET_H_INCLUDED

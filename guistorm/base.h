@@ -60,7 +60,7 @@ public:
   colourset colours;                            // set of colours for different states of this object
 
   // label
-private:
+protected:
   std::string label_text;                       // the text for the label of this object
   std::vector<font::line> label_lines;          // the actual organised label content
   coordtype label_origin;                       // where to reset the pen to
@@ -137,6 +137,9 @@ public:
   std::string const &get_label() __attribute__((__const__));
   template<class T, class ...Args> void add_layout_rule(T thisrule, Args &&...args);
 
+  // input handling
+  virtual void select_as_input();
+
   // updating
   virtual void update();
   virtual void on_press() __attribute__((__const__));
@@ -152,7 +155,7 @@ public:
   void arrange_label();
   void update_label_alignment();
 protected:
-  void setup_label();
+  virtual void setup_label();
 public:
   virtual void update_layout();
   virtual void refresh();

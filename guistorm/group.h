@@ -1,5 +1,5 @@
-#ifndef GROUP_H_INCLUDED
-#define GROUP_H_INCLUDED
+#ifndef GUISTORM_GROUP_H_INCLUDED
+#define GUISTORM_GROUP_H_INCLUDED
 
 #include "window.h"
 #include <string>
@@ -34,4 +34,4 @@ public:
 
 }
 
-#endif // GROUP_H_INCLUDED
+#endif // GUISTORM_GROUP_H_INCLUDED

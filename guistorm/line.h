@@ -1,5 +1,5 @@
-#ifndef LINE_H_INCLUDED
-#define LINE_H_INCLUDED
+#ifndef GUISTORM_LINE_H_INCLUDED
+#define GUISTORM_LINE_H_INCLUDED
 
 #include "base.h"
 
@@ -27,4 +27,4 @@ public:
 }
 
 
-#endif // LINE_H_INCLUDED
+#endif // GUISTORM_LINE_H_INCLUDED

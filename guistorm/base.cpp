@@ -1,4 +1,5 @@
 #include "base.h"
+#include "utf8/utf8.h"
 #include "cast_if_required.h"
 #include "gui.h"
 
@@ -22,15 +23,15 @@ base::base(container *newparent,
       std::cout << "GUIStorm: ERROR: " << __PRETTY_FUNCTION__ << " must not be initialised with no parent" << std::endl;
       return;
     }
-  #endif
-  parent->add(this);                          // this also assigns the parent_gui pointer
+  #endif // NDEBUG
+  parent->add(this);                                                            // this also assigns the parent_gui pointer
   #ifndef NDEBUG
-    if(!parent_gui) {                         // but check this for safety
+    if(!parent_gui) {                                                           // but check this for safety
       std::cout << "GUIStorm: ERROR: " << __PRETTY_FUNCTION__ << " parent chain failed to assign parent_gui, make sure the top level container's parent is a guistorm::gui object" << std::endl;
       return;
     }
-  #endif
-  position *= parent_gui->get_dpi_scale();    // these must come after parent gui assignment
+  #endif // NDEBUG
+  position *= parent_gui->get_dpi_scale();                                      // these must come after parent gui assignment
   size     *= parent_gui->get_dpi_scale();
 }
 
@@ -62,7 +63,7 @@ void base::set_position(coordtype const &new_position) {
   refresh_position_only();
 }
 void base::set_position(GLfloat new_position_x, GLfloat new_position_y) {
-  set_position(coordtype(new_position_x, new_position_y));    // wrapper
+  set_position(coordtype(new_position_x, new_position_y));                      // wrapper
 }
 void base::set_position_nodpiscale(coordtype const &new_position) {
   /// Update this element's relative position to its parent element or the screen centre if parentless, lower left corner - not scaled by dpi
@@ -70,7 +71,7 @@ void base::set_position_nodpiscale(coordtype const &new_position) {
   refresh_position_only();
 }
 void base::set_position_nodpiscale(GLfloat new_position_x, GLfloat new_position_y) {
-  set_position_nodpiscale(coordtype(new_position_x, new_position_y));    // wrapper
+  set_position_nodpiscale(coordtype(new_position_x, new_position_y));           // wrapper
 }
 void base::set_size(coordtype const &new_size) {
   /// Update this element's size
@@ -78,7 +79,7 @@ void base::set_size(coordtype const &new_size) {
   refresh_position_only();
 }
 void base::set_size(GLfloat new_size_x, GLfloat new_size_y) {
-  set_size(coordtype(new_size_x, new_size_y));                // wrapper
+  set_size(coordtype(new_size_x, new_size_y));                                  // wrapper
 }
 void base::set_size_nodpiscale(coordtype const &new_size) {
   /// Update this element's size - not scaled by dpi
@@ -86,7 +87,7 @@ void base::set_size_nodpiscale(coordtype const &new_size) {
   refresh_position_only();
 }
 void base::set_size_nodpiscale(GLfloat new_size_x, GLfloat new_size_y) {
-  set_size_nodpiscale(coordtype(new_size_x, new_size_y));                // wrapper
+  set_size_nodpiscale(coordtype(new_size_x, new_size_y));                       // wrapper
 }
 void base::move(coordtype const &offset) {
   /// Move this element relative to its existing position
@@ -122,7 +123,7 @@ void base::stretch_to_label_horizontally() {
       std::cout << "GUIStorm: WARNING: " << __PRETTY_FUNCTION__ << " attempted to operate with zero width label; has setup_label been called yet?" << std::endl;
       return;
     }
-  #endif
+  #endif // NDEBUG
   if(label_size.x + (label_margin.x * 2) > size.x) {
     size.x = label_size.x + (label_margin.x * 2);
     refresh_position_only();
@@ -188,40 +189,40 @@ font &base::get_label_font() {
   /// its own specific label font or the gui's default or another fallback
   /// Note - this cannot fail to return a valid font, otherwise it exits fatally
   font *thisfont = label_font;
-  if(!thisfont) {                                     // check our font is valid
-    thisfont = parent_gui->font_default;              // otherwise try to use the default font
+  if(!thisfont) {                                                               // check our font is valid
+    thisfont = parent_gui->font_default;                                        // otherwise try to use the default font
     if(!thisfont) {
       std::cout << "GUIStorm: WARNING: No default font set, and " << __PRETTY_FUNCTION__ << " is trying to query it." << std::endl;
       if(!parent_gui->fonts.empty()) {
-        thisfont = *(parent_gui->fonts.begin());      // no default available, so select the first one from the available list
+        thisfont = *(parent_gui->fonts.begin());                                // no default available, so select the first one from the available list
         std::cout << "GUIStorm: WARNING: Defaulting to first entry: " << thisfont->name << " size " << thisfont->font_size << std::endl;
       }
       if(!thisfont) {
         std::cout << "GUIStorm: ERROR: No font available for " << __PRETTY_FUNCTION__ << std::endl;
-        abort();                                        // bail out!
+        abort();                                                                // bail out!
       }
     }
   }
   if(!parent_gui->font_atlas) {
     #ifdef DEBUG_GUISTORM
       std::cout << "GUIStorm: DEBUG: parent_gui->font_atlas not yet loaded when arranging label" << std::endl;
-    #endif
+    #endif // DEBUG_GUISTORM
     parent_gui->load_fonts();
   }
   thisfont->load_if_needed(parent_gui->font_atlas);
   #ifdef DEBUG_GUISTORM
     //std::cout << "GUIStorm: DEBUG: parent_gui->font_atlas->id() = " << parent_gui->font_atlas->id() << std::endl;
-  #endif
-  //font_atlas_id = parent_gui->font_atlas->id();       // cache the font atlas ID for this font
+  #endif // DEBUG_GUISTORM
+  //font_atlas_id = parent_gui->font_atlas->id();                                 // cache the font atlas ID for this font
   return *thisfont;
 }
 
 void base::set_label(std::string const &newlabel) {
   if(newlabel == label_text) {
-    return;                   // skip updating if we're making no changes
+    return;                                                                     // skip updating if we're making no changes
   }
   label_text = newlabel;
-  refresh();                  // refresh the buffer (this also clears label lines)
+  refresh();                                                                    // refresh the buffer (this also clears label lines)
 }
 
 coordtype const base::get_absolute_position() const {
@@ -229,9 +230,9 @@ coordtype const base::get_absolute_position() const {
   coordtype parent_origin(0, 0);
   base *parent_base(dynamic_cast<base*>(parent));
   if(parent_base) {
-    return position + parent_base->get_absolute_position();       // obtain its parent position recursively
+    return position + parent_base->get_absolute_position();                     // obtain its parent position recursively
   } else {
-    return position;                                              // its parent is not a base type so has no position of its own
+    return position;                                                            // its parent is not a base type so has no position of its own
   }
 }
 coordtype base::get_position() const {
@@ -280,6 +281,10 @@ std::string const &base::get_label() {
   return label_text;
 }
 
+void base::select_as_input() {
+  parent_gui->deselect_input_field();                                           // not selectable by default
+}
+
 void base::update() {
   /// Update colours based on current state
   // check if we're mousing over this
@@ -296,6 +301,7 @@ void base::update() {
       } else {
         if(parent_gui->mouse_released) {
           on_release();
+          select_as_input();
         }
         colours.blend_to_hover(0.5f);
       }
@@ -307,6 +313,11 @@ void base::update() {
       }
     }
   } else {
+    if(this == parent_gui->picked_element) {
+      if(parent_gui->mouse_released) {
+        select_as_input();
+      }
+    }
     colours.blend_to_idle(0.05f);
   }
 }
@@ -365,12 +376,16 @@ void base::setup_buffer() {
 
   glBindBuffer(GL_ARRAY_BUFFER,         vbo);
   glBufferData(GL_ARRAY_BUFFER,         vbodata.size() * sizeof(vertex), &vbodata[0], GL_STATIC_DRAW);
-  //glBindBuffer(GL_ARRAY_BUFFER,         0);
+  #ifdef GUISTORM_UNBIND
+    glBindBuffer(GL_ARRAY_BUFFER,         0);
+  #endif // GUISTORM_UNBIND
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, numverts       * sizeof(GLuint), &ibodata[0], GL_STATIC_DRAW);
-  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  #ifdef GUISTORM_UNBIND
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  #endif // GUISTORM_UNBIND
 
-  setup_label();                          // set up the label buffer
+  setup_label();                                                                // set up the label buffer
 
   initialised = true;
 }
@@ -381,35 +396,41 @@ void base::arrange_label() {
   // compose the text layout in the abstract first
   label_line_spacing = this_label_font.metrics_height;
   label_lines.clear();
-  label_lines.emplace_back();                           // create a default first line
+  label_lines.emplace_back();                                                   // create a default first line
 
   std::vector<font::word> words;
   words.emplace_back();
-  for(size_t i = 0; i != label_text.length(); ++i) {
-    font::glyph const *tempglyph = this_label_font.getglyph(label_text[i]);
+  auto it = label_text.begin();
+  for(unsigned int i = 0; it != label_text.end(); ++i) {
+    #ifdef GUISTORM_UNSAFEUTF
+      char32_t codepoint = utf8::unchecked::next(it);
+    #else
+      char32_t codepoint = utf8::next(it, label_text.end());
+    #endif // GUISTORM_UNSAFEUTF
+    font::glyph const *tempglyph = this_label_font.getglyph(codepoint);
     if(!tempglyph) {
-      std::cout << "GUIStorm: WARNING: Requested unmapped character \"" << label_text[i] << "\" (ascii " << static_cast<int>(label_text[i]) << ")" << std::endl;
-      tempglyph = this_label_font.getglyph(' ');       // replace unknown characters with space
+      std::cout << "GUIStorm: WARNING: Requested unmapped character \"" << codepoint << "\" (ascii " << static_cast<unsigned int>(codepoint) << ")" << std::endl;
+      tempglyph = this_label_font.getglyph(U' ');                               // replace unknown characters with space
     }
     //if(tempglyph.advance.y > label_line_spacing) {
-    //  label_line_spacing = tempglyph.advance.y;         // update uniform minimum line spacing
+    //  label_line_spacing = tempglyph.advance.y;                                 // update uniform minimum line spacing
     //}
     bool wordbreak_here = false;
     bool printchar_here = true;
-    if(tempglyph->linebreak) {                          // newline or carriage return
+    if(tempglyph->linebreak) {                                                  // newline or carriage return
       words.back().linebreak = true;
       //words.back().advance.x = 0.0f;
       if(!label_merge_newlines) {
-        wordbreak_here = true;                          // add newlines if we aren't merging them
+        wordbreak_here = true;                                                  // add newlines if we aren't merging them
       }
       printchar_here = false;
     } else {
-      if(i != 0) {                                      // don't check for word breaks if this is the first character
-        if(!words.back().glyphs.empty() &&              // if the last word has any characters...
-           words.back().glyphs.back()->is_blank) {      // ...and the last character was invisible...
-          if(!tempglyph->is_blank ||                    // ...and this one is visible,
-             !label_merge_whitespace) {                 // ...or we aren't merging whitespace, then
-            wordbreak_here = true;                      // ...start a new word
+      if(i != 0) {                                                              // don't check for word breaks if this is the first character
+        if(!words.back().glyphs.empty() &&                                      // if the last word has any characters...
+           words.back().glyphs.back()->is_blank) {                              // ...and the last character was invisible...
+          if(!tempglyph->is_blank ||                                            // ...and this one is visible,
+             !label_merge_whitespace) {                                         // ...or we aren't merging whitespace, then
+            wordbreak_here = true;                                              // ...start a new word
           }
         }
       }
@@ -417,51 +438,51 @@ void base::arrange_label() {
     if(wordbreak_here) {
       #ifdef DEBUG_GUISTORM
         //words.back().glyphs.emplace_back(this_label_font.getglyph(']'));
-      #endif
+      #endif // DEBUG_GUISTORM
       words.emplace_back();
       #ifdef DEBUG_GUISTORM
         //words.back().glyphs.emplace_back(this_label_font.getglyph('['));
-      #endif
+      #endif // DEBUG_GUISTORM
     }
     if(printchar_here) {
       words.back().glyphs.emplace_back(tempglyph);
     } else {
       #ifdef DEBUG_GUISTORM
         //words.back().glyphs.emplace_back(this_label_font.getglyph('/'));
-      #endif
+      #endif // DEBUG_GUISTORM
     }
   }
 
   // carry out word-wrapping
-  label_size.assign(0.0f, label_line_spacing * -0.5f);  // start the height with 1 line thickess minimum
+  label_size.assign(0.0f, label_line_spacing * -0.5f);                          // start the height with 1 line thickess minimum
   coordtype const text_area(size - (label_margin * 2));
   GLfloat hpos = 0.0f;
   for(auto const &thisword : words) {
     GLfloat wordlength = thisword.length();
     hpos += wordlength;
     if(label_wordwrap) {
-      if(hpos > text_area.x) {                          // this word would break out of the permissible box area, so start a new line
+      if(hpos > text_area.x) {                                                  // this word would break out of the permissible box area, so start a new line
         if(hpos > label_size.x) {
-          label_size.x = hpos -  wordlength;            // this line is the longest (for centering calculations)
+          label_size.x = hpos -  wordlength;                                    // this line is the longest (for centering calculations)
         }
-        label_lines.emplace_back();                     // line feed
-        hpos = wordlength;                              // because we're pushing the wrapped word onto the new line our cursor starts after it
+        label_lines.emplace_back();                                             // line feed
+        hpos = wordlength;                                                      // because we're pushing the wrapped word onto the new line our cursor starts after it
         label_size.y += label_line_spacing;
       }
     }
     label_lines.back().words.emplace_back(thisword);
     if(thisword.linebreak) {
       if(hpos > label_size.x) {
-        label_size.x = hpos;                            // this line is the longest (for centering calculations)
+        label_size.x = hpos;                                                    // this line is the longest (for centering calculations)
       }
       label_lines.back().linebreak = true;
-      label_lines.emplace_back();                       // line feed
-      hpos = 0.0f;                                      // carriage return
+      label_lines.emplace_back();                                               // line feed
+      hpos = 0.0f;                                                              // carriage return
       label_size.y += label_line_spacing;
     }
   }
   if(hpos > label_size.x) {
-    label_size.x = hpos;                                // this line is the longest (for centering calculations)
+    label_size.x = hpos;                                                        // this line is the longest (for centering calculations)
   }
   #ifdef DEBUG_GUISTORM
     //std::cout << "GUIStorm: DEBUG: words wrapped to " << label_lines.size() << " lines max size " << label_size << std::endl;
@@ -476,9 +497,9 @@ void base::arrange_label() {
   }
 
   // carry out justification if required
-  if(label_justify_horizontal && label_lines.size() > 1) {              // don't justify anything consisting of one line (or none)
+  if(label_justify_horizontal && label_lines.size() > 1) {                      // don't justify anything consisting of one line (or none)
     for(auto &thisline : boost::make_iterator_range(label_lines.begin(), --label_lines.end())) {    // don't justify the last line
-      if(!thisline.linebreak && thisline.words.size() > 1) {            // don't try to justify one-word lines or lines that are intentionally split
+      if(!thisline.linebreak && thisline.words.size() > 1) {                    // don't try to justify one-word lines or lines that are intentionally split
         thisline.spacing = (label_size.x - thisline.size.x) / static_cast<float>(thisline.words.size() - 1);
       }
       #ifdef DEBUG_GUISTORM
@@ -497,11 +518,11 @@ void base::arrange_label() {
 void base::update_label_alignment() {
   /// decide on label positioning and reshuffle the layout for justifications
   coordtype const label_position(get_absolute_position());
-  switch(label_alignment) {       // horizontal
+  switch(label_alignment) {                                                     // horizontal
   case aligntype::CENTRE:
   case aligntype::TOP:
   case aligntype::BOTTOM:
-    label_origin.x = label_position.x + ((size.x - label_size.x) / 2.0f);     // the margins simplify out
+    label_origin.x = label_position.x + ((size.x - label_size.x) / 2.0f);       // the margins simplify out
     break;
   case aligntype::LEFT:
   case aligntype::TOP_LEFT:
@@ -514,11 +535,11 @@ void base::update_label_alignment() {
     label_origin.x = label_position.x - (label_margin.x * parent_gui->dpi_scale) + size.x - label_size.x;
     break;
   }
-  switch(label_alignment) {       // vertical
+  switch(label_alignment) {                                                     // vertical
   case aligntype::CENTRE:
   case aligntype::LEFT:
   case aligntype::RIGHT:
-    label_origin.y = label_position.y + ((size.y + label_size.y) / 2.0f);     // the margins simplify out
+    label_origin.y = label_position.y + ((size.y + label_size.y) / 2.0f);       // the margins simplify out
     break;
   case aligntype::TOP:
   case aligntype::TOP_LEFT:
@@ -536,43 +557,49 @@ void base::update_label_alignment() {
 void base::setup_label() {
   /// Upload just the label portion of the buffer
   if(label_lines.empty()) {
-    arrange_label();                                    // only rearrange label if it hasn't already been laid out as this does not require GL context
+    arrange_label();                                                            // only rearrange label if it hasn't already been laid out as this does not require GL context
   }
-  update_label_alignment();                             // update position in all cases
+  update_label_alignment();                                                     // update position in all cases
 
   // compose the VBO from the text positioning
   std::vector<vertex> vbodata;
   std::vector<GLuint> ibodata;
   coordtype pen = label_origin;
-  char charcode_last = '\0';
+  char32_t charcode_last = U'\0';
   for(auto const &thisline : label_lines) {
     for(auto const &thisword : thisline.words) {
       for(auto const &thisglyph : thisword.glyphs) {
         pen.x += thisglyph->get_kerning(charcode_last);
         charcode_last = thisglyph->charcode;
-        if(!thisglyph->is_blank) {                      // whitespace glyphs don't get added but still take up horizontal space
+        if(!thisglyph->is_blank) {                                              // whitespace glyphs don't get added but still take up horizontal space
           coordtype const corner0(pen + thisglyph->offset);
           coordtype const corner1(corner0 + thisglyph->size);
           unsigned int ibo_offset = cast_if_required<GLuint>(vbodata.size());
+          vbodata.reserve(vbodata.size() + 4);
           vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner0.x, corner0.y)), coordtype(thisglyph->texcoord0.x, thisglyph->texcoord0.y));
           vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner1.x, corner0.y)), coordtype(thisglyph->texcoord1.x, thisglyph->texcoord0.y));
           vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner1.x, corner1.y)), coordtype(thisglyph->texcoord1.x, thisglyph->texcoord1.y));
           vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner0.x, corner1.y)), coordtype(thisglyph->texcoord0.x, thisglyph->texcoord1.y));
+          #ifdef GUISTORM_AVOIDQUADS
+            ibodata.reserve(ibodata.size() + 6);
+          #else
+            ibodata.reserve(ibodata.size() + 4);
+          #endif // GUISTORM_AVOIDQUADS
           ibodata.emplace_back(ibo_offset + 0);
           ibodata.emplace_back(ibo_offset + 1);
           ibodata.emplace_back(ibo_offset + 2);
           #ifdef GUISTORM_AVOIDQUADS
-            ibodata.emplace_back(ibo_offset + 0);       // doing this as indexed triangles instead of deprecated quads costs 50% more index entries
+            ibodata.emplace_back(ibo_offset + 0);                               // doing this as indexed triangles instead of deprecated quads costs 50% more index entries
             ibodata.emplace_back(ibo_offset + 2);
-          #endif
+          #endif // GUISTORM_AVOIDQUADS
           ibodata.emplace_back(ibo_offset + 3);
         }
         pen += thisglyph->advance;
       }
-      pen.x += thisline.spacing;                        // justification inter-word space expansion
+      pen.x += thisline.spacing;                                                // justification inter-word space expansion
     }
-    pen.x = label_origin.x;                             // carriage return
-    pen.y -= label_line_spacing;                        // line feed
+    pen.x = label_origin.x;                                                     // carriage return
+    pen.y -= label_line_spacing;                                                // line feed
   }
   numverts_label = cast_if_required<GLuint>(ibodata.size());
 
@@ -587,15 +614,21 @@ void base::setup_label() {
 
   glBindBuffer(GL_ARRAY_BUFFER,         vbo_label);
   glBufferData(GL_ARRAY_BUFFER,         vbodata.size() * sizeof(vertex), &vbodata[0], GL_STATIC_DRAW);
-  //glBindBuffer(GL_ARRAY_BUFFER,         0);
+  #ifdef GUISTORM_UNBIND
+    glBindBuffer(GL_ARRAY_BUFFER,         0);
+  #endif // GUISTORM_UNBIND
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_label);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, numverts_label * sizeof(GLuint), &ibodata[0], GL_STATIC_DRAW);
-  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  #ifdef GUISTORM_UNBIND
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  #endif // GUISTORM_UNBIND
 }
 
 void base::update_layout() {
   /// Reposition this object in accordance with any layout rules given to it
-  //std::cout << "GUIStorm: DEBUG: updating layout for " << get_label() << " with " << layout_rules.size() << " rules..." << std::endl;
+  #ifdef DEBUG_GUISTORM
+    std::cout << "GUIStorm: DEBUG: updating layout for " << get_label() << " with " << layout_rules.size() << " rules..." << std::endl;
+  #endif // DEBUG_GUISTORM
   for(auto const &thisrule : layout_rules) {
     thisrule();
   }
@@ -606,8 +639,8 @@ void base::update_layout() {
 
 void base::refresh() {
   /// Refresh this object's visual state
-  label_lines.clear();        // ensure the label buffer arrangement also gets refreshed
-  refresh_position_only();    // refresh the outline shape
+  label_lines.clear();                                                          // ensure the label buffer arrangement also gets refreshed
+  refresh_position_only();                                                      // refresh the outline shape
 }
 
 void base::refresh_position_only() {
@@ -620,7 +653,7 @@ void base::render() {
   if(!visible) {
     return;
   }
-  if(__builtin_expect(!initialised, 0)) {  // if the buffer hasn't been initialised yet (unlikely)
+  if(__builtin_expect(!initialised, 0)) {                                       // if the buffer hasn't been initialised yet (unlikely)
     setup_buffer();
   }
   if(numverts != 0) {
@@ -629,21 +662,21 @@ void base::render() {
     glVertexAttribPointer(parent_gui->attrib_coords,    2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
     glVertexAttribPointer(parent_gui->attrib_texcoords, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::texcoords)));
 
-    if(colours.current.background.a != 0.0f) {                          // skip drawing fully transparent parts
+    if(colours.current.background.a != 0.0f) {                                  // skip drawing fully transparent parts
       glUniform4f(parent_gui->uniform_colour,
                   colours.current.background.r,
                   colours.current.background.g,
                   colours.current.background.b,
                   colours.current.background.a);
-      glDrawElements(GL_TRIANGLE_FAN, numverts, GL_UNSIGNED_INT, 0);    // background
+      glDrawElements(GL_TRIANGLE_FAN, numverts, GL_UNSIGNED_INT, 0);            // background
     }
-    if(colours.current.outline.a != 0.0f) {                             // skip drawing fully transparent parts
+    if(colours.current.outline.a != 0.0f) {                                     // skip drawing fully transparent parts
       glUniform4f(parent_gui->uniform_colour,
                   colours.current.outline.r,
                   colours.current.outline.g,
                   colours.current.outline.b,
                   colours.current.outline.a);
-      glDrawElements(GL_LINE_LOOP,    numverts, GL_UNSIGNED_INT, 0);    // outline
+      glDrawElements(GL_LINE_LOOP,    numverts, GL_UNSIGNED_INT, 0);            // outline
     }
   }
   // draw the label
@@ -662,7 +695,7 @@ void base::render() {
       glDrawElements(GL_TRIANGLES, numverts_label, GL_UNSIGNED_INT, 0);
     #else
       glDrawElements(GL_QUADS, numverts_label, GL_UNSIGNED_INT, 0);
-    #endif
+    #endif // GUISTORM_AVOIDQUADS
   }
 
   update();
