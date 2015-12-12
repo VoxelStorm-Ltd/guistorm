@@ -403,11 +403,11 @@ void base::arrange_label() {
   auto it = label_text.begin();
   for(unsigned int i = 0; it != label_text.end(); ++i) {
     #ifdef GUISTORM_UNSAFEUTF
-      char32_t codepoint = utf8::unchecked::next(it);
+      char32_t const codepoint = utf8::unchecked::next(it);
     #else
-      char32_t codepoint = utf8::next(it, label_text.end());
+      char32_t const codepoint = utf8::next(it, label_text.end());
     #endif // GUISTORM_UNSAFEUTF
-    font::glyph const *tempglyph = this_label_font.getglyph(codepoint);
+    std::shared_ptr<font::glyph> tempglyph(this_label_font.getglyph(codepoint));
     if(!tempglyph) {
       std::cout << "GUIStorm: WARNING: Requested unmapped character \"" << codepoint << "\" (ascii " << static_cast<unsigned int>(codepoint) << ")" << std::endl;
       tempglyph = this_label_font.getglyph(U' ');                               // replace unknown characters with space
@@ -426,11 +426,12 @@ void base::arrange_label() {
       printchar_here = false;
     } else {
       if(i != 0) {                                                              // don't check for word breaks if this is the first character
-        if(!words.back().glyphs.empty() &&                                      // if the last word has any characters...
-           words.back().glyphs.back()->is_blank) {                              // ...and the last character was invisible...
-          if(!tempglyph->is_blank ||                                            // ...and this one is visible,
-             !label_merge_whitespace) {                                         // ...or we aren't merging whitespace, then
-            wordbreak_here = true;                                              // ...start a new word
+        if(!words.back().glyphs.empty()) {                                      // if the last word has any characters...
+          if(words.back().glyphs.back()->is_blank) {                            // ...and the last character was invisible...
+            if(!tempglyph->is_blank ||                                          // ...and this one is visible,
+               !label_merge_whitespace) {                                       // ...or we aren't merging whitespace, then
+              wordbreak_here = true;                                            // ...start a new word
+            }
           }
         }
       }

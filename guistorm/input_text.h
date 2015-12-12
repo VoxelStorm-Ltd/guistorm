@@ -16,6 +16,9 @@ private:
   GLuint ibo_cursor      = 0;                                                   // index buffer for cursor
   GLuint numverts_cursor = 0;                                                   // number of vertices to render for the cursor
 
+  unsigned int length_limit = 128;                                              // length limit for input
+  bool multiline_allowed = false;                                               // whether to allow multiple line input
+
   bool cursor_visible = false;                                                  // whether the cursor should be drawn right now
 
 public:
@@ -23,6 +26,7 @@ public:
              colourset const &colours,
              std::string const &label = std::string(),
              font *label_font = nullptr,
+             unsigned int this_length_limit = 128,
              coordtype const &size     = coordtype(),
              coordtype const &position = coordtype());
 protected:
@@ -41,8 +45,15 @@ protected:
 public:
   virtual void render() override final;
 
+  // notification
   void selected_as_input();
   void deselected_as_input();
+
+  // input: settings
+  unsigned int get_length_limit() const __attribute__((__pure__));
+  void set_length_limit(unsigned int new_limit);
+  bool is_multiline_allowed() const __attribute__((__pure__));
+  void set_multiline_allowed(bool allowed);
 
   // input: insertion
   void insert(char character);

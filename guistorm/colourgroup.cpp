@@ -6,12 +6,12 @@ colourgroup::colourgroup() {
   /// Default constructor
 }
 
-colourgroup::colourgroup(colourtype const &background,
-                         colourtype const &outline,
-                         colourtype const &content)
-  : background(background),
-    outline(outline),
-    content(content) {
+colourgroup::colourgroup(colourtype const &this_background,
+                         colourtype const &this_outline,
+                         colourtype const &this_content)
+  : background(this_background),
+    outline(this_outline),
+    content(this_content) {
   /// Specific constructor
 }
 

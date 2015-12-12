@@ -131,6 +131,7 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
 
   // load each glyph
   if(!load_glyphs(font_atlas, face, charcodes)) {
+    std::cout << "GUIStorm: WARNING: Failed to load all glyphs." << std::endl;
     return false;
   }
 
@@ -146,6 +147,7 @@ bool font::load_glyphs(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &fa
   /// Load all glyphs specified in a string
   for(auto const &thischar : codes_to_load) {
     if(!load_glyph(font_atlas, face, thischar)) {
+      std::cout << "GUIStorm: WARNING: Failed to load glyph \"" << thischar << "\" (ascii " << static_cast<unsigned int>(thischar) << ")" << std::endl;
       return false;
     }
   }
@@ -180,7 +182,7 @@ bool font::load_glyph(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &fac
   bitmap_size -= 1;
   font_atlas->SetRegion(region.x, region.y, bitmap_size.x, bitmap_size.y, ft_bitmap.buffer, ft_bitmap.pitch);
 
-  glyph *tempglyph = new glyph;
+  std::shared_ptr<font::glyph> tempglyph(new glyph);
   tempglyph->charcode    = thischar;
   tempglyph->offset.x    = static_cast<GLfloat>(face->glyph->bitmap_left);
   tempglyph->offset.y    = static_cast<GLfloat>(face->glyph->bitmap_top) - static_cast<GLfloat>(bitmap_size.y);
@@ -205,16 +207,17 @@ bool font::load_glyph(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &fac
     //tempglyph->advance.x = 0.0f;                                                // newlines do not advance the cursor
   }
 
-  glyphs.emplace(thischar, tempglyph);
+  {
+    std::lock_guard<std::mutex> lock(glyph_map_mutex);
+    glyphs.emplace(thischar, tempglyph);
+  }
   return true;
 }
 
 void font::unload() {
   /// Unload this font from memory
   /// Note: it is not usually necessary to call this explicitly, as load() will unload first, and destruction will clean up properly
-  for(auto const &it : glyphs) {
-    delete it.second;
-  }
+  std::lock_guard<std::mutex> lock(glyph_map_mutex);
   glyphs.clear();
 }
 
@@ -240,15 +243,16 @@ void font::update_kerning(FT_Face const &face, glyph &this_glyph, glyph const &l
   this_glyph.kerning.emplace(last_glyph.charcode, static_cast<GLfloat>(kerning.x) / (hres * hres));
 }
 
-font::glyph const *font::getglyph(char32_t charcode) {
+std::shared_ptr<font::glyph> const font::getglyph(char32_t charcode) {
   /// Reimplemented form of TextureFont::GetGlyph which is a wrapper for texture_font_load_glyphs
-  font::glyph *tempglyph = nullptr;
+  std::shared_ptr<font::glyph> tempglyph;
   try {
     tempglyph = glyphs.at(charcode);
   } catch(std::out_of_range const &e) {
     #ifdef GUISTORM_LOAD_MISSING_GLYPHS
       std::cout << "GUIStorm: loading glyph for character \"" << charcode << "\" (ascii " << static_cast<unsigned int>(charcode) << ")" << std::endl;
-      unload();
+      ///unload();
+      ///__sync_synchronize();                                                     // memory barrier
       charcodes += charcode;
       parent_gui->load_fonts();                                                 // request a full font reload - expensive!
       tempglyph = glyphs[charcode];

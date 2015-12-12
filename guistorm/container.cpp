@@ -1,5 +1,6 @@
 #include "container.h"
 #include <boost/range/adaptor/reversed.hpp>
+#include "cast_if_required.h"
 #include "base.h"
 #ifndef NDEBUG
   #include <iostream>
@@ -31,7 +32,7 @@ unsigned int container::add(base *element) {
   elements.emplace_back(element);
   elements.back()->parent = this;
   add_to_gui(element);
-  return elements.size() - 1;
+  return cast_if_required<unsigned int>(elements.size()) - 1;
 }
 
 void container::remove(unsigned int index) {

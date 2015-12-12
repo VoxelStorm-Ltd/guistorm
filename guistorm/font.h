@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <mutex>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <freetype-gl++/freetype-gl++.hpp>
@@ -34,7 +35,7 @@ public:
   };
   struct word {
     /// Container for the glyphs that make up a single word of text
-    std::vector<glyph const*> glyphs;                               // the glyphs in this word, including a trailing space, if used
+    std::vector<std::shared_ptr<font::glyph>> glyphs;               // the glyphs in this word, including a trailing space, if used
     bool linebreak = false;                                         // whether to add a line break after this word
     GLfloat length() const;
   };
@@ -49,7 +50,8 @@ public:
 
 private:
   gui *parent_gui = nullptr;
-  std::unordered_map<char32_t, glyph*> glyphs;                      // library of glyphs
+  std::unordered_map<char32_t, std::shared_ptr<glyph>> glyphs;      // library of glyphs
+  std::mutex glyph_map_mutex;                                       // mutex to prevent glyphs being modified while being read
 public:
   std::string name;
   const unsigned char*  memory_offset = 0;                          // offset in memory of the raw font data
@@ -89,7 +91,7 @@ public:
   void update_kerning(FT_Face const &face, glyph &first);
   void update_kerning(FT_Face const &face, glyph &first, glyph const &second);
 
-  glyph const *getglyph(char32_t charcode);
+  std::shared_ptr<font::glyph> const getglyph(char32_t charcode);
 };
 
 }

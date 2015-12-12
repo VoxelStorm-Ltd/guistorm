@@ -2,6 +2,7 @@
 #include <boost/algorithm/clamp.hpp>
 #include <freetype-gl/texture-atlas.h>
 #include "blob_loader.h"
+#include "cast_if_required.h"
 #include "shader_load.h"
 #include "lineshape.h"
 #include "input_text.h"
@@ -148,17 +149,33 @@ void gui::upload_fonts() {
   }
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, font_atlas->width(), font_atlas->height(), 0, GL_ALPHA, GL_UNSIGNED_BYTE, atlas_self->data);
+  glTexImage2D(GL_TEXTURE_2D,
+               0,
+               GL_ALPHA,
+               cast_if_required<GLsizei>(font_atlas->width()),
+               cast_if_required<GLsizei>(font_atlas->height()),
+               0,
+               GL_ALPHA,
+               GL_UNSIGNED_BYTE,
+               atlas_self->data);
 
   // set the 1,0 to 1,1 texels of the font atlas texture to a 0.0-1.0 alpha gradient to use the shader for solid objects without texture switching
-  unsigned int constexpr const strip_height = 2;
+  GLsizei constexpr const strip_height = 2;
   GLfloat data[strip_height][font_atlas->width()];
-  for(unsigned int y = 0; y != strip_height; ++y) {
-    for(unsigned int x = 0; x != font_atlas->width(); ++x) {
+  for(GLsizei y = 0; y != strip_height; ++y) {
+    for(GLsizei x = 0; x != cast_if_required<GLsizei>(font_atlas->width()); ++x) {
       data[y][x] = static_cast<GLfloat>(x) / static_cast<GLfloat>(font_atlas->width() - 1); // produce a gradient from 0 to 1 in unsigned byte form
     }
   }
-  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, font_atlas->height() - strip_height, font_atlas->width(), strip_height, GL_ALPHA, GL_FLOAT, data);
+  glTexSubImage2D(GL_TEXTURE_2D,
+                  0,
+                  0,
+                  cast_if_required<GLsizei>(font_atlas->height()) - strip_height,
+                  cast_if_required<GLsizei>(font_atlas->width()),
+                  strip_height,
+                  GL_ALPHA,
+                  GL_FLOAT,
+                  data);
   glBindTexture(GL_TEXTURE_2D, 0);
   std::cout << "GUIStorm: Font atlas uploaded, " << (font_atlas->width() * font_atlas->height()) / 1024 << "KB, id=" << font_atlas->id() << std::endl;
 }

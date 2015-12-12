@@ -9,11 +9,14 @@ input_text::input_text(container *newparent,
                        colourset const &newcolours,
                        std::string const &newlabel,
                        font *newlabel_font,
+                       unsigned int this_length_limit,
                        coordtype const &thissize,
                        coordtype const &thisposition)
-  : widget(newparent, newcolours, newlabel, newlabel_font, thissize, thisposition) {
+  : widget(newparent, newcolours, newlabel, newlabel_font, thissize, thisposition),
+    length_limit(this_length_limit) {
   /// Specific constructor
   focusable = true;
+  set_length_limit(length_limit);
   cursor_end();                                                                 // wind the cursor to the end for input
 }
 
@@ -148,6 +151,49 @@ void input_text::deselected_as_input() {
   cursor_visible = false;
 }
 
+unsigned int input_text::get_length_limit() const {
+  return length_limit;
+}
+void input_text::set_length_limit(unsigned int new_limit) {
+  length_limit = new_limit;
+  #ifdef GUISTORM_UNSAFEUTF
+    size_t const length = utf8::unchecked::distance(label_text.begin(), label_text.end());
+  #else
+    size_t const length = utf8::distance(label_text.begin(), label_text.end());
+  #endif // GUISTORM_UNSAFEUTF
+  if(length > length_limit) {                                                   // it's too long, so trim the string to fit inside the limit
+    auto it = label_text.begin();
+    for(unsigned int i = 0; i != length_limit; ++i) {                           // find the utf8 character at the length limit
+      #ifdef GUISTORM_UNSAFEUTF
+        utf8::unchecked::next(it);
+      #else
+        utf8::next(it, label_text.end());
+      #endif // GUISTORM_UNSAFEUTF
+    }
+    label_text.erase(it, label_text.end());                                     // trim off anything remaining after the iterator
+  }
+}
+bool input_text::is_multiline_allowed() const {
+  return multiline_allowed;
+}
+void input_text::set_multiline_allowed(bool new_allowed) {
+  if(multiline_allowed == true && new_allowed == false) {
+    // multiline was previously allowed and is now disabled, so we need to check for and remove any line breaks
+    for(auto it = label_text.begin(); it != label_text.end();) {                // iterate through the string by utf8 chars
+      #ifdef GUISTORM_UNSAFEUTF
+        char32_t const codepoint = utf8::unchecked::next(it);
+      #else
+        char32_t const codepoint = utf8::next(it, label_text.end());
+      #endif // GUISTORM_UNSAFEUTF
+      if(codepoint == U'\n' || codepoint == U'\r') {                            // find the first newline
+        label_text.erase(it, label_text.end());                                 // trim off anything remaining after the newline
+        break;
+      }
+    }
+  }
+  multiline_allowed = new_allowed;
+}
+
 void input_text::insert(char character) {
   /// insert the character at the selected position
   if(cursor == label_text.length()) {                                           // are we at the end of the string?
@@ -160,6 +206,12 @@ void input_text::insert(char character) {
 }
 void input_text::insert(char32_t codepoint) {
   /// insert the UTF32 codepoint at the selected position
+  if(label_text.length() == length_limit) {
+    #ifdef DEBUG_GUISTORM
+      std::cout << "GUIStorm: DEBUG: text input " << get_label() << " reached its length limit of " << length_limit << std::endl;
+    #endif // DEBUG_GUISTORM
+    return;                                                                     // can't enter any more text, we're at length limit
+  }
   if(cursor == label_text.length()) {                                           // are we at the end of the string?
     #ifdef GUISTORM_UNSAFEUTF
       utf8::unchecked::append(codepoint, std::back_inserter(label_text));       // just append to the end
@@ -179,7 +231,7 @@ void input_text::insert(char32_t codepoint) {
   #else
     utf8::next(it, label_text.end());
   #endif // GUISTORM_UNSAFEUTF
-  cursor = it - label_text.begin();
+  cursor = cast_if_required<unsigned int>(it - label_text.begin());
   refresh();                                                                    // we've altered the label text so refresh it
 }
 void input_text::cursor_left() {
@@ -192,7 +244,7 @@ void input_text::cursor_left() {
   #else
     utf8::prior(it, label_text.begin());
   #endif // GUISTORM_UNSAFEUTF
-  cursor = it - label_text.begin();
+  cursor = cast_if_required<unsigned int>(it - label_text.begin());
   update_cursor();
 }
 void input_text::cursor_right() {
@@ -205,7 +257,7 @@ void input_text::cursor_right() {
   #else
     utf8::next(it, label_text.end());
   #endif // GUISTORM_UNSAFEUTF
-  cursor = it - label_text.begin();
+  cursor = cast_if_required<unsigned int>(it - label_text.begin());
   update_cursor();
 }
 void input_text::cursor_up() {
@@ -221,7 +273,7 @@ void input_text::cursor_home() {
   update_cursor();
 }
 void input_text::cursor_end() {
-  cursor = label_text.length();
+  cursor = cast_if_required<unsigned int>(label_text.length());
   update_cursor();
 }
 void input_text::cursor_backspace() {
@@ -236,7 +288,7 @@ void input_text::cursor_backspace() {
   #else
     utf8::prior(it, label_text.begin());
   #endif // GUISTORM_UNSAFEUTF
-  cursor = it - label_text.begin();
+  cursor = cast_if_required<unsigned int>(it - label_text.begin());
   label_text.erase(cursor, cursor_last - cursor);                               // erase that character, however wide it may have been
   refresh();                                                                    // we've altered the label text so refresh it
 }
@@ -251,7 +303,7 @@ void input_text::cursor_delete() {
   #else
     utf8::next(it_last, label_text.end());
   #endif // GUISTORM_UNSAFEUTF
-  unsigned int const cursor_last = it_last - label_text.begin();                // don't move the actual cursor position though
+  unsigned int const cursor_last = cast_if_required<unsigned int>(it_last - label_text.begin());  // don't move the actual cursor position though
   label_text.erase(cursor, cursor_last - cursor);                               // erase that character, however wide it may have been
   refresh();                                                                    // we've altered the label text so refresh it
 }
