@@ -66,6 +66,7 @@ protected:
   coordtype label_origin;                       // where to reset the pen to
   coordtype label_size;                         // maximum size of the label, width and height
   GLfloat label_line_spacing = 0.0;             // how far apart the label lines are vertically
+  unsigned int label_glyphs = 0;                // cached count of label glyphs (to assist in fast buffer reservation)
 
 public:
   aligntype label_alignment = aligntype::CENTRE;

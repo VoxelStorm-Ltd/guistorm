@@ -1,5 +1,7 @@
 #include "input_text.h"
-#include "utf8/utf8.h"
+#ifdef GUISTORM_NO_UTF
+  #include "utf8/utf8.h"
+#endif // GUISTORM_NO_UTF
 #include "cast_if_required.h"
 #include "gui.h"
 
@@ -180,12 +182,18 @@ void input_text::set_multiline_allowed(bool new_allowed) {
   if(multiline_allowed == true && new_allowed == false) {
     // multiline was previously allowed and is now disabled, so we need to check for and remove any line breaks
     for(auto it = label_text.begin(); it != label_text.end();) {                // iterate through the string by utf8 chars
-      #ifdef GUISTORM_UNSAFEUTF
-        char32_t const codepoint = utf8::unchecked::next(it);
+      #ifdef GUISTORM_NO_UTF
+        char const codepoint = *it;
+        ++it;
+        if(codepoint == '\n' || codepoint == '\r') {                            // find the first newline
       #else
-        char32_t const codepoint = utf8::next(it, label_text.end());
-      #endif // GUISTORM_UNSAFEUTF
-      if(codepoint == U'\n' || codepoint == U'\r') {                            // find the first newline
+        #ifdef GUISTORM_UNSAFEUTF
+          char32_t const codepoint = utf8::unchecked::next(it);
+        #else
+          char32_t const codepoint = utf8::next(it, label_text.end());
+        #endif // GUISTORM_UNSAFEUTF
+        if(codepoint == U'\n' || codepoint == U'\r') {                          // find the first newline
+      #endif // GUISTORM_NO_UTF
         label_text.erase(it, label_text.end());                                 // trim off anything remaining after the newline
         break;
       }
@@ -204,6 +212,7 @@ void input_text::insert(char character) {
   ++cursor;                                                                     // advance the cursor, no need to worry about unicode
   refresh();                                                                    // we've altered the label text so refresh it
 }
+#ifndef GUISTORM_NO_UTF
 void input_text::insert(char32_t codepoint) {
   /// insert the UTF32 codepoint at the selected position
   if(label_text.length() == length_limit) {
@@ -234,30 +243,39 @@ void input_text::insert(char32_t codepoint) {
   cursor = cast_if_required<unsigned int>(it - label_text.begin());
   refresh();                                                                    // we've altered the label text so refresh it
 }
+#endif // GUISTORM_NO_UTF
 void input_text::cursor_left() {
   if(cursor == 0) {
     return;
   }
-  auto it = label_text.begin() + cursor;
-  #ifdef GUISTORM_UNSAFEUTF
-    utf8::unchecked::prior(it);                                                 // shift the cursor backwards
+  #ifdef GUISTORM_NO_UTF
+    --cursor;
   #else
-    utf8::prior(it, label_text.begin());
-  #endif // GUISTORM_UNSAFEUTF
-  cursor = cast_if_required<unsigned int>(it - label_text.begin());
+    auto it = label_text.begin() + cursor;
+    #ifdef GUISTORM_UNSAFEUTF
+      utf8::unchecked::prior(it);                                               // shift the cursor backwards
+    #else
+      utf8::prior(it, label_text.begin());
+    #endif // GUISTORM_UNSAFEUTF
+    cursor = cast_if_required<unsigned int>(it - label_text.begin());
+  #endif // GUISTORM_NO_UTF
   update_cursor();
 }
 void input_text::cursor_right() {
   if(cursor == label_text.length()) {
     return;
   }
-  auto it = label_text.begin() + cursor;
-  #ifdef GUISTORM_UNSAFEUTF
-    utf8::unchecked::next(it);                                                  // advance the cursor
+  #ifdef GUISTORM_NO_UTF
+    ++cursor;
   #else
-    utf8::next(it, label_text.end());
-  #endif // GUISTORM_UNSAFEUTF
-  cursor = cast_if_required<unsigned int>(it - label_text.begin());
+    auto it = label_text.begin() + cursor;
+    #ifdef GUISTORM_UNSAFEUTF
+      utf8::unchecked::next(it);                                                // advance the cursor
+    #else
+      utf8::next(it, label_text.end());
+    #endif // GUISTORM_UNSAFEUTF
+    cursor = cast_if_required<unsigned int>(it - label_text.begin());
+  #endif // GUISTORM_NO_UTF
   update_cursor();
 }
 void input_text::cursor_up() {
@@ -282,13 +300,17 @@ void input_text::cursor_backspace() {
     return;
   }
   unsigned int const cursor_last = cursor;
-  auto it = label_text.begin() + cursor;
-  #ifdef GUISTORM_UNSAFEUTF
-    utf8::unchecked::prior(it);                                                 // shift the cursor backwards
+  #ifdef GUISTORM_NO_UTF
+    --cursor;
   #else
-    utf8::prior(it, label_text.begin());
-  #endif // GUISTORM_UNSAFEUTF
-  cursor = cast_if_required<unsigned int>(it - label_text.begin());
+    auto it = label_text.begin() + cursor;
+    #ifdef GUISTORM_UNSAFEUTF
+      utf8::unchecked::prior(it);                                               // shift the cursor backwards
+    #else
+      utf8::prior(it, label_text.begin());
+    #endif // GUISTORM_UNSAFEUTF
+    cursor = cast_if_required<unsigned int>(it - label_text.begin());
+  #endif // GUISTORM_NO_UTF
   label_text.erase(cursor, cursor_last - cursor);                               // erase that character, however wide it may have been
   refresh();                                                                    // we've altered the label text so refresh it
 }
@@ -297,13 +319,17 @@ void input_text::cursor_delete() {
   if(cursor == label_text.length()) {
     return;
   }
-  auto it_last = label_text.begin() + cursor;
-  #ifdef GUISTORM_UNSAFEUTF
-    utf8::unchecked::next(it_last);                                             // advance the temporary cursor
+  #ifdef GUISTORM_NO_UTF
+    unsigned int const cursor_last = cursor + 1;                                // don't move the actual cursor position though
   #else
-    utf8::next(it_last, label_text.end());
-  #endif // GUISTORM_UNSAFEUTF
-  unsigned int const cursor_last = cast_if_required<unsigned int>(it_last - label_text.begin());  // don't move the actual cursor position though
+    auto it_last = label_text.begin() + cursor;
+    #ifdef GUISTORM_UNSAFEUTF
+      utf8::unchecked::next(it_last);                                           // advance the temporary cursor
+    #else
+      utf8::next(it_last, label_text.end());
+    #endif // GUISTORM_UNSAFEUTF
+    unsigned int const cursor_last = cast_if_required<unsigned int>(it_last - label_text.begin());  // don't move the actual cursor position though
+  #endif // GUISTORM_NO_UTF
   label_text.erase(cursor, cursor_last - cursor);                               // erase that character, however wide it may have been
   refresh();                                                                    // we've altered the label text so refresh it
 }
@@ -315,7 +341,11 @@ coordtype input_text::get_cursor_position() const{
     return pen;                                                                 // cursor's at the origin if it's at string start
   }
   unsigned int char_position = 0;
-  char32_t charcode_last = U'\0';
+  #ifdef GUISTORM_NO_UTF
+    char charcode_last = '\0';
+  #else
+    char32_t charcode_last = U'\0';
+  #endif // GUISTORM_NO_UTF
   for(auto const &thisline : label_lines) {
     for(auto const &thisword : thisline.words) {
       /*
