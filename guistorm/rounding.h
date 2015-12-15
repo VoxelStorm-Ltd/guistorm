@@ -48,12 +48,12 @@
     inline double fistp2(double val) {
       int out;
       __asm__ __volatile__ ("fistpl %0" : "=m" (out) : "t" (val) : "st");
-      return out;
+      return static_cast<double>(out);
     }
     inline float fistp2(float val) {
       int out;
       __asm__ __volatile__ ("fistpl %0" : "=m" (out) : "t" (val) : "st");
-      return out;
+      return static_cast<float>(out);
     }
     #define GUISTORM_ROUND(x) fistp2(x)
   #elif defined(GUISTORM_ROUND_STOREINT)

@@ -1,5 +1,5 @@
 #include "input_text.h"
-#ifdef GUISTORM_NO_UTF
+#ifndef GUISTORM_NO_UTF
   #include "utf8/utf8.h"
 #endif // GUISTORM_NO_UTF
 #include "cast_if_required.h"
@@ -158,11 +158,15 @@ unsigned int input_text::get_length_limit() const {
 }
 void input_text::set_length_limit(unsigned int new_limit) {
   length_limit = new_limit;
-  #ifdef GUISTORM_UNSAFEUTF
-    size_t const length = utf8::unchecked::distance(label_text.begin(), label_text.end());
+  #ifdef GUISTORM_NO_UTF
+    size_t const length = label_text.length();
   #else
-    size_t const length = utf8::distance(label_text.begin(), label_text.end());
-  #endif // GUISTORM_UNSAFEUTF
+    #ifdef GUISTORM_UNSAFEUTF
+      size_t const length = utf8::unchecked::distance(label_text.begin(), label_text.end());
+    #else
+      size_t const length = utf8::distance(label_text.begin(), label_text.end());
+    #endif // GUISTORM_UNSAFEUTF
+  #endif // GUISTORM_NO_UTF
   if(length > length_limit) {                                                   // it's too long, so trim the string to fit inside the limit
     auto it = label_text.begin();
     for(unsigned int i = 0; i != length_limit; ++i) {                           // find the utf8 character at the length limit
