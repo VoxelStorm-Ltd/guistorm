@@ -185,14 +185,15 @@ void input_text::set_multiline_allowed(bool new_allowed) {
       #ifdef GUISTORM_NO_UTF
         char const codepoint = *it;
         ++it;
+        if(codepoint == '\n' || codepoint == '\r') {                            // find the first newline
       #else
         #ifdef GUISTORM_UNSAFEUTF
           char32_t const codepoint = utf8::unchecked::next(it);
         #else
           char32_t const codepoint = utf8::next(it, label_text.end());
         #endif // GUISTORM_UNSAFEUTF
+        if(codepoint == U'\n' || codepoint == U'\r') {                          // find the first newline
       #endif // GUISTORM_NO_UTF
-      if(codepoint == U'\n' || codepoint == U'\r') {                            // find the first newline
         label_text.erase(it, label_text.end());                                 // trim off anything remaining after the newline
         break;
       }

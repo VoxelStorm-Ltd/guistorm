@@ -439,6 +439,7 @@ void base::arrange_label() {
   /// Called by setup_label, but can be called manually to just update text.
   font &this_label_font(get_label_font());
   // compose the text layout in the abstract first
+  label_glyphs = 0;                                                             // reset the glyph count
   label_line_spacing = this_label_font.metrics_height;
   label_lines.clear();
   label_lines.emplace_back();                                                   // create a default first line
@@ -497,6 +498,7 @@ void base::arrange_label() {
     }
     if(printchar_here) {
       words.back().glyphs.emplace_back(tempglyph);
+      ++label_glyphs;
     } else {
       #ifdef DEBUG_GUISTORM
         //words.back().glyphs.emplace_back(this_label_font.getglyph('/'));
@@ -639,6 +641,12 @@ void base::setup_label() {
   #else
     char32_t charcode_last = U'\0';
   #endif // GUISTORM_NO_UTF
+  vbodata.reserve(label_glyphs * 4);
+  #ifdef GUISTORM_AVOIDQUADS
+    ibodata.reserve(label_glyphs + 6);
+  #else
+    ibodata.reserve(label_glyphs + 4);
+  #endif // GUISTORM_AVOIDQUADS
   for(auto const &thisline : label_lines) {
     for(auto const &thisword : thisline.words) {
       for(auto const &thisglyph : thisword.glyphs) {
@@ -653,16 +661,10 @@ void base::setup_label() {
           #endif // GUISTORM_ROUND_NEAREST_ALL
           coordtype const corner1(corner0 + thisglyph->size);
           unsigned int ibo_offset = cast_if_required<GLuint>(vbodata.size());
-          vbodata.reserve(vbodata.size() + 4);
           vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner0.x, corner0.y)), coordtype(thisglyph->texcoord0.x, thisglyph->texcoord0.y));
           vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner1.x, corner0.y)), coordtype(thisglyph->texcoord1.x, thisglyph->texcoord0.y));
           vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner1.x, corner1.y)), coordtype(thisglyph->texcoord1.x, thisglyph->texcoord1.y));
           vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner0.x, corner1.y)), coordtype(thisglyph->texcoord0.x, thisglyph->texcoord1.y));
-          #ifdef GUISTORM_AVOIDQUADS
-            ibodata.reserve(ibodata.size() + 6);
-          #else
-            ibodata.reserve(ibodata.size() + 4);
-          #endif // GUISTORM_AVOIDQUADS
           ibodata.emplace_back(ibo_offset + 0);
           ibodata.emplace_back(ibo_offset + 1);
           ibodata.emplace_back(ibo_offset + 2);

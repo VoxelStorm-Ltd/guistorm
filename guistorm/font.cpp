@@ -10,7 +10,11 @@ namespace guistorm {
   GLfloat font::glyph::get_kerning(char32_t charcode_last) const {
 #endif // GUISTORM_NO_UTF
   /// Return the kerning for this glyph when preceded by the specified previous glyph
-  if(charcode_last == U'\0') {
+  #ifdef GUISTORM_NO_UTF
+    if(charcode_last == '\0') {
+  #else
+    if(charcode_last == U'\0') {
+  #endif // GUISTORM_NO_UTF
     return 0.0f;
   }
   GLfloat result = 0.0f;
@@ -220,12 +224,25 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
   tempglyph->advance.x   = static_cast<GLfloat>(face->glyph->advance.x) / hres;
   tempglyph->advance.y   = static_cast<GLfloat>(face->glyph->advance.y) / hres;
 
-  if(thischar == U' ') {                                                        // if we're drawing whitespace, skip adding the quad - every little helps
+  #ifdef GUISTORM_NO_UTF
+    if(thischar == ' ') {                                                       // if we're drawing whitespace, skip adding the quad - every little helps
+  #else
+    if(thischar == U' ') {                                                      // if we're drawing whitespace, skip adding the quad - every little helps
+  #endif // GUISTORM_NO_UTF
     tempglyph->is_blank = true;
-  } else if(thischar == U'\t') {                                                // tab
+  #ifdef GUISTORM_NO_UTF
+    } else if(thischar == '\t') {                                               // tab
+  #else
+    } else if(thischar == U'\t') {                                              // tab
+  #endif // GUISTORM_NO_UTF
     tempglyph->is_blank = true;
+  #ifdef GUISTORM_NO_UTF
+    tempglyph->advance.x = 4.0f * getglyph(' ')->advance.x;                     // use four spaces for a tab - yes lame
+    } else if(thischar == '\n' || thischar == '\r') {                           // newline or carriage return
+  #else
     tempglyph->advance.x = 4.0f * getglyph(U' ')->advance.x;                    // use four spaces for a tab - yes lame
-  } else if(thischar == U'\n' || thischar == U'\r') {                           // newline or carriage return
+    } else if(thischar == U'\n' || thischar == U'\r') {                         // newline or carriage return
+  #endif // GUISTORM_NO_UTF
     tempglyph->is_blank = true;
     tempglyph->linebreak = true;
     //tempglyph->advance.x = 0.0f;                                                // newlines do not advance the cursor

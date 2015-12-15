@@ -62,7 +62,11 @@ public:
 
 private:
   gui *parent_gui = nullptr;
-  std::unordered_map<char32_t, std::shared_ptr<glyph>> glyphs;      // library of glyphs
+  #ifdef GUISTORM_NO_UTF
+    std::unordered_map<char, std::shared_ptr<glyph>> glyphs;        // library of ascii glyphs
+  #else
+    std::unordered_map<char32_t, std::shared_ptr<glyph>> glyphs;    // library of unicode glyphs
+  #endif // GUISTORM_NO_UTF
   std::mutex glyph_map_mutex;                                       // mutex to prevent glyphs being modified while being read
 public:
   std::string name;
