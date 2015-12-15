@@ -33,6 +33,12 @@ base::base(container *newparent,
   #endif // NDEBUG
   position *= parent_gui->get_dpi_scale();                                      // these must come after parent gui assignment
   size     *= parent_gui->get_dpi_scale();
+  #ifdef GUISTORM_ROUND_NEAREST_ALL
+    position.x = std::nearbyint(position.x);
+    position.y = std::nearbyint(position.y);
+    size.x = std::nearbyint(size.x);
+    size.y = std::nearbyint(size.y);
+  #endif // GUISTORM_ROUND_NEAREST_ALL
 }
 
 base::~base() {
@@ -59,7 +65,7 @@ void base::toggle() {
 }
 void base::set_position(coordtype const &new_position) {
   /// Update this element's relative position to its parent element or the screen centre if parentless, lower left corner
-  position = new_position * parent_gui->get_dpi_scale();
+  set_position_nodpiscale(new_position * parent_gui->get_dpi_scale());
   refresh_position_only();
 }
 void base::set_position(GLfloat new_position_x, GLfloat new_position_y) {
@@ -68,6 +74,10 @@ void base::set_position(GLfloat new_position_x, GLfloat new_position_y) {
 void base::set_position_nodpiscale(coordtype const &new_position) {
   /// Update this element's relative position to its parent element or the screen centre if parentless, lower left corner - not scaled by dpi
   position = new_position;
+  #ifdef GUISTORM_ROUND_NEAREST_ALL
+    position.x = std::nearbyint(position.x);
+    position.y = std::nearbyint(position.y);
+  #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
 void base::set_position_nodpiscale(GLfloat new_position_x, GLfloat new_position_y) {
@@ -75,7 +85,7 @@ void base::set_position_nodpiscale(GLfloat new_position_x, GLfloat new_position_
 }
 void base::set_size(coordtype const &new_size) {
   /// Update this element's size
-  size = new_size * parent_gui->get_dpi_scale();
+  set_size_nodpiscale(new_size * parent_gui->get_dpi_scale());
   refresh_position_only();
 }
 void base::set_size(GLfloat new_size_x, GLfloat new_size_y) {
@@ -84,6 +94,10 @@ void base::set_size(GLfloat new_size_x, GLfloat new_size_y) {
 void base::set_size_nodpiscale(coordtype const &new_size) {
   /// Update this element's size - not scaled by dpi
   size = new_size;
+  #ifdef GUISTORM_ROUND_NEAREST_ALL
+    size.x = std::nearbyint(size.x);
+    size.y = std::nearbyint(size.y);
+  #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
 void base::set_size_nodpiscale(GLfloat new_size_x, GLfloat new_size_y) {
@@ -92,21 +106,37 @@ void base::set_size_nodpiscale(GLfloat new_size_x, GLfloat new_size_y) {
 void base::move(coordtype const &offset) {
   /// Move this element relative to its existing position
   position += offset * parent_gui->get_dpi_scale();
+  #ifdef GUISTORM_ROUND_NEAREST_ALL
+    position.x = std::nearbyint(position.x);
+    position.y = std::nearbyint(position.y);
+  #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
 void base::grow(coordtype const &increase) {
   /// Scale this element up by a specified increase
   size += increase * parent_gui->get_dpi_scale();
+  #ifdef GUISTORM_ROUND_NEAREST_ALL
+    size.x = std::nearbyint(size.x);
+    size.y = std::nearbyint(size.y);
+  #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
 void base::shrink(coordtype const &decrease) {
   /// Scale this element down by a specified decrease
   size -= decrease * parent_gui->get_dpi_scale();
+  #ifdef GUISTORM_ROUND_NEAREST_ALL
+    size.x = std::nearbyint(size.x);
+    size.y = std::nearbyint(size.y);
+  #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
 void base::scale(coordtype const &factor) {
   /// Scale this element by a specified factor in each direction
   size *= factor;
+  #ifdef GUISTORM_ROUND_NEAREST_ALL
+    size.x = std::nearbyint(size.x);
+    size.y = std::nearbyint(size.y);
+  #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
 
@@ -126,6 +156,9 @@ void base::stretch_to_label_horizontally() {
   #endif // NDEBUG
   if(label_size.x + (label_margin.x * 2) > size.x) {
     size.x = label_size.x + (label_margin.x * 2);
+    #ifdef GUISTORM_ROUND_NEAREST_ALL
+      size.x = std::nearbyint(size.x);
+    #endif // GUISTORM_ROUND_NEAREST_ALL
     refresh_position_only();
   }
 }
@@ -134,6 +167,9 @@ void base::stretch_to_label_vertically() {
   GLfloat const targetsize = label_size.y + (label_margin.y * 2) + get_label_font().metrics_height;
   if(targetsize > size.y) {
     size.y = targetsize;
+    #ifdef GUISTORM_ROUND_NEAREST_ALL
+      size.y = std::nearbyint(size.y);
+    #endif // GUISTORM_ROUND_NEAREST_ALL
     refresh_position_only();
   }
 }
@@ -147,6 +183,9 @@ void base::shrink_to_label_horizontally() {
   GLfloat const targetsize = label_size.x + (label_margin.x * 2);
   if(targetsize < size.x) {
     size.x = targetsize;
+    #ifdef GUISTORM_ROUND_NEAREST_ALL
+      size.x = std::nearbyint(size.x);
+    #endif // GUISTORM_ROUND_NEAREST_ALL
     refresh_position_only();
   }
 }
@@ -155,6 +194,9 @@ void base::shrink_to_label_vertically() {
   GLfloat const targetsize = label_size.y + (label_margin.y * 2) + get_label_font().metrics_height;
   if(targetsize < size.y) {
     size.y = targetsize;
+    #ifdef GUISTORM_ROUND_NEAREST_ALL
+      size.y = std::nearbyint(size.y);
+    #endif // GUISTORM_ROUND_NEAREST_ALL
     refresh_position_only();
   }
 }
@@ -524,16 +566,25 @@ void base::update_label_alignment() {
   case aligntype::TOP:
   case aligntype::BOTTOM:
     label_origin.x = label_position.x + ((size.x - label_size.x) / 2.0f);       // the margins simplify out
+    #ifdef GUISTORM_ROUND_NEAREST_ALL
+      label_origin.x = std::nearbyint(label_origin.x);
+    #endif // GUISTORM_ROUND_NEAREST_ALL
     break;
   case aligntype::LEFT:
   case aligntype::TOP_LEFT:
   case aligntype::BOTTOM_LEFT:
     label_origin.x = label_position.x + (label_margin.x * parent_gui->dpi_scale);
+    #ifdef GUISTORM_ROUND_NEAREST_ALL
+      label_origin.x = std::nearbyint(label_origin.x);
+    #endif // GUISTORM_ROUND_NEAREST_ALL
     break;
   case aligntype::RIGHT:
   case aligntype::TOP_RIGHT:
   case aligntype::BOTTOM_RIGHT:
     label_origin.x = label_position.x - (label_margin.x * parent_gui->dpi_scale) + size.x - label_size.x;
+    #ifdef GUISTORM_ROUND_NEAREST_ALL
+      label_origin.x = std::nearbyint(label_origin.x);
+    #endif // GUISTORM_ROUND_NEAREST_ALL
     break;
   }
   switch(label_alignment) {                                                     // vertical
@@ -541,16 +592,25 @@ void base::update_label_alignment() {
   case aligntype::LEFT:
   case aligntype::RIGHT:
     label_origin.y = label_position.y + ((size.y + label_size.y) / 2.0f);       // the margins simplify out
+    #ifdef GUISTORM_ROUND_NEAREST_ALL
+      label_origin.y = std::nearbyint(label_origin.y);
+    #endif // GUISTORM_ROUND_NEAREST_ALL
     break;
   case aligntype::TOP:
   case aligntype::TOP_LEFT:
   case aligntype::TOP_RIGHT:
     label_origin.y = label_position.y - (label_margin.y * parent_gui->dpi_scale) + size.y - get_label_font().metrics_height;
+    #ifdef GUISTORM_ROUND_NEAREST_ALL
+      label_origin.y = std::nearbyint(label_origin.y);
+    #endif // GUISTORM_ROUND_NEAREST_ALL
     break;
   case aligntype::BOTTOM:
   case aligntype::BOTTOM_LEFT:
   case aligntype::BOTTOM_RIGHT:
     label_origin.y = label_position.y + (label_margin.y * parent_gui->dpi_scale);
+    #ifdef GUISTORM_ROUND_NEAREST_ALL
+      label_origin.y = std::nearbyint(label_origin.y);
+    #endif // GUISTORM_ROUND_NEAREST_ALL
     break;
   }
 }
@@ -573,7 +633,12 @@ void base::setup_label() {
         pen.x += thisglyph->get_kerning(charcode_last);
         charcode_last = thisglyph->charcode;
         if(!thisglyph->is_blank) {                                              // whitespace glyphs don't get added but still take up horizontal space
-          coordtype const corner0(pen + thisglyph->offset);
+          #ifdef GUISTORM_ROUND_NEAREST_ALL
+            coordtype const corner0(std::nearbyint(pen.x + thisglyph->offset.x),
+                                    std::nearbyint(pen.y + thisglyph->offset.y));
+          #else
+            coordtype const corner0(pen + thisglyph->offset);
+          #endif // GUISTORM_ROUND_NEAREST_ALL
           coordtype const corner1(corner0 + thisglyph->size);
           unsigned int ibo_offset = cast_if_required<GLuint>(vbodata.size());
           vbodata.reserve(vbodata.size() + 4);

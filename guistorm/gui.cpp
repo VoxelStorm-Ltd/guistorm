@@ -421,8 +421,13 @@ void gui::set_mouse_released() {
 
 coordtype gui::coord_transform(coordtype const &coord) {
   /// Helper to transform screen coordinates into screen space suitable for feeding to the shader without further transformation
-  return coordtype((coord.x * 2 / windowsize.x) - 1.0f,
-                   (coord.y * 2 / windowsize.y) - 1.0f);
+  #ifdef GUISTORM_ROUND_NEAREST_OUT
+    return coordtype((std::nearbyint(coord.x) * 2 / windowsize.x) - 1.0f,
+                     (std::nearbyint(coord.y) * 2 / windowsize.y) - 1.0f);
+  #else
+    return coordtype((coord.x * 2 / windowsize.x) - 1.0f,
+                     (coord.y * 2 / windowsize.y) - 1.0f);
+  #endif // GUISTORM_ROUND_NEAREST_OUT
 }
 
 void gui::select_input_field(input_text *new_input_field) {
