@@ -6,10 +6,19 @@
 ///
 /// Defines: GUISTORM_AVOIDQUADS - use triangles instead of deprecated GL_QUADS primitives even if quads are cheaper
 ///          GUISTORM_UNBIND - unbind shader and buffers after rendering
+///          GUISTORM_NO_UTF - do not use utf8 and utf32 at all, limit all characters to ascii
 ///          GUISTORM_UNSAFEUTF - do not check UTF8 input for validity when iterating; this assumes you guarantee all strings are safe
 ///          GUISTORM_LOAD_MISSING_GLYPHS - add any new characters we encounter dynamically to the texture atlas (can be costly at runtime)
 ///          GUISTORM_ROUND_NEAREST_OUT - round screen positions and sizes to the nearest pixel when transforming to screen space
 ///          GUISTORM_ROUND_NEAREST_ALL - round all element screen positions and sizes to the nearest pixel at all stages
+///            GUISTORM_ROUND_NEARBYINT - when rounding use std::nearbyint
+///            GUISTORM_ROUND_RINT - when rounding use std::rint
+///            GUISTORM_ROUND_ROUND - when rounding use std::round
+///            GUISTORM_ROUND_CAST - when rounding use cast back and forth
+///            GUISTORM_ROUND_REAL2INT - when rounding use a custom magic-number based function
+///            GUISTORM_ROUND_FISTP - when rounding use the fistp assembly instruction
+///            GUISTORM_ROUND_FISTP2 - when rounding use an alternative fistp assembly implementation
+///            GUISTORM_ROUND_STOREINT - instead of rounding, just store all coordinates in ints (may require -Wno-narrowing)
 ///          DEBUG_GUISTORM - draw outlines of hidden gui elements and show advanced debugging messages
 
 /// Convenience wrapper header to include all top level types

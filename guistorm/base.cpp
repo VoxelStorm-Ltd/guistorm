@@ -1,6 +1,9 @@
 #include "base.h"
-#include "utf8/utf8.h"
+#ifndef GUISTORM_NO_UTF
+  #include "utf8/utf8.h"
+#endif // GUISTORM_NO_UTF
 #include "cast_if_required.h"
+#include "rounding.h"
 #include "gui.h"
 
 namespace guistorm {
@@ -34,10 +37,10 @@ base::base(container *newparent,
   position *= parent_gui->get_dpi_scale();                                      // these must come after parent gui assignment
   size     *= parent_gui->get_dpi_scale();
   #ifdef GUISTORM_ROUND_NEAREST_ALL
-    position.x = std::nearbyint(position.x);
-    position.y = std::nearbyint(position.y);
-    size.x = std::nearbyint(size.x);
-    size.y = std::nearbyint(size.y);
+    position.x = GUISTORM_ROUND(position.x);
+    position.y = GUISTORM_ROUND(position.y);
+    size.x     = GUISTORM_ROUND(size.x);
+    size.y     = GUISTORM_ROUND(size.y);
   #endif // GUISTORM_ROUND_NEAREST_ALL
 }
 
@@ -75,8 +78,8 @@ void base::set_position_nodpiscale(coordtype const &new_position) {
   /// Update this element's relative position to its parent element or the screen centre if parentless, lower left corner - not scaled by dpi
   position = new_position;
   #ifdef GUISTORM_ROUND_NEAREST_ALL
-    position.x = std::nearbyint(position.x);
-    position.y = std::nearbyint(position.y);
+    position.x = GUISTORM_ROUND(position.x);
+    position.y = GUISTORM_ROUND(position.y);
   #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
@@ -95,8 +98,8 @@ void base::set_size_nodpiscale(coordtype const &new_size) {
   /// Update this element's size - not scaled by dpi
   size = new_size;
   #ifdef GUISTORM_ROUND_NEAREST_ALL
-    size.x = std::nearbyint(size.x);
-    size.y = std::nearbyint(size.y);
+    size.x = GUISTORM_ROUND(size.x);
+    size.y = GUISTORM_ROUND(size.y);
   #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
@@ -107,8 +110,8 @@ void base::move(coordtype const &offset) {
   /// Move this element relative to its existing position
   position += offset * parent_gui->get_dpi_scale();
   #ifdef GUISTORM_ROUND_NEAREST_ALL
-    position.x = std::nearbyint(position.x);
-    position.y = std::nearbyint(position.y);
+    position.x = GUISTORM_ROUND(position.x);
+    position.y = GUISTORM_ROUND(position.y);
   #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
@@ -116,8 +119,8 @@ void base::grow(coordtype const &increase) {
   /// Scale this element up by a specified increase
   size += increase * parent_gui->get_dpi_scale();
   #ifdef GUISTORM_ROUND_NEAREST_ALL
-    size.x = std::nearbyint(size.x);
-    size.y = std::nearbyint(size.y);
+    size.x = GUISTORM_ROUND(size.x);
+    size.y = GUISTORM_ROUND(size.y);
   #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
@@ -125,8 +128,8 @@ void base::shrink(coordtype const &decrease) {
   /// Scale this element down by a specified decrease
   size -= decrease * parent_gui->get_dpi_scale();
   #ifdef GUISTORM_ROUND_NEAREST_ALL
-    size.x = std::nearbyint(size.x);
-    size.y = std::nearbyint(size.y);
+    size.x = GUISTORM_ROUND(size.x);
+    size.y = GUISTORM_ROUND(size.y);
   #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
@@ -134,8 +137,8 @@ void base::scale(coordtype const &factor) {
   /// Scale this element by a specified factor in each direction
   size *= factor;
   #ifdef GUISTORM_ROUND_NEAREST_ALL
-    size.x = std::nearbyint(size.x);
-    size.y = std::nearbyint(size.y);
+    size.x = GUISTORM_ROUND(size.x);
+    size.y = GUISTORM_ROUND(size.y);
   #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
@@ -157,7 +160,7 @@ void base::stretch_to_label_horizontally() {
   if(label_size.x + (label_margin.x * 2) > size.x) {
     size.x = label_size.x + (label_margin.x * 2);
     #ifdef GUISTORM_ROUND_NEAREST_ALL
-      size.x = std::nearbyint(size.x);
+      size.x = GUISTORM_ROUND(size.x);
     #endif // GUISTORM_ROUND_NEAREST_ALL
     refresh_position_only();
   }
@@ -168,7 +171,7 @@ void base::stretch_to_label_vertically() {
   if(targetsize > size.y) {
     size.y = targetsize;
     #ifdef GUISTORM_ROUND_NEAREST_ALL
-      size.y = std::nearbyint(size.y);
+      size.y = GUISTORM_ROUND(size.y);
     #endif // GUISTORM_ROUND_NEAREST_ALL
     refresh_position_only();
   }
@@ -184,7 +187,7 @@ void base::shrink_to_label_horizontally() {
   if(targetsize < size.x) {
     size.x = targetsize;
     #ifdef GUISTORM_ROUND_NEAREST_ALL
-      size.x = std::nearbyint(size.x);
+      size.x = GUISTORM_ROUND(size.x);
     #endif // GUISTORM_ROUND_NEAREST_ALL
     refresh_position_only();
   }
@@ -195,7 +198,7 @@ void base::shrink_to_label_vertically() {
   if(targetsize < size.y) {
     size.y = targetsize;
     #ifdef GUISTORM_ROUND_NEAREST_ALL
-      size.y = std::nearbyint(size.y);
+      size.y = GUISTORM_ROUND(size.y);
     #endif // GUISTORM_ROUND_NEAREST_ALL
     refresh_position_only();
   }
@@ -444,11 +447,16 @@ void base::arrange_label() {
   words.emplace_back();
   auto it = label_text.begin();
   for(unsigned int i = 0; it != label_text.end(); ++i) {
-    #ifdef GUISTORM_UNSAFEUTF
-      char32_t const codepoint = utf8::unchecked::next(it);
+    #ifdef GUISTORM_NO_UTF
+      char const codepoint = *it;
+      ++it;
     #else
-      char32_t const codepoint = utf8::next(it, label_text.end());
-    #endif // GUISTORM_UNSAFEUTF
+      #ifdef GUISTORM_UNSAFEUTF
+        char32_t const codepoint = utf8::unchecked::next(it);
+      #else
+        char32_t const codepoint = utf8::next(it, label_text.end());
+      #endif // GUISTORM_UNSAFEUTF
+    #endif // GUISTORM_NO_UTF
     std::shared_ptr<font::glyph> tempglyph(this_label_font.getglyph(codepoint));
     if(!tempglyph) {
       std::cout << "GUIStorm: WARNING: Requested unmapped character \"" << codepoint << "\" (ascii " << static_cast<unsigned int>(codepoint) << ")" << std::endl;
@@ -567,7 +575,7 @@ void base::update_label_alignment() {
   case aligntype::BOTTOM:
     label_origin.x = label_position.x + ((size.x - label_size.x) / 2.0f);       // the margins simplify out
     #ifdef GUISTORM_ROUND_NEAREST_ALL
-      label_origin.x = std::nearbyint(label_origin.x);
+      label_origin.x = GUISTORM_ROUND(label_origin.x);
     #endif // GUISTORM_ROUND_NEAREST_ALL
     break;
   case aligntype::LEFT:
@@ -575,7 +583,7 @@ void base::update_label_alignment() {
   case aligntype::BOTTOM_LEFT:
     label_origin.x = label_position.x + (label_margin.x * parent_gui->dpi_scale);
     #ifdef GUISTORM_ROUND_NEAREST_ALL
-      label_origin.x = std::nearbyint(label_origin.x);
+      label_origin.x = GUISTORM_ROUND(label_origin.x);
     #endif // GUISTORM_ROUND_NEAREST_ALL
     break;
   case aligntype::RIGHT:
@@ -583,7 +591,7 @@ void base::update_label_alignment() {
   case aligntype::BOTTOM_RIGHT:
     label_origin.x = label_position.x - (label_margin.x * parent_gui->dpi_scale) + size.x - label_size.x;
     #ifdef GUISTORM_ROUND_NEAREST_ALL
-      label_origin.x = std::nearbyint(label_origin.x);
+      label_origin.x = GUISTORM_ROUND(label_origin.x);
     #endif // GUISTORM_ROUND_NEAREST_ALL
     break;
   }
@@ -593,7 +601,7 @@ void base::update_label_alignment() {
   case aligntype::RIGHT:
     label_origin.y = label_position.y + ((size.y + label_size.y) / 2.0f);       // the margins simplify out
     #ifdef GUISTORM_ROUND_NEAREST_ALL
-      label_origin.y = std::nearbyint(label_origin.y);
+      label_origin.y = GUISTORM_ROUND(label_origin.y);
     #endif // GUISTORM_ROUND_NEAREST_ALL
     break;
   case aligntype::TOP:
@@ -601,7 +609,7 @@ void base::update_label_alignment() {
   case aligntype::TOP_RIGHT:
     label_origin.y = label_position.y - (label_margin.y * parent_gui->dpi_scale) + size.y - get_label_font().metrics_height;
     #ifdef GUISTORM_ROUND_NEAREST_ALL
-      label_origin.y = std::nearbyint(label_origin.y);
+      label_origin.y = GUISTORM_ROUND(label_origin.y);
     #endif // GUISTORM_ROUND_NEAREST_ALL
     break;
   case aligntype::BOTTOM:
@@ -609,7 +617,7 @@ void base::update_label_alignment() {
   case aligntype::BOTTOM_RIGHT:
     label_origin.y = label_position.y + (label_margin.y * parent_gui->dpi_scale);
     #ifdef GUISTORM_ROUND_NEAREST_ALL
-      label_origin.y = std::nearbyint(label_origin.y);
+      label_origin.y = GUISTORM_ROUND(label_origin.y);
     #endif // GUISTORM_ROUND_NEAREST_ALL
     break;
   }
@@ -626,7 +634,11 @@ void base::setup_label() {
   std::vector<vertex> vbodata;
   std::vector<GLuint> ibodata;
   coordtype pen = label_origin;
-  char32_t charcode_last = U'\0';
+  #ifdef GUISTORM_NO_UTF
+    char charcode_last = '\0';
+  #else
+    char32_t charcode_last = U'\0';
+  #endif // GUISTORM_NO_UTF
   for(auto const &thisline : label_lines) {
     for(auto const &thisword : thisline.words) {
       for(auto const &thisglyph : thisword.glyphs) {
@@ -634,8 +646,8 @@ void base::setup_label() {
         charcode_last = thisglyph->charcode;
         if(!thisglyph->is_blank) {                                              // whitespace glyphs don't get added but still take up horizontal space
           #ifdef GUISTORM_ROUND_NEAREST_ALL
-            coordtype const corner0(std::nearbyint(pen.x + thisglyph->offset.x),
-                                    std::nearbyint(pen.y + thisglyph->offset.y));
+            coordtype const corner0(GUISTORM_ROUND(pen.x + thisglyph->offset.x),
+                                    GUISTORM_ROUND(pen.y + thisglyph->offset.y));
           #else
             coordtype const corner0(pen + thisglyph->offset);
           #endif // GUISTORM_ROUND_NEAREST_ALL

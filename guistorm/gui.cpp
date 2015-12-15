@@ -4,6 +4,7 @@
 #include "blob_loader.h"
 #include "cast_if_required.h"
 #include "shader_load.h"
+#include "rounding.h"
 #include "lineshape.h"
 #include "input_text.h"
 
@@ -240,7 +241,12 @@ void gui::add_font(std::string const &name,
                    const unsigned char* memory_offset,
                    size_t memory_size,
                    float font_size,
-                   std::u32string const &glyphs_to_load) {
+                   #ifdef GUISTORM_NO_UTF
+                     std::string const &glyphs_to_load
+                   #else
+                     std::u32string const &glyphs_to_load
+                   #endif // GUISTORM_NO_UTF
+                   ) {
   /// Font factory that sets up font ownership with this GUI
   fonts.emplace_back(new font(this, name, memory_offset, memory_size, font_size, glyphs_to_load));
   #ifdef DEBUG_GUISTORM
@@ -422,8 +428,8 @@ void gui::set_mouse_released() {
 coordtype gui::coord_transform(coordtype const &coord) {
   /// Helper to transform screen coordinates into screen space suitable for feeding to the shader without further transformation
   #ifdef GUISTORM_ROUND_NEAREST_OUT
-    return coordtype((std::nearbyint(coord.x) * 2 / windowsize.x) - 1.0f,
-                     (std::nearbyint(coord.y) * 2 / windowsize.y) - 1.0f);
+    return coordtype((GUISTORM_ROUND(coord.x) * 2 / windowsize.x) - 1.0f,
+                     (GUISTORM_ROUND(coord.y) * 2 / windowsize.y) - 1.0f);
   #else
     return coordtype((coord.x * 2 / windowsize.x) - 1.0f,
                      (coord.y * 2 / windowsize.y) - 1.0f);

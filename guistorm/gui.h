@@ -79,7 +79,12 @@ public:
                 const unsigned char* memory_offset,
                 size_t memory_size,
                 float font_size,
-                std::u32string const &glyphs_to_load = U"");
+                #ifdef GUISTORM_NO_UTF
+                  std::string const &glyphs_to_load = ""
+                #else
+                  std::u32string const &glyphs_to_load = U""
+                #endif // GUISTORM_NO_UTF
+                );
   void add_font(font *thisfont);
   void clear_fonts();
   font *get_font_by_size(           float size)

@@ -24,7 +24,7 @@ private:
 public:
   input_text(container *parent,
              colourset const &colours,
-             std::string const &label = std::string(),
+             std::string const &label = "",
              font *label_font = nullptr,
              unsigned int this_length_limit = 128,
              coordtype const &size     = coordtype(),

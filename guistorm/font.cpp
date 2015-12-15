@@ -4,8 +4,11 @@
 
 namespace guistorm {
 
-
-GLfloat font::glyph::get_kerning(char32_t charcode_last) const {
+#ifdef GUISTORM_NO_UTF
+  GLfloat font::glyph::get_kerning(char charcode_last) const {
+#else
+  GLfloat font::glyph::get_kerning(char32_t charcode_last) const {
+#endif // GUISTORM_NO_UTF
   /// Return the kerning for this glyph when preceded by the specified previous glyph
   if(charcode_last == U'\0') {
     return 0.0f;
@@ -25,7 +28,11 @@ GLfloat font::glyph::get_kerning(char32_t charcode_last) const {
 GLfloat font::word::length() const {
   /// Return the horizontal length of this word
   GLfloat length = 0.0f;
-  char32_t charcode_last = U' ';
+  #ifdef GUISTORM_NO_UTF
+    char charcode_last = ' ';
+  #else
+    char32_t charcode_last = U' ';
+  #endif // GUISTORM_NO_UTF
   for(auto const &thisglyph : glyphs) {
     length += thisglyph->advance.x + thisglyph->get_kerning(charcode_last);
     charcode_last = thisglyph->charcode;
@@ -47,7 +54,11 @@ font::font(gui *new_parent_gui,
            unsigned char const *new_memory_offset,
            size_t new_memory_size,
            float new_font_size,
-           std::u32string const &charcodes_to_load,
+           #ifdef GUISTORM_NO_UTF
+             std::string const &charcodes_to_load,
+           #else
+             std::u32string const &charcodes_to_load,
+           #endif // GUISTORM_NO_UTF
            bool new_suppress_horizontal_hint)
   : parent_gui(new_parent_gui),
     name(new_name),
@@ -64,8 +75,13 @@ font::font(gui *new_parent_gui,
   #endif
   if(charcodes.empty()) {                                                       // no custom glyphs specified, so load a sensible default selection
     // note: space needs to be the first character, as it's used for reference elsewhere
-    //charcodes = U" ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,?!:/";    // common glyphs
-    charcodes = U" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\t\n\r";  // all lower ascii plus whitespace
+    #ifdef GUISTORM_NO_UTF
+      //charcodes = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,?!:/";    // common glyphs
+      charcodes = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\t\n\r";  // all lower ascii plus whitespace
+    #else
+      //charcodes = U" ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,?!:/";    // common glyphs
+      charcodes = U" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\t\n\r";  // all lower ascii plus whitespace
+    #endif // GUISTORM_NO_UTF
   }
 }
 
@@ -143,7 +159,11 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
   return true;
 }
 
-bool font::load_glyphs(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, std::u32string const &codes_to_load) {
+#ifdef GUISTORM_NO_UTF
+  bool font::load_glyphs(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, std::string const &codes_to_load) {
+#else
+  bool font::load_glyphs(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, std::u32string const &codes_to_load) {
+#endif // GUISTORM_NO_UTF
   /// Load all glyphs specified in a string
   for(auto const &thischar : codes_to_load) {
     if(!load_glyph(font_atlas, face, thischar)) {
@@ -153,7 +173,11 @@ bool font::load_glyphs(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &fa
   }
   return true;
 }
-bool font::load_glyph(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, char32_t thischar) {
+#ifdef GUISTORM_NO_UTF
+  bool font::load_glyph(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, char thischar) {
+#else
+  bool font::load_glyph(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, char32_t thischar) {
+#endif // GUISTORM_NO_UTF
   /// Load a glyph specified by one UTF32 codepoint
   FT_UInt glyph_index = FT_Get_Char_Index(face, thischar);
   FT_Int32 flags = 0;
@@ -243,7 +267,11 @@ void font::update_kerning(FT_Face const &face, glyph &this_glyph, glyph const &l
   this_glyph.kerning.emplace(last_glyph.charcode, static_cast<GLfloat>(kerning.x) / (hres * hres));
 }
 
-std::shared_ptr<font::glyph> const font::getglyph(char32_t charcode) {
+#ifdef GUISTORM_NO_UTF
+  std::shared_ptr<font::glyph> const font::getglyph(char charcode) {
+#else
+  std::shared_ptr<font::glyph> const font::getglyph(char32_t charcode) {
+#endif // GUISTORM_NO_UTF
   /// Reimplemented form of TextureFont::GetGlyph which is a wrapper for texture_font_load_glyphs
   std::shared_ptr<font::glyph> tempglyph;
   try {

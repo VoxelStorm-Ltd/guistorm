@@ -20,7 +20,11 @@ public:
   struct glyph {
     /// Container for the dimensions of glyph rectangles and their texcoords
     friend class font;
-    char32_t charcode = U'\0';                                      // what character this glyph represents
+    #ifdef GUISTORM_NO_UTF
+      char charcode = '\0';                                         // what character this glyph represents (ascii)
+    #else
+      char32_t charcode = U'\0';                                    // what character this glyph represents (unicode)
+    #endif // GUISTORM_NO_UTF
     bool is_blank = false;                                          // for spaces and other invisible horizontal whitespace glyphs
     bool linebreak = false;                                         // whether to add a line break after this glyph
     coordtype offset;                                               // lower-left corner of the quad
@@ -29,9 +33,17 @@ public:
     coordtype texcoord1;                                            // texcoord of the upper right corner in the texture atlas
     coordtype advance;                                              // how far this moves the cursor forward after it's placed
   protected:
-    std::unordered_map<char32_t, GLfloat> kerning;                  // map of kerning for this glyph by preceding character
+    #ifdef GUISTORM_NO_UTF
+      std::unordered_map<char, GLfloat> kerning;                    // map of kerning for this glyph by preceding ascii character
+    #else
+      std::unordered_map<char32_t, GLfloat> kerning;                // map of kerning for this glyph by preceding unicode character
+    #endif // GUISTORM_NO_UTF
   public:
-    GLfloat get_kerning(char32_t charcode_last) const;
+    #ifdef GUISTORM_NO_UTF
+      GLfloat get_kerning(char charcode_last) const;
+    #else
+      GLfloat get_kerning(char32_t charcode_last) const;
+    #endif // GUISTORM_NO_UTF
   };
   struct word {
     /// Container for the glyphs that make up a single word of text
@@ -62,7 +74,11 @@ public:
   GLfloat metrics_height    = 0.0;
   GLfloat metrics_linegap   = 0.0;
 
-  std::u32string charcodes;                                         // string containing all the glyphs to be generated for this font
+  #ifdef GUISTORM_NO_UTF
+    std::string charcodes;                                          // string containing all the ascii glyphs to be generated for this font
+  #else
+    std::u32string charcodes;                                       // string containing all the unicode glyphs to be generated for this font
+  #endif // GUISTORM_NO_UTF
   bool force_autohint           = false;                            // whether to force font hinting - can introduce unnecessary blur
   bool suppress_horizontal_hint = true;                             // whether to suppress horizontal hints for better high-res rendering
   bool suppress_autohunt        = false;                            // whether to disable autohint (ignored if force_autohint is on)
@@ -77,21 +93,34 @@ public:
        unsigned char const *memory_offset,
        size_t memory_size,
        float font_size,
-       std::u32string const &charcodes_to_load = U"",
+       #ifdef GUISTORM_NO_UTF
+         std::string const &charcodes_to_load = "",
+       #else
+        std::u32string const &charcodes_to_load = U"",
+       #endif // GUISTORM_NO_UTF
        bool suppress_horizontal_hint = true);
   ~font();
 
   bool load_if_needed(freetypeglxx::TextureAtlas *font_atlas);
   bool load(freetypeglxx::TextureAtlas *font_atlas);
-  bool load_glyphs(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, std::u32string const &charcodes);
-  bool load_glyph( freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, char32_t charcode);
+  #ifdef GUISTORM_NO_UTF
+    bool load_glyphs(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, std::string const &charcodes);
+    bool load_glyph( freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, char charcode);
+  #else
+    bool load_glyphs(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, std::u32string const &charcodes);
+    bool load_glyph( freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, char32_t charcode);
+  #endif // GUISTORM_NO_UTF
   void unload();
 
   void update_kerning(FT_Face const &face);
   void update_kerning(FT_Face const &face, glyph &first);
   void update_kerning(FT_Face const &face, glyph &first, glyph const &second);
 
-  std::shared_ptr<font::glyph> const getglyph(char32_t charcode);
+  #ifdef GUISTORM_NO_UTF
+    std::shared_ptr<font::glyph> const getglyph(char charcode);
+  #else
+    std::shared_ptr<font::glyph> const getglyph(char32_t charcode);
+  #endif // GUISTORM_NO_UTF
 };
 
 }
