@@ -169,13 +169,17 @@ void input_text::set_length_limit(unsigned int new_limit) {
   #endif // GUISTORM_NO_UTF
   if(length > length_limit) {                                                   // it's too long, so trim the string to fit inside the limit
     auto it = label_text.begin();
-    for(unsigned int i = 0; i != length_limit; ++i) {                           // find the utf8 character at the length limit
-      #ifdef GUISTORM_UNSAFEUTF
-        utf8::unchecked::next(it);
-      #else
-        utf8::next(it, label_text.end());
-      #endif // GUISTORM_UNSAFEUTF
-    }
+    #ifdef GUISTORM_NO_UTF
+      it += length_limit;
+    #else
+      for(unsigned int i = 0; i != length_limit; ++i) {                         // find the utf8 character at the length limit
+        #ifdef GUISTORM_UNSAFEUTF
+          utf8::unchecked::next(it);
+        #else
+          utf8::next(it, label_text.end());
+        #endif // GUISTORM_UNSAFEUTF
+      }
+    #endif // GUISTORM_NO_UTF
     label_text.erase(it, label_text.end());                                     // trim off anything remaining after the iterator
   }
 }
