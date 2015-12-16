@@ -26,7 +26,11 @@ public:
   unsigned int add(base *element);
   void remove(unsigned int index);
   void remove(base const *const thiselement);
-  base *get(unsigned int index) const;
+  #ifdef NDEBUG
+    base *get(unsigned int index) const __attribute__((__pure__));
+  #else
+    base *get(unsigned int index) const;
+  #endif // NDEBUG
   void clear();
 
   virtual void add_to_gui(base *element) = 0;
