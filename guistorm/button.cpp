@@ -43,7 +43,7 @@ void button::execute() {
   /// Wrapper to call this button's function and handle any errors
   try {
     function();
-  } catch(const std::bad_function_call &e) {
+  } catch(std::bad_function_call const &e) {
     std::cout << "GUIStorm: ERROR: button \"" << get_label() << "\" threw exception " << e.what() << std::endl;
   }
 }

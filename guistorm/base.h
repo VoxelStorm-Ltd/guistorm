@@ -136,7 +136,7 @@ public:
   bool const &is_active() const __attribute__((__const__));
   virtual base *get_picked(coordtype const &cursor_position);
   std::string const &get_label() __attribute__((__const__));
-  template<class T, class ...Args> void add_layout_rule(T thisrule, Args &&...args);
+  template<typename T, class ...Args> void add_layout_rule(T thisrule, Args &&...args);
 
   // input handling
   virtual void select_as_input();
@@ -165,7 +165,7 @@ public:
   virtual void render();
 };
 
-template<class T, class ...Args> void base::add_layout_rule(T thisrule, Args &&...args) {
+template<typename T, class ...Args> void base::add_layout_rule(T thisrule, Args &&...args) {
   /// Insertion helper function to build a function object with the right parameters for a layout rule
   // each of these options works, and should be effectively equivalent, but lambdas may be faster, see http://stackoverflow.com/questions/6868171/c0x-lambda-wrappers-vs-bind-for-passing-member-functions
   //layout_rules.emplace_back(std::bind(thisrule, *this, args...));

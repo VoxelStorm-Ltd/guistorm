@@ -238,7 +238,7 @@ void gui::add_to_gui(base *element) {
 }
 
 void gui::add_font(std::string const &name,
-                   const unsigned char* memory_offset,
+                   unsigned char const *memory_offset,
                    size_t memory_size,
                    float font_size,
                    #ifdef GUISTORM_NO_UTF
@@ -444,7 +444,7 @@ void gui::select_input_field(input_text *new_input_field) {
   if(current_input_field != nullptr) {                                          // first deselect anything we have selected already
     try {
       function_deselect_input(*current_input_field);                            // call the deselect (unbind) function
-    } catch(const std::bad_function_call &e) {
+    } catch(std::bad_function_call const &e) {
       std::cout << "GUIStorm: ERROR: input deselect for \"" << current_input_field->get_label() << "\" threw exception " << e.what() << std::endl;
     }
     current_input_field->deselected_as_input();                                 // tell the old one it it's been deselected
@@ -453,7 +453,7 @@ void gui::select_input_field(input_text *new_input_field) {
   if(current_input_field != nullptr) {                                          // only call selection function on non-null object
     try {
       function_select_input(*current_input_field);                              // call the select (bind) function
-    } catch(const std::bad_function_call &e) {
+    } catch(std::bad_function_call const &e) {
       std::cout << "GUIStorm: ERROR: input select for \"" << current_input_field->get_label() << "\" threw exception " << e.what() << std::endl;
     }
     current_input_field->selected_as_input();                                   // tell the new one it it's been selected

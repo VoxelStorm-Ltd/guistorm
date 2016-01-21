@@ -44,10 +44,10 @@ public:
   void set_max_auto();
   void set_min_and_max_auto();
 
-  template<class T> void upload(T const &begin, T const &end);
+  template<typename T> void upload(T const &begin, T const &end);
 };
 
-template<class T> void graph_line::upload(T const &begin, T const &end) {
+template<typename T> void graph_line::upload(T const &begin, T const &end) {
   /// Upload a new set of data points to this graph
   data.clear();
   for(auto const &it : boost::make_iterator_range(begin, end)) {

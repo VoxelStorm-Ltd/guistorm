@@ -76,7 +76,7 @@ public:
 
   void add_to_gui(base *element) override final;
   void add_font(std::string const &name,
-                const unsigned char* memory_offset,
+                unsigned char const *memory_offset,
                 size_t memory_size,
                 float font_size,
                 #ifdef GUISTORM_NO_UTF
