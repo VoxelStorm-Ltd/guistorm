@@ -1,4 +1,5 @@
 #include "base.h"
+#include <iostream>
 #ifndef GUISTORM_NO_UTF
   #include "utf8/utf8.h"
 #endif // GUISTORM_NO_UTF

@@ -3,20 +3,21 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "vmath.h"
+#include "vectorstorm/vector/vector2.h"
+#include "vectorstorm/vector/vector4.h"
 
 namespace guistorm {
 
 // types
 #ifdef GUISTORM_ROUND_STOREINT
-  using coordtype  = Vector2<GLint>;
-  using colourtype = Vector4<GLint>;
+  using coordtype  = vec2<GLint>;
+  using colourtype = vec4<GLint>;
 #else
-  using coordtype  = Vector2<GLfloat>;
-  using colourtype = Vector4<GLfloat>;
+  using coordtype  = vec2<GLfloat>;
+  using colourtype = vec4<GLfloat>;
 #endif // GUISTORM_ROUND_STOREINT
 
-enum class aligntype : char {                 // the coordinate origin and size are relative to which part of the parent
+enum class aligntype : char {                                                   // the coordinate origin and size are relative to which part of the parent
   CENTRE,
   TOP,
   BOTTOM,

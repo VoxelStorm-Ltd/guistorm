@@ -201,7 +201,7 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
 
   FT_Bitmap ft_bitmap = face->glyph->bitmap;
   // We want each glyph to be separated by at least one blank pixel (eg. shader in demo-subpixel.c)
-  Vector2<size_t> bitmap_size(ft_bitmap.width / font_atlas->depth() + 1, ft_bitmap.rows + 1);
+  vec2<size_t> bitmap_size(ft_bitmap.width / font_atlas->depth() + 1, ft_bitmap.rows + 1);
   freetypeglxx::ivec4 region = font_atlas->GetRegion(bitmap_size.x, bitmap_size.y);
   if(region.x < 0) {
     std::cout << "GUIStorm: WARNING: font load: no room in atlas for font " << name << " at size " << font_size << std::endl;

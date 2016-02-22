@@ -1,4 +1,5 @@
 #include "gui.h"
+#include <iostream>
 #include <boost/algorithm/clamp.hpp>
 #include <freetype-gl/texture-atlas.h>
 #include "blob_loader.h"
@@ -11,7 +12,7 @@
 namespace guistorm {
 
 GLuint gui::shader = 0;
-GLfloat constexpr gui::dpi_default;             // static
+GLfloat constexpr gui::dpi_default;
 GLfloat constexpr gui::dpi_min;
 GLfloat constexpr gui::dpi_max;
 
@@ -106,7 +107,7 @@ void gui::destroy_shader() {
 void gui::load_fonts() {
   /// Initialise the font atlas and any font associated objects
   /// Note: TextureAtlas depth == 1 uses format GL_RED by default which is not available on older hardware, so we need to upload manually in those cases
-  Vector2<size_t> newsize(256, 256);
+  vec2<size_t> newsize(256, 256);
   bool atlas_complete;
   do {
     atlas_complete = true;
@@ -129,7 +130,7 @@ void gui::load_fonts() {
       }
     }
   } while(!atlas_complete);
-  upload_fonts();            // upload manually since we've reimplemented loadGlyphs' uploader and so not using font_atlas->Upload()
+  upload_fonts();                                                               // upload manually since we've reimplemented loadGlyphs' uploader and so not using font_atlas->Upload()
 }
 
 #pragma GCC diagnostic push
@@ -137,7 +138,7 @@ void gui::load_fonts() {
 void gui::upload_fonts() {
   /// Manually upload the texture as GL_ALPHA instead of not-always-supported GL_RED which is default in freetype-gl
   texture_atlas_t *atlas_self = static_cast<texture_atlas_t*>(font_atlas->RawGet());
-  if(!font_atlas->id()) {                                               // if no texture has been generated, then generate one ourselves
+  if(!font_atlas->id()) {                                                       // if no texture has been generated, then generate one ourselves
     glGenTextures(1, &atlas_self->id);
   }
   glBindTexture(GL_TEXTURE_2D, font_atlas->id());
@@ -194,12 +195,12 @@ void gui::destroy_fonts() {
 void gui::refresh() {
   /// Re-create the buffers of all elements in this gui
   container::refresh();
-  picked_element = get_picked(cursor_position);       // traverse the tree to update the currently picked element
+  picked_element = get_picked(cursor_position);                                 // traverse the tree to update the currently picked element
 }
 
 void gui::render() {
   /// Render every visible element in the gui
-  if(__builtin_expect(shader == 0, 0)) {  // if the shader hasn't been loaded yet (unlikely)
+  if(__builtin_expect(shader == 0, 0)) {                                        // if the shader hasn't been loaded yet (unlikely)
     std::cout << "WARNING: shader had not been pre-loaded before gui::render called" << std::endl;
     load_shader();
   }
@@ -223,10 +224,10 @@ void gui::render() {
 
   mouse_released = false;
   if(mouse_pressed) {
-    ++mouse_pressed_frames;         // keep track of how long the mouse has been pressed
+    ++mouse_pressed_frames;                                                     // keep track of how long the mouse has been pressed
   } else {
     if(mouse_pressed_frames != 0) {
-      mouse_released = true;        // create a flag for one frame when the mouse is released
+      mouse_released = true;                                                    // create a flag for one frame when the mouse is released
     }
     mouse_pressed_frames = 0;
   }
@@ -278,9 +279,9 @@ void gui::set_windowsize(coordtype const &new_windowsize) {
     return;
   }
   windowsize = new_windowsize;
-  update_layout();                          // reposition any window-relative GUI elements
+  update_layout();                                                              // reposition any window-relative GUI elements
   // update all buffers
-  if(glfwGetCurrentContext() != NULL) {     // make sure we're in a valid opengl context before we try to refresh
+  if(glfwGetCurrentContext() != NULL) {                                         // make sure we're in a valid opengl context before we try to refresh
     refresh();
   } else {
     #ifdef DEBUG_GUISTORM
@@ -315,7 +316,7 @@ font *gui::get_font_by_size_or_nearest(float size) {
   font *f = nullptr;
   for(auto const &thisfont : fonts) {
     if(f) {
-      if(std::abs(thisfont->font_size - size) < std::abs(f->font_size - size)) {      // compare to get the smallest difference in font size
+      if(std::abs(thisfont->font_size - size) < std::abs(f->font_size - size)) {  // compare to get the smallest difference in font size
         f = thisfont;
         #ifdef DEBUG_GUISTORM
           std::cout << "GUIStorm: found new nearest font size " << f->font_size << " (" << f->name << ")" << std::endl;
@@ -337,9 +338,9 @@ font *gui::get_font_by_size_or_smaller(float size) {
   #endif // DEBUG_GUISTORM
   font *f = nullptr;
   for(auto const &thisfont : fonts) {
-    if(thisfont->font_size <= size) {                     // filter for same size or smaller fonts only
+    if(thisfont->font_size <= size) {                                           // filter for same size or smaller fonts only
       if(f) {
-        if(thisfont->font_size > f->font_size) {          // compare to get the biggest font size of the filtered fonts
+        if(thisfont->font_size > f->font_size) {                                // compare to get the biggest font size of the filtered fonts
           f = thisfont;
           #ifdef DEBUG_GUISTORM
             std::cout << "GUIStorm: found new nearest font size " << f->font_size << " (" << f->name << ")" << std::endl;
@@ -362,9 +363,9 @@ font *gui::get_font_by_size_or_bigger(float size) {
   #endif // DEBUG_GUISTORM
   font *f = nullptr;
   for(auto const &thisfont : fonts) {
-    if(thisfont->font_size >= size) {                     // filter for same size or bigger fonts only
+    if(thisfont->font_size >= size) {                                           // filter for same size or bigger fonts only
       if(f) {
-        if(thisfont->font_size < f->font_size) {          // compare to get the smalleset font size of the filtered fonts
+        if(thisfont->font_size < f->font_size) {                                // compare to get the smalleset font size of the filtered fonts
           f = thisfont;
           #ifdef DEBUG_GUISTORM
             std::cout << "GUIStorm: found new nearest font size " << f->font_size << " (" << f->name << ")" << std::endl;
@@ -402,7 +403,7 @@ void gui::set_cursor_position(coordtype const &new_cursor_position) {
   /// Update the cursor position
   cursor_position = new_cursor_position;
   if(cursor) {
-    cursor->set_position_nodpiscale(cursor_position); // don't call the dpi scaler function
+    cursor->set_position_nodpiscale(cursor_position);                           // don't call the dpi scaler function
     cursor->refresh_position_only();
   }
   update_cursor_pick();
@@ -410,7 +411,7 @@ void gui::set_cursor_position(coordtype const &new_cursor_position) {
 
 void gui::update_cursor_pick() {
   /// Update what the cursor is picking, for instance if windows have changed under the cursor without it having moved
-  picked_element = get_picked(cursor_position);       // traverse the tree to update the currently picked element
+  picked_element = get_picked(cursor_position);                                 // traverse the tree to update the currently picked element
 }
 
 void gui::set_mouse_pressed() {

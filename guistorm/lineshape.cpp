@@ -1,4 +1,5 @@
 #include "lineshape.h"
+#include <iostream>
 #include "cast_if_required.h"
 #include "gui.h"
 

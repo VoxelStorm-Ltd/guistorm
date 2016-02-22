@@ -1,4 +1,5 @@
 //#include "layout_rules.h"
+#include <iostream>
 #include "gui.h"
 #include "base.h"
 

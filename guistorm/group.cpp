@@ -1,4 +1,5 @@
 #include "group.h"
+#include <iostream>
 
 namespace guistorm {
 
