@@ -158,8 +158,9 @@ void base::stretch_to_label_horizontally() {
       return;
     }
   #endif // NDEBUG
-  if(label_size.x + (label_margin.x * 2) > size.x) {
-    size.x = label_size.x + (label_margin.x * 2);
+  auto const targetsize = label_size.x + (label_margin.x * 2);
+  if(targetsize > size.x) {
+    size.x = targetsize;
     #ifdef GUISTORM_ROUND_NEAREST_ALL
       size.x = GUISTORM_ROUND(size.x);
     #endif // GUISTORM_ROUND_NEAREST_ALL
@@ -168,7 +169,7 @@ void base::stretch_to_label_horizontally() {
 }
 void base::stretch_to_label_vertically() {
   /// Expand the height of this object to encompass its label contents plus margin
-  GLfloat const targetsize = label_size.y + (label_margin.y * 2) + get_label_font().metrics_height;
+  auto const targetsize = label_size.y + (label_margin.y * 2) + get_label_font().metrics_height;
   if(targetsize > size.y) {
     size.y = targetsize;
     #ifdef GUISTORM_ROUND_NEAREST_ALL
@@ -184,7 +185,7 @@ void base::shrink_to_label() {
 }
 void base::shrink_to_label_horizontally() {
   /// Shrink the width of this object so it is no larger than the widest point of its label contents plus margin
-  GLfloat const targetsize = label_size.x + (label_margin.x * 2);
+  auto const targetsize = label_size.x + (label_margin.x * 2);
   if(targetsize < size.x) {
     size.x = targetsize;
     #ifdef GUISTORM_ROUND_NEAREST_ALL
@@ -195,7 +196,7 @@ void base::shrink_to_label_horizontally() {
 }
 void base::shrink_to_label_vertically() {
   /// Shrink the height of this object so it is no larger than the height point of its label contents plus margin
-  GLfloat const targetsize = label_size.y + (label_margin.y * 2) + get_label_font().metrics_height;
+  auto const targetsize = label_size.y + (label_margin.y * 2) + get_label_font().metrics_height;
   if(targetsize < size.y) {
     size.y = targetsize;
     #ifdef GUISTORM_ROUND_NEAREST_ALL

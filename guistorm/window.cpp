@@ -202,6 +202,35 @@ void window::layout_horizontal(std::vector<base*>::const_iterator first,
   }
 }
 
+void window::stretch_to_labels() {
+  /// Stretch all inner elements horizontally to the widest required unless they're wider
+  stretch_to_labels(elements.begin(), elements.end());                          // wrapper: adding element range
+}
+void window::stretch_to_labels(std::vector<base*>::const_iterator first,
+                               std::vector<base*>::const_iterator last) {
+  /// Stretch selected elements horizontally to the widest required unless they're wider
+  coordtype newsize(get_size());
+  for(auto const &it : boost::make_iterator_range(first, last)) {
+    it->stretch_to_label_horizontally();
+    newsize.x = std::max(newsize.x, it->get_size().x + (it->label_margin.x * 2.0f));        // rubber-band to widest horizontal
+  }
+  for(auto const &it : boost::make_iterator_range(first, last)) {
+    auto const old_size_y(it->get_size().y);
+    it->set_size(newsize.x - it->label_margin.x * 2.0f, old_size_y);
+  }
+  set_size(newsize);
+}
+void window::shrink_to_labels() {
+  /// Shrink all inner elements horizontally to the widest required unless they're narrower
+  shrink_to_labels(elements.begin(), elements.end());                           // wrapper: adding element range
+}
+void window::shrink_to_labels(std::vector<base*>::const_iterator first,
+                              std::vector<base*>::const_iterator last) {
+  /// Shrink selected elements horizontally to the widest required unless they're narrower
+  set_size(0, get_size().y);
+  stretch_to_labels();
+}
+
 void window::destroy_buffer() {
   base::destroy_buffer();
   container::destroy_buffer();

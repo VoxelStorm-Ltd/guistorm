@@ -39,6 +39,11 @@ public:
   void layout_horizontal( std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last, GLfloat margin = 0.0, aligntype alignment = aligntype::CENTRE);
   void layout_horizontal( std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last, coordtype const &bottomleft = coordtype(), coordtype const &topright = coordtype(), aligntype alignment = aligntype::CENTRE);
 
+  void stretch_to_labels();
+  void stretch_to_labels(std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last);
+  void shrink_to_labels();
+  void shrink_to_labels( std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last);
+
   void destroy_buffer() override;
 
   void update_layout() override final;
