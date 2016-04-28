@@ -8,12 +8,12 @@ namespace guistorm {
 class colourset {
 public:
   // a complete set of colours for this widget
-  colourgroup current;                              // current colour of this element
+  colourgroup current;                                                          // current colour of this element
 
-  colourgroup idle;                                 // default colours at idle
-  colourgroup hover;                                // mouseover colours
-  colourgroup focus;                                // focus colours (when an element is currently selected for input)
-  colourgroup active;                               // active colours (while mouse_pressed / when text is being entered)
+  colourgroup idle;                                                             // default colours at idle
+  colourgroup hover;                                                            // mouseover colours
+  colourgroup focus;                                                            // focus colours (when an element is currently selected for input)
+  colourgroup active;                                                           // active colours (while mouse_pressed / when text is being entered)
 
   colourset();
   colourset(colourgroup const &current,

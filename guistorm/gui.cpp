@@ -56,14 +56,14 @@ void gui::destroy_buffer() {
 void gui::load_shader() {
   /// Load and initialise the gui shader
   if(shader != 0) {
-    return;                   // shader already initialised elsewhere
+    return;                                                                     // shader already initialised elsewhere
   }
   std::cout << "GUIStorm: ";
   shader = shader_load(std::string(R"(#version 120
                                       #pragma optimize(on)
                                       #pragma debug(off)
 
-                                      attribute vec4 coords;    // we only input a vec3, so w defaults to 1.0
+                                      attribute vec4 coords;                    // we only input a vec3, so w defaults to 1.0
                                       attribute vec2 texcoords;
 
                                       varying vec2 texcoords_frag;
@@ -116,7 +116,7 @@ void gui::load_fonts() {
     std::cout << "GUIStorm: Loading " << fonts.size() << " fonts to " << font_atlas->width() << "x" << font_atlas->height() << " atlas..." << std::endl;
     for(auto const &thisfont : fonts) {
       atlas_complete = thisfont->load(font_atlas);
-      if(!atlas_complete) {                      // attempt to scale the texture until we reach opengl texture max size
+      if(!atlas_complete) {                                                     // attempt to scale the texture until we reach opengl texture max size
         std::cout << "GUIStorm: Texture atlas full (no room for " << thisfont->name << " size " << thisfont->font_size << "), growing atlas..." << std::endl;
         thisfont->unload();
         newsize *= 2;
@@ -316,7 +316,7 @@ font *gui::get_font_by_size_or_nearest(float size) {
   font *f = nullptr;
   for(auto const &thisfont : fonts) {
     if(f) {
-      if(std::abs(thisfont->font_size - size) < std::abs(f->font_size - size)) {  // compare to get the smallest difference in font size
+      if(std::abs(thisfont->font_size - size) < std::abs(f->font_size - size)) { // compare to get the smallest difference in font size
         f = thisfont;
         #ifdef DEBUG_GUISTORM
           std::cout << "GUIStorm: found new nearest font size " << f->font_size << " (" << f->name << ")" << std::endl;

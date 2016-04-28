@@ -67,7 +67,7 @@ base *container::get(unsigned int index) const {
   #ifndef NDEBUG
     if(index >= elements.size()) {
       std::cout << "ERROR: " << __PRETTY_FUNCTION__ << ": attempted to access element " << index << " outside array bounds " << elements.size() << ", exiting" << std::endl;
-      abort();  // there's nothing sane we can safely return in this situation
+      abort();                                                                  // there's nothing sane we can safely return in this situation
     }
   #endif
   return elements[index];
@@ -82,7 +82,7 @@ void container::clear() {
     }
   #endif
   for(auto & element : elements) {
-    ::delete element;                       // call the default delete operator explicitly to avoid our overridden warning deleter
+    ::delete element;                                                           // call the default delete operator explicitly to avoid our overridden warning deleter
   }
   elements.clear();
 }
@@ -92,13 +92,13 @@ base *container::get_picked(coordtype const &cursor_position) {
   #ifndef NDEBUG
     lock_iterating = true;
   #endif
-  for(auto &element : boost::adaptors::reverse(elements)) {         // we iterate in reverse so most on-top object from equal tiers appears first
+  for(auto &element : boost::adaptors::reverse(elements)) {                     // we iterate in reverse so most on-top object from equal tiers appears first
     base *picked_element(element->get_picked(cursor_position));
     if(picked_element) {
       #ifndef NDEBUG
         lock_iterating = false;
       #endif
-      return picked_element;        // early exit on the first positive result
+      return picked_element;                                                    // early exit on the first positive result
     }
   }
   #ifndef NDEBUG

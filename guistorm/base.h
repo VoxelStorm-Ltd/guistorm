@@ -9,11 +9,11 @@
 
 namespace guistorm {
 
-class gui;                                      // forward declarations
+class gui;                                                                      // forward declarations
 class container;
 
 class base {
-  friend class container;                       // needed to allow deletion by container
+  friend class container;                                                       // needed to allow deletion by container
 protected:
   // OpenGL rendering
   struct vertex {
@@ -26,62 +26,62 @@ protected:
       /// Specific constructor
     }
   };
-  GLuint vbo            = 0;                    // vertex buffer, in format compatible with both GL_LINE_LOOP and GL_TRIANGLE_FAN
-  GLuint ibo            = 0;                    // index buffer
-  GLuint vbo_label      = 0;                    // vertex buffer for label text in GL_QUADS format
-  GLuint ibo_label      = 0;                    // index buffer for label text
-  GLuint numverts       = 0;                    // number of vertices to render for the main shape
-  GLuint numverts_label = 0;                    // number of vertices to render for the label
-  //GLuint font_atlas_id  = 0;                    // font atlas ID for this label
+  GLuint vbo            = 0;                                                    // vertex buffer, in format compatible with both GL_LINE_LOOP and GL_TRIANGLE_FAN
+  GLuint ibo            = 0;                                                    // index buffer
+  GLuint vbo_label      = 0;                                                    // vertex buffer for label text in GL_QUADS format
+  GLuint ibo_label      = 0;                                                    // index buffer for label text
+  GLuint numverts       = 0;                                                    // number of vertices to render for the main shape
+  GLuint numverts_label = 0;                                                    // number of vertices to render for the label
+  //GLuint font_atlas_id  = 0;                                                  // font atlas ID for this label
 
 public:
   // relations
-  gui *parent_gui   = nullptr;                  // the top level gui this entity is rendered as a part of
-  container *parent = nullptr;                  // the container this object belongs to
+  gui *parent_gui   = nullptr;                                                  // the top level gui this entity is rendered as a part of
+  container *parent = nullptr;                                                  // the container this object belongs to
 
 protected:
   // state
-  bool visible     = true;                      // whether to render this element
-  bool initialised = false;                     // whether the buffer is populated and it's ready to be rendered
+  bool visible     = true;                                                      // whether to render this element
+  bool initialised = false;                                                     // whether the buffer is populated and it's ready to be rendered
 public:
-  bool focusable = false;                       // whether it can be given focus
-  bool focused   = false;                       // true recursively for all windows upwards from the currently focused widget or window
+  bool focusable = false;                                                       // whether it can be given focus
+  bool focused   = false;                                                       // true recursively for all windows upwards from the currently focused widget or window
 protected:
-  bool mouseover = false;                       // only works on focusable items
-  bool active    = false;                       // clicked - only true while clicking / typing / dragging
+  bool mouseover = false;                                                       // only works on focusable items
+  bool active    = false;                                                       // clicked - only true while clicking / typing / dragging
 
 protected:
   // positions
-  coordtype position;                           // the relative coordinates of this to its parent
-  coordtype size;                               // the distance of the furthest corner
+  coordtype position;                                                           // the relative coordinates of this to its parent
+  coordtype size;                                                               // the distance of the furthest corner
 
 public:
   // colours
-  colourset colours;                            // set of colours for different states of this object
+  colourset colours;                                                            // set of colours for different states of this object
 
   // label
 protected:
-  std::string label_text;                       // the text for the label of this object
-  std::vector<font::line> label_lines;          // the actual organised label content
-  coordtype label_origin;                       // where to reset the pen to
-  coordtype label_size;                         // maximum size of the label, width and height
-  GLfloat label_line_spacing = 0.0;             // how far apart the label lines are vertically
-  unsigned int label_glyphs = 0;                // cached count of label glyphs (to assist in fast buffer reservation)
+  std::string label_text;                                                       // the text for the label of this object
+  std::vector<font::line> label_lines;                                          // the actual organised label content
+  coordtype label_origin;                                                       // where to reset the pen to
+  coordtype label_size;                                                         // maximum size of the label, width and height
+  GLfloat label_line_spacing = 0.0;                                             // how far apart the label lines are vertically
+  unsigned int label_glyphs = 0;                                                // cached count of label glyphs (to assist in fast buffer reservation)
 
 public:
   aligntype label_alignment = aligntype::CENTRE;
-  coordtype label_margin;                       // how far the label is from the alignment edge, or how big a distance to leave on both sides justifying
-  bool label_merge_whitespace   = true;         // whether to collapse adjacent whitespace together into a single space
-  bool label_merge_newlines     = false;        // whether to collapse adjacent line breaks together into a single newline
-  bool label_wordwrap           = true;         // whether to wrap words to new lines when they exceed the width of the containing box
-  bool label_justify_horizontal = true;         // whether to justify each line horizontally
-  bool label_justify_vertical   = false;        // whether to justify the whole text to fill the vertical space
-  bool label_stretch_vertical   = false;        // whether to stretch the container vertically to fit the label if the label is taller
-  bool label_shrink_vertical    = false;        // whether to shrink the container vertically to fit the label if the label is shorter
-  font *label_font = nullptr;                   // the font chosen for this label - this may be nullptr, use get_label_font() to get one safely
+  coordtype label_margin;                                                       // how far the label is from the alignment edge, or how big a distance to leave on both sides justifying
+  bool label_merge_whitespace   = true;                                         // whether to collapse adjacent whitespace together into a single space
+  bool label_merge_newlines     = false;                                        // whether to collapse adjacent line breaks together into a single newline
+  bool label_wordwrap           = true;                                         // whether to wrap words to new lines when they exceed the width of the containing box
+  bool label_justify_horizontal = true;                                         // whether to justify each line horizontally
+  bool label_justify_vertical   = false;                                        // whether to justify the whole text to fill the vertical space
+  bool label_stretch_vertical   = false;                                        // whether to stretch the container vertically to fit the label if the label is taller
+  bool label_shrink_vertical    = false;                                        // whether to shrink the container vertically to fit the label if the label is shorter
+  font *label_font = nullptr;                                                   // the font chosen for this label - this may be nullptr, use get_label_font() to get one safely
 
   // layout rules
-  std::vector<layout::rule> layout_rules;       // container for layout rules in the order in which they're applied to determine the element's position
+  std::vector<layout::rule> layout_rules;                                       // container for layout rules in the order in which they're applied to determine the element's position
 
 protected:
   base(container *parent,

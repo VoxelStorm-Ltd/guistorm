@@ -44,7 +44,7 @@ base *window::get_picked(coordtype const &cursor_position) {
 
 coordtype const window::get_absolute_position() const {
   /// Return the absolute screen coords of the origin of this element
-  return base::get_absolute_position();    // this is needed since container class has its own function to retrieve absolute position that we must override
+  return base::get_absolute_position();                                         // this is needed since container class has its own function to retrieve absolute position that we must override
 }
 
 void window::stretch_vertical(GLfloat margin) {
@@ -100,7 +100,7 @@ void window::layout_vertical(std::vector<base*>::const_iterator first,
                              GLfloat margin,
                              aligntype alignment) {
   /// Distribute the selected contained elements to fill the whole available space vertically with a set margin
-  layout_vertical(first, last, coordtype(margin, margin), get_size() - margin, alignment);  // wrapper: convert margin to coords
+  layout_vertical(first, last, coordtype(margin, margin), get_size() - margin, alignment); // wrapper: convert margin to coords
 }
 void window::layout_vertical(std::vector<base*>::const_iterator first,
                              std::vector<base*>::const_iterator last,
@@ -113,7 +113,7 @@ void window::layout_vertical(std::vector<base*>::const_iterator first,
     totalheight += it->get_size().y;
   }
   GLfloat const range = topright.y - bottomleft.y;
-  GLfloat const margin = (range - totalheight) / static_cast<GLfloat>(std::distance(first, last) - 1);  // take 1 to allow marginless fitting
+  GLfloat const margin = (range - totalheight) / static_cast<GLfloat>(std::distance(first, last) - 1); // take 1 to allow marginless fitting
   GLfloat pen = topright.y;
   for(auto const &it : boost::make_iterator_range(first, last)) {               // distribute evenly within the space
     pen -= it->get_size().y;
@@ -121,7 +121,7 @@ void window::layout_vertical(std::vector<base*>::const_iterator first,
     case aligntype::CENTRE:
     case aligntype::TOP:
     case aligntype::BOTTOM:
-      it->set_position((((topright.x - bottomleft.x) - it->get_size().x) / 2.0f) + bottomleft.x, pen);  // centre each element
+      it->set_position((((topright.x - bottomleft.x) - it->get_size().x) / 2.0f) + bottomleft.x, pen); // centre each element
       break;
     case aligntype::LEFT:
     case aligntype::TOP_LEFT:
@@ -135,7 +135,7 @@ void window::layout_vertical(std::vector<base*>::const_iterator first,
       break;
     }
     pen -= margin;
-  }     // note: this is not optimal (the loop should be inside the switch) but -funswitch-loops should hoist this for us, so save duplicate copy-pasting
+  }                                                                             // note: this is not optimal (the loop should be inside the switch) but -funswitch-loops should hoist this for us, so save duplicate copy-pasting
 }
 
 void window::layout_horizontal(GLfloat margin,
@@ -158,7 +158,7 @@ void window::layout_horizontal(std::vector<base*>::const_iterator first,
                                GLfloat margin,
                                aligntype alignment) {
   /// Distribute the selected contained elements to fill the whole available space horizontally with a set margin
-  layout_horizontal(first, last, coordtype(margin, margin), get_size() - margin, alignment);  // wrapper: convert margin to coords
+  layout_horizontal(first, last, coordtype(margin, margin), get_size() - margin, alignment); // wrapper: convert margin to coords
 }
 void window::layout_horizontal(std::vector<base*>::const_iterator first,
                                std::vector<base*>::const_iterator last,
@@ -179,7 +179,7 @@ void window::layout_horizontal(std::vector<base*>::const_iterator first,
   case aligntype::LEFT:
   case aligntype::RIGHT:
     for(auto const &it : boost::make_iterator_range(first, last)) {
-      it->set_position(pen, (((topright.y - bottomleft.y) - it->get_size().y) / 2.0f) + bottomleft.y);  // centre each element
+      it->set_position(pen, (((topright.y - bottomleft.y) - it->get_size().y) / 2.0f) + bottomleft.y); // centre each element
       pen += it->get_size().x + margin;
     }
     break;
@@ -212,7 +212,7 @@ void window::stretch_to_labels(std::vector<base*>::const_iterator first,
   coordtype newsize(get_size());
   for(auto const &it : boost::make_iterator_range(first, last)) {
     it->stretch_to_label_horizontally();
-    newsize.x = std::max(newsize.x, it->get_size().x + (it->label_margin.x * 2.0f));        // rubber-band to widest horizontal
+    newsize.x = std::max(newsize.x, it->get_size().x + (it->label_margin.x * 2.0f)); // rubber-band to widest horizontal
   }
   for(auto const &it : boost::make_iterator_range(first, last)) {
     auto const old_size_y(it->get_size().y);

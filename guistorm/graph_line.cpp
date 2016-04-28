@@ -44,7 +44,7 @@ void graph_line::destroy_buffer() {
 
 void graph_line::setup_buffer() {
   /// Create or update the buffer for this element
-  if(__builtin_expect(vbo == 0, 0)) {  // if the buffer hasn't been generated yet (unlikely)
+  if(__builtin_expect(vbo == 0, 0)) {                                           // if the buffer hasn't been generated yet (unlikely)
     init_buffer();
   }
   coordtype const position_absolute(get_absolute_position());
@@ -55,7 +55,7 @@ void graph_line::setup_buffer() {
 
   float const xstep = size.x / static_cast<float>(data.size());
   float vertical_scale = size.y / (max - min);
-  if(std::isnan(vertical_scale)) {      // in case max and min are both zero
+  if(std::isnan(vertical_scale)) {                                              // in case max and min are both zero
     vertical_scale = 0.0;
   }
   float x = position_absolute.x;
@@ -87,11 +87,11 @@ void graph_line::render() {
   if(!visible) {
     return;
   }
-  if(__builtin_expect(!initialised, 0)) {  // if the buffer hasn't been initialised yet (unlikely)
+  if(__builtin_expect(!initialised, 0)) {                                       // if the buffer hasn't been initialised yet (unlikely)
     setup_buffer();
   }
   if(numverts != 0) {
-    if(colours.current.background.a != 0.0f) {                          // skip drawing fully transparent parts
+    if(colours.current.background.a != 0.0f) {                                  // skip drawing fully transparent parts
       glBindBuffer(GL_ARRAY_BUFFER,         vbo_fill);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_fill);
       glVertexAttribPointer(parent_gui->attrib_coords,    2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
@@ -101,9 +101,9 @@ void graph_line::render() {
                   colours.current.background.g,
                   colours.current.background.b,
                   colours.current.background.a);
-      glDrawElements(GL_TRIANGLES, numverts_fill, GL_UNSIGNED_INT, 0);  // fill under the line
+      glDrawElements(GL_TRIANGLES, numverts_fill, GL_UNSIGNED_INT, 0);          // fill under the line
     }
-    if(colours.current.content.a != 0.0f) {                             // skip drawing fully transparent parts
+    if(colours.current.content.a != 0.0f) {                                     // skip drawing fully transparent parts
       glBindBuffer(GL_ARRAY_BUFFER,         vbo);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
       glVertexAttribPointer(parent_gui->attrib_coords,    2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
@@ -113,7 +113,7 @@ void graph_line::render() {
                   colours.current.content.g,
                   colours.current.content.b,
                   colours.current.content.a);
-      glDrawElements(GL_LINE_STRIP, numverts, GL_UNSIGNED_INT, 0);      // line
+      glDrawElements(GL_LINE_STRIP, numverts, GL_UNSIGNED_INT, 0);              // line
     }
   }
 
@@ -123,7 +123,7 @@ void graph_line::render() {
 void graph_line::set_min(float new_min) {
   if(min != new_min) {
     min = new_min;
-    initialised = false;                                                // mark the buffer as needing a refresh
+    initialised = false;                                                        // mark the buffer as needing a refresh
   }
 }
 float const &graph_line::get_min() const {
@@ -132,7 +132,7 @@ float const &graph_line::get_min() const {
 void graph_line::set_max(float new_max) {
   if(max != new_max) {
     max = new_max;
-    initialised = false;                                                // mark the buffer as needing a refresh
+    initialised = false;                                                        // mark the buffer as needing a refresh
   }
 }
 float const &graph_line::get_max() const {
@@ -145,7 +145,7 @@ void graph_line::set_min_and_max(float new_min, float new_max) {
 
 void graph_line::set_min_auto() {
   /// Automatically scale the graph to fit the lowest element of the data
-  if(__builtin_expect(data.empty(), 0)) {                               // branch prediction hint: unlikely
+  if(__builtin_expect(data.empty(), 0)) {                                       // branch prediction hint: unlikely
     min = 0.0;
     return;
   }
@@ -153,7 +153,7 @@ void graph_line::set_min_auto() {
 }
 void graph_line::set_max_auto() {
   /// Automatically scale the graph to fit the highest element of the data
-  if(__builtin_expect(data.empty(), 0)) {                               // branch prediction hint: unlikely
+  if(__builtin_expect(data.empty(), 0)) {                                       // branch prediction hint: unlikely
     max = 0.0;
     return;
   }
@@ -161,7 +161,7 @@ void graph_line::set_max_auto() {
 }
 void graph_line::set_min_and_max_auto() {
   /// Automatically scale the graph to fit all elements of the data
-  if(__builtin_expect(data.empty(), 0)) {                               // branch prediction hint: unlikely
+  if(__builtin_expect(data.empty(), 0)) {                                       // branch prediction hint: unlikely
     min = 0.0;
     max = 0.0;
     return;

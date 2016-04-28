@@ -9,10 +9,10 @@ namespace guistorm {
 class progressbar : public base {
   /// A horizontal bar the fill of which reaches across horizontally to part of its width
 private:
-  GLuint vbo_fill = 0;                      // vertex buffer for the fill, in format compatible with GL_TRIANGLE_FAN - we use the same IBO as base
+  GLuint vbo_fill = 0;                                                          // vertex buffer for the fill, in format compatible with GL_TRIANGLE_FAN - we use the same IBO as base
 
-  float value = 0.0;                        // the value of the progress bar, from 0 to scale (may be negative if scale is negative)
-  float scale = 1.0;                        // the scale of the progress bar, that the value relates to (may be negative)
+  float value = 0.0;                                                            // the value of the progress bar, from 0 to scale (may be negative if scale is negative)
+  float scale = 1.0;                                                            // the scale of the progress bar, that the value relates to (may be negative)
 public:
   progressbar(container *parent,
               colourset const &colours,

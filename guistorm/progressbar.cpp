@@ -39,7 +39,7 @@ void progressbar::destroy_buffer() {
 
 void progressbar::setup_buffer() {
   /// Create or update the buffer for this element
-  if(__builtin_expect(vbo == 0, 0)) {  // if the buffer hasn't been generated yet (unlikely)
+  if(__builtin_expect(vbo == 0, 0)) {                                           // if the buffer hasn't been generated yet (unlikely)
     init_buffer();
   }
   coordtype const position_absolute(get_absolute_position());
@@ -82,11 +82,11 @@ void progressbar::render() {
   if(!visible) {
     return;
   }
-  if(__builtin_expect(!initialised, 0)) {  // if the buffer hasn't been initialised yet (unlikely)
+  if(__builtin_expect(!initialised, 0)) {                                       // if the buffer hasn't been initialised yet (unlikely)
     setup_buffer();
   }
   if(numverts != 0) {
-    if(colours.current.background.a != 0.0f) {                          // skip drawing fully transparent parts
+    if(colours.current.background.a != 0.0f) {                                  // skip drawing fully transparent parts
       glBindBuffer(GL_ARRAY_BUFFER,         vbo_fill);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
       glVertexAttribPointer(parent_gui->attrib_coords,    2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
@@ -96,9 +96,9 @@ void progressbar::render() {
                   colours.current.background.g,
                   colours.current.background.b,
                   colours.current.background.a);
-      glDrawElements(GL_TRIANGLE_FAN, numverts, GL_UNSIGNED_INT, 0);    // background
+      glDrawElements(GL_TRIANGLE_FAN, numverts, GL_UNSIGNED_INT, 0);            // background
     }
-    if(colours.current.outline.a != 0.0f) {                             // skip drawing fully transparent parts
+    if(colours.current.outline.a != 0.0f) {                                     // skip drawing fully transparent parts
       glBindBuffer(GL_ARRAY_BUFFER,         vbo);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
       glVertexAttribPointer(parent_gui->attrib_coords,    2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
@@ -108,7 +108,7 @@ void progressbar::render() {
                   colours.current.outline.g,
                   colours.current.outline.b,
                   colours.current.outline.a);
-      glDrawElements(GL_LINE_LOOP,    numverts, GL_UNSIGNED_INT, 0);    // outline
+      glDrawElements(GL_LINE_LOOP,    numverts, GL_UNSIGNED_INT, 0);            // outline
     }
   }
 

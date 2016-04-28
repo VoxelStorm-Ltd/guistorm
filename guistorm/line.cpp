@@ -35,7 +35,7 @@ void line::destroy_buffer() {
 
 void line::setup_buffer() {
   /// Create or update the buffer for this element
-  if(__builtin_expect(vbo == 0, 0)) {  // if the buffer hasn't been generated yet (unlikely)
+  if(__builtin_expect(vbo == 0, 0)) {                                           // if the buffer hasn't been generated yet (unlikely)
     init_buffer();
   }
 
@@ -67,7 +67,7 @@ void line::render() {
   if(!visible) {
     return;
   }
-  if(__builtin_expect(!initialised, 0)) {  // if the buffer hasn't been initialised yet (unlikely)
+  if(__builtin_expect(!initialised, 0)) {                                       // if the buffer hasn't been initialised yet (unlikely)
     setup_buffer();
   }
   glBindBuffer(GL_ARRAY_BUFFER,         vbo);
@@ -80,7 +80,7 @@ void line::render() {
               colours.current.outline.g,
               colours.current.outline.b,
               colours.current.outline.a);
-  glDrawElements(GL_LINES, numverts, GL_UNSIGNED_INT, 0);    // outline
+  glDrawElements(GL_LINES, numverts, GL_UNSIGNED_INT, 0);                       // outline
 
   update();
 }

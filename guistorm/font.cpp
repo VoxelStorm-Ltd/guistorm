@@ -80,11 +80,11 @@ font::font(gui *new_parent_gui,
   if(charcodes.empty()) {                                                       // no custom glyphs specified, so load a sensible default selection
     // note: space needs to be the first character, as it's used for reference elsewhere
     #ifdef GUISTORM_NO_UTF
-      //charcodes = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,?!:/";    // common glyphs
-      charcodes = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\t\n\r";  // all lower ascii plus whitespace
+      //charcodes = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,?!:/"; // common glyphs
+      charcodes = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\t\n\r"; // all lower ascii plus whitespace
     #else
-      //charcodes = U" ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,?!:/";    // common glyphs
-      charcodes = U" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\t\n\r";  // all lower ascii plus whitespace
+      //charcodes = U" ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,?!:/"; // common glyphs
+      charcodes = U" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\t\n\r"; // all lower ascii plus whitespace
     #endif // GUISTORM_NO_UTF
   }
 }
@@ -245,7 +245,7 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
   #endif // GUISTORM_NO_UTF
     tempglyph->is_blank = true;
     tempglyph->linebreak = true;
-    //tempglyph->advance.x = 0.0f;                                                // newlines do not advance the cursor
+    //tempglyph->advance.x = 0.0f;                                              // newlines do not advance the cursor
   }
 
   {
@@ -297,7 +297,7 @@ void font::update_kerning(FT_Face const &face, glyph &this_glyph, glyph const &l
     #ifdef GUISTORM_LOAD_MISSING_GLYPHS
       std::cout << "GUIStorm: loading glyph for character \"" << charcode << "\" (ascii " << static_cast<unsigned int>(charcode) << ")" << std::endl;
       ///unload();
-      ///__sync_synchronize();                                                     // memory barrier
+      ///__sync_synchronize();                                                  // memory barrier
       charcodes += charcode;
       parent_gui->load_fonts();                                                 // request a full font reload - expensive!
       tempglyph = glyphs[charcode];

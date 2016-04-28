@@ -21,12 +21,12 @@ class gui : public container {
   friend class progressbar;
   friend class graph_line;
 protected:
-  static GLuint shader;                                     // the shader for rendering all gui elements
-  freetypeglxx::TextureAtlas *font_atlas = nullptr;         // texture atlas containing all font glyphs we use
+  static GLuint shader;                                                         // the shader for rendering all gui elements
+  freetypeglxx::TextureAtlas *font_atlas = nullptr;                             // texture atlas containing all font glyphs we use
 public:
-  bool font_atlas_filtering = true;                         // whether to filter the font atlas linearly or use nearest neighbour - for subpixel offsets
-  std::vector<font*> fonts;                                 // the list of fonts we contain
-  font *font_default = nullptr;                             // which font to recommend as default to child objects
+  bool font_atlas_filtering = true;                                             // whether to filter the font atlas linearly or use nearest neighbour - for subpixel offsets
+  std::vector<font*> fonts;                                                     // the list of fonts we contain
+  font *font_default = nullptr;                                                 // which font to recommend as default to child objects
 protected:
   // per-vertex attribute indices
   GLuint attrib_coords    = 0;
@@ -34,27 +34,27 @@ protected:
   GLuint uniform_colour   = 0;
 
 public:
-  static GLfloat constexpr dpi_default = 72.0;              // standard pixels per inch
-  static GLfloat constexpr dpi_min     = 18.0;              // minimum allowed dpi value
-  static GLfloat constexpr dpi_max     = 500.0;             // maximum allowed dpi value
+  static GLfloat constexpr dpi_default = 72.0;                                  // standard pixels per inch
+  static GLfloat constexpr dpi_min     = 18.0;                                  // minimum allowed dpi value
+  static GLfloat constexpr dpi_max     = 500.0;                                 // maximum allowed dpi value
 private:
-  GLfloat dpi = 72.0;                                       // the dots per inch of the display - used to scale and all elements
-  GLfloat dpi_scale = 1.0;                                  // size multiplier to scale gui layout and fonts for the screen
+  GLfloat dpi = 72.0;                                                           // the dots per inch of the display - used to scale and all elements
+  GLfloat dpi_scale = 1.0;                                                      // size multiplier to scale gui layout and fonts for the screen
 public:
-  coordtype windowsize;                                     // cached value for the size of the window
-  coordtype cursor_position;                                // cached value for the window position of the cursor
-  bool mouse_pressed = false;                               // whether we're holding down the mousebutton
-  bool mouse_released = false;                              // whether the mouse was being held and has been released this frame
-  unsigned int mouse_pressed_frames = 0;                    // how long the mouse has been held down, in frames
+  coordtype windowsize;                                                         // cached value for the size of the window
+  coordtype cursor_position;                                                    // cached value for the window position of the cursor
+  bool mouse_pressed = false;                                                   // whether we're holding down the mousebutton
+  bool mouse_released = false;                                                  // whether the mouse was being held and has been released this frame
+  unsigned int mouse_pressed_frames = 0;                                        // how long the mouse has been held down, in frames
 
-  base *picked_element = nullptr;                           // what element we're currently hovering over, if any
+  base *picked_element = nullptr;                                               // what element we're currently hovering over, if any
 
-  base *cursor = nullptr;                                   // what entity is acting as this gui's current cursor, if any
+  base *cursor = nullptr;                                                       // what entity is acting as this gui's current cursor, if any
 
   // input field management
-  std::function<void(input_text&)> function_select_input   = [](input_text &this_input __attribute__((__unused__))){};  // what to call on a selected input field, for binding text input callbacks etc
-  std::function<void(input_text&)> function_deselect_input = [](input_text &this_input __attribute__((__unused__))){};  // what to call on a deselected input field, for unbinding etc
-  input_text *current_input_field = nullptr;                // what input field we have selected, if any
+  std::function<void(input_text&)> function_select_input   = [](input_text &this_input __attribute__((__unused__))){}; // what to call on a selected input field, for binding text input callbacks etc
+  std::function<void(input_text&)> function_deselect_input = [](input_text &this_input __attribute__((__unused__))){}; // what to call on a deselected input field, for unbinding etc
+  input_text *current_input_field = nullptr;                                    // what input field we have selected, if any
 
 
 public:

@@ -7,16 +7,16 @@
 
 namespace guistorm {
 
-class base;                                     // forward declaration
+class base;                                                                     // forward declaration
 
 class container {
   /// virtual class for containing other elements - any element that can contain
   /// others should inherit from this
 public:
-  std::vector<base*> elements;                  // container for all child elements
+  std::vector<base*> elements;                                                  // container for all child elements
 private:
   #ifndef NDEBUG
-    std::atomic_bool lock_iterating{false};     // safety interlock in to catch any attempts to modify the container while iterating through it
+    std::atomic_bool lock_iterating{false};                                     // safety interlock in to catch any attempts to modify the container while iterating through it
   #endif
 protected:
   container();

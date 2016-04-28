@@ -10,14 +10,14 @@ namespace guistorm {
 class graph_line : public base {
   /// A horizontal line graph populated from an iteraterable container
 private:
-  GLuint vbo_fill = 0;                      // vertex buffer for the fill, in format compatible with GL_TRIANGLES
-  GLuint ibo_fill = 0;                      // index buffer for the fill
-  GLuint numverts_fill = 0;                 // number of vertices in the fill buffer
+  GLuint vbo_fill = 0;                                                          // vertex buffer for the fill, in format compatible with GL_TRIANGLES
+  GLuint ibo_fill = 0;                                                          // index buffer for the fill
+  GLuint numverts_fill = 0;                                                     // number of vertices in the fill buffer
 
-  float min = 0.0;                          // the value of the progress bar, from 0 to scale (may be negative if scale is negative)
-  float max = 1.0;                          // the scale of the progress bar, that the value relates to (may be negative)
+  float min = 0.0;                                                              // the value of the progress bar, from 0 to scale (may be negative if scale is negative)
+  float max = 1.0;                                                              // the scale of the progress bar, that the value relates to (may be negative)
 
-  std::vector<float> data;                  // the set of individual graph points
+  std::vector<float> data;                                                      // the set of individual graph points
 
 public:
   graph_line(container *parent,
@@ -53,7 +53,7 @@ template<typename T> void graph_line::upload(T const &begin, T const &end) {
   for(auto const &it : boost::make_iterator_range(begin, end)) {
     data.emplace_back(it);
   }
-  initialised = false;                                                // mark the buffer as needing a refresh
+  initialised = false;                                                          // mark the buffer as needing a refresh
 }
 
 }

@@ -260,7 +260,7 @@ font &base::get_label_font() {
   #ifdef DEBUG_GUISTORM
     //std::cout << "GUIStorm: DEBUG: parent_gui->font_atlas->id() = " << parent_gui->font_atlas->id() << std::endl;
   #endif // DEBUG_GUISTORM
-  //font_atlas_id = parent_gui->font_atlas->id();                                 // cache the font atlas ID for this font
+  //font_atlas_id = parent_gui->font_atlas->id();                               // cache the font atlas ID for this font
   return *thisfont;
 }
 
@@ -407,7 +407,7 @@ void base::destroy_buffer() {
 }
 void base::setup_buffer() {
   /// Create or update the buffer for this element
-  if(__builtin_expect(vbo == 0, 0)) {  // if the buffer hasn't been generated yet (unlikely)
+  if(__builtin_expect(vbo == 0, 0)) {                                           // if the buffer hasn't been generated yet (unlikely)
     init_buffer();
   }
 
@@ -545,7 +545,7 @@ void base::arrange_label() {
 
   // calculate and cache the max line length of each line and the max overall
   for(auto &thisline : label_lines) {
-    thisline.size.x = thisline.length();                // relatively expensive calculation, so we cache the result
+    thisline.size.x = thisline.length();                                        // relatively expensive calculation, so we cache the result
     if(thisline.size.x > label_size.x) {
       label_size.x = thisline.size.x;
     }
@@ -553,7 +553,7 @@ void base::arrange_label() {
 
   // carry out justification if required
   if(label_justify_horizontal && label_lines.size() > 1) {                      // don't justify anything consisting of one line (or none)
-    for(auto &thisline : boost::make_iterator_range(label_lines.begin(), --label_lines.end())) {    // don't justify the last line
+    for(auto &thisline : boost::make_iterator_range(label_lines.begin(), --label_lines.end())) { // don't justify the last line
       if(!thisline.linebreak && thisline.words.size() > 1) {                    // don't try to justify one-word lines or lines that are intentionally split
         thisline.spacing = (label_size.x - thisline.size.x) / static_cast<float>(thisline.words.size() - 1);
       }

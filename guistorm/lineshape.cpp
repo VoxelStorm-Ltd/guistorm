@@ -26,13 +26,13 @@ void lineshape::upload_shape(std::vector<std::pair<coordtype, coordtype>> const 
       return;
     }
   #endif
-  vbodata.reserve(lines.size() * 2);      // worst case size reservation
+  vbodata.reserve(lines.size() * 2);                                            // worst case size reservation
 
   for(std::pair<coordtype, coordtype> pair : lines) {
-    std::vector<coordtype*> coords({&pair.first, &pair.second});      // quick hack to iterate through a pair
+    std::vector<coordtype*> coords({&pair.first, &pair.second});                // quick hack to iterate through a pair
     for(auto const &coord : coords) {
       GLuint thisindex = 0;
-      for(vertex const &v : vbodata) {      // search the vector for this point and try to get its index
+      for(vertex const &v : vbodata) {                                          // search the vector for this point and try to get its index
         if(v.coords == *coord) {
           break;
         }
@@ -53,13 +53,13 @@ void lineshape::upload_shape(std::vector<std::pair<coordtype, coordtype>> const 
     std::cout << "GUIStorm: Lineshape indexer: " << lines.size() * 2 << " input verts reduced to " << vbodata.size() << " (" << ((lines.size() * 2) - vbodata.size()) * 100 / (lines.size() * 2) << "% sharing)" << std::endl;
   #endif // DEBUG_GUISTORM
 
-  refresh();                                  // calculates the transform
+  refresh();                                                                    // calculates the transform
 }
 
 base *lineshape::get_picked(coordtype const &cursor_position) {
   /// Return true if the mouse is over this element
   if(parent_gui->cursor == this) {
-    return nullptr;                           // skip collision check if this is the current cursor, or we can't click anything
+    return nullptr;                                                             // skip collision check if this is the current cursor, or we can't click anything
   }
   return base::get_picked(cursor_position);
 }
@@ -83,12 +83,12 @@ void lineshape::destroy_buffer() {
 
 void lineshape::setup_buffer() {
   /// Create or update the buffer for this element
-  if(__builtin_expect(vbo == 0, 0)) {   // if the buffer hasn't been generated yet (unlikely)
+  if(__builtin_expect(vbo == 0, 0)) {                                           // if the buffer hasn't been generated yet (unlikely)
     init_buffer();
   }
 
   coordtype const position_transformed(parent_gui->coord_transform(position));
-  vbodata_shifted = vbodata_transformed;      // reuse the already allocated vector here
+  vbodata_shifted = vbodata_transformed;                                        // reuse the already allocated vector here
   for(vertex &v : vbodata_shifted) {
     v.coords += position_transformed;
   }
@@ -116,7 +116,7 @@ void lineshape::setup_buffer() {
 
 void lineshape::refresh() {
   /// Transform the coords to gui space
-  vbodata_transformed = vbodata;              // use the cached vector to avoid reallocations
+  vbodata_transformed = vbodata;                                                // use the cached vector to avoid reallocations
   coordtype const baseoffset(parent_gui->coord_transform(coordtype(0.0, 0.0)));
   for(vertex &v : vbodata_transformed) {
     v.coords = parent_gui->coord_transform(v.coords) - baseoffset;
@@ -129,7 +129,7 @@ void lineshape::render() {
   if(!visible) {
     return;
   }
-  if(__builtin_expect(!initialised, 0)) {  // if the buffer hasn't been initialised yet (unlikely)
+  if(__builtin_expect(!initialised, 0)) {                                       // if the buffer hasn't been initialised yet (unlikely)
     setup_buffer();
   }
   glBindBuffer(GL_ARRAY_BUFFER,         vbo);
@@ -142,7 +142,7 @@ void lineshape::render() {
               colours.current.outline.g,
               colours.current.outline.b,
               colours.current.outline.a);
-  glDrawElements(GL_LINES, numverts, GL_UNSIGNED_INT, 0);    // outline
+  glDrawElements(GL_LINES, numverts, GL_UNSIGNED_INT, 0);                       // outline
 
   update();
 }

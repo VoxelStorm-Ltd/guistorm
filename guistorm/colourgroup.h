@@ -7,9 +7,9 @@ namespace guistorm {
 
 class colourgroup {
 public:
-  colourtype background;                            // colour of the solid fill of this element
-  colourtype outline;                               // colour of the outline box of this element
-  colourtype content;                               // colour of the text content of this element
+  colourtype background;                                                        // colour of the solid fill of this element
+  colourtype outline;                                                           // colour of the outline box of this element
+  colourtype content;                                                           // colour of the text content of this element
 
   colourgroup();
   colourgroup(colourtype const &background,

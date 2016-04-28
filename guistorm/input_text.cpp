@@ -64,7 +64,7 @@ void input_text::destroy_buffer() {
 }
 void input_text::setup_buffer() {
   /// Create or update the buffer for this element
-  if(__builtin_expect(vbo_cursor == 0, 0)) {  // if the buffer hasn't been generated yet (unlikely)
+  if(__builtin_expect(vbo_cursor == 0, 0)) {                                    // if the buffer hasn't been generated yet (unlikely)
     init_buffer();
   }
 
@@ -336,7 +336,7 @@ void input_text::cursor_delete() {
     #else
       utf8::next(it_last, label_text.end());
     #endif // GUISTORM_UNSAFEUTF
-    unsigned int const cursor_last = cast_if_required<unsigned int>(it_last - label_text.begin());  // don't move the actual cursor position though
+    unsigned int const cursor_last = cast_if_required<unsigned int>(it_last - label_text.begin()); // don't move the actual cursor position though
   #endif // GUISTORM_NO_UTF
   label_text.erase(cursor, cursor_last - cursor);                               // erase that character, however wide it may have been
   refresh();                                                                    // we've altered the label text so refresh it
