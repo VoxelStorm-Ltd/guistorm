@@ -10,12 +10,12 @@ namespace guistorm {
 
 // types
 #ifdef GUISTORM_ROUND_STOREINT
-  using coordtype  = vec2<GLint>;
-  using colourtype = vec4<GLint>;
+  using coordcomponent = GLint;
 #else
-  using coordtype  = vec2<GLfloat>;
-  using colourtype = vec4<GLfloat>;
+  using coordcomponent = GLfloat;
 #endif // GUISTORM_ROUND_STOREINT
+using coordtype  = vec2<coordcomponent>;
+using colourtype = vec4<coordcomponent>;
 
 enum class aligntype : char {                                                   // the coordinate origin and size are relative to which part of the parent
   CENTRE,

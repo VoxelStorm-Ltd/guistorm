@@ -70,7 +70,7 @@ void input_text::setup_buffer() {
 
   std::vector<vertex> vbodata;
   coordtype const corner0(cursor_position);
-  coordtype const corner1(cursor_position + vec2<GLfloat>(2.0f, 10.0f));
+  coordtype const corner1(cursor_position + coordtype(2.0f, 10.0f));
   // TODO: scale the cursor appropriately to the text
   unsigned int ibo_offset = cast_if_required<GLuint>(vbodata.size());
   vbodata.reserve(4);
@@ -344,7 +344,7 @@ void input_text::cursor_delete() {
 
 coordtype input_text::get_cursor_position() const{
   /// Fetch the cursor's visible coordinates
-  coordtype pen = label_origin;
+  coordtype pen(label_origin);
   if(cursor == 0) {
     return pen;                                                                 // cursor's at the origin if it's at string start
   }

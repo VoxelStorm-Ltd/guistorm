@@ -26,17 +26,17 @@ public:
   coordtype const get_absolute_position() const override final;
 
   // layout control
-  void stretch_vertical(  GLfloat margin = 0.0);
-  void stretch_vertical(  std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last, GLfloat margin = 0.0);
-  void stretch_horizontal(GLfloat margin = 0.0);
-  void stretch_horizontal(std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last, GLfloat margin = 0.0);
-  void layout_vertical(   GLfloat margin = 0.0, aligntype alignment = aligntype::CENTRE);
+  void stretch_vertical(  coordcomponent margin = 0.0);
+  void stretch_vertical(  std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last, coordcomponent margin = 0.0);
+  void stretch_horizontal(coordcomponent margin = 0.0);
+  void stretch_horizontal(std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last, coordcomponent margin = 0.0);
+  void layout_vertical(   coordcomponent margin = 0.0, aligntype alignment = aligntype::CENTRE);
   void layout_vertical(   coordtype const &bottomleft, coordtype const &topright, aligntype alignment = aligntype::CENTRE);
-  void layout_vertical(   std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last, GLfloat margin = 0.0, aligntype alignment = aligntype::CENTRE);
+  void layout_vertical(   std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last, coordcomponent margin = 0.0, aligntype alignment = aligntype::CENTRE);
   void layout_vertical(   std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last, coordtype const &bottomleft = coordtype(), coordtype const &topright = coordtype(), aligntype alignment = aligntype::CENTRE);
-  void layout_horizontal( GLfloat margin = 0.0, aligntype alignment = aligntype::CENTRE);
+  void layout_horizontal( coordcomponent margin = 0.0, aligntype alignment = aligntype::CENTRE);
   void layout_horizontal( coordtype const &bottomleft, coordtype const &topright, aligntype alignment = aligntype::CENTRE);
-  void layout_horizontal( std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last, GLfloat margin = 0.0, aligntype alignment = aligntype::CENTRE);
+  void layout_horizontal( std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last, coordcomponent margin = 0.0, aligntype alignment = aligntype::CENTRE);
   void layout_horizontal( std::vector<base*>::const_iterator first, std::vector<base*>::const_iterator last, coordtype const &bottomleft = coordtype(), coordtype const &topright = coordtype(), aligntype alignment = aligntype::CENTRE);
 
   void stretch_to_labels();

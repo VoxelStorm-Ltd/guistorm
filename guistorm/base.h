@@ -65,7 +65,7 @@ protected:
   std::vector<font::line> label_lines;                                          // the actual organised label content
   coordtype label_origin;                                                       // where to reset the pen to
   coordtype label_size;                                                         // maximum size of the label, width and height
-  GLfloat label_line_spacing = 0.0;                                             // how far apart the label lines are vertically
+  coordcomponent label_line_spacing = 0;                                        // how far apart the label lines are vertically
   unsigned int label_glyphs = 0;                                                // cached count of label glyphs (to assist in fast buffer reservation)
 
 public:
@@ -100,13 +100,13 @@ public:
   void hide();
   void toggle();
   void set_position(coordtype const &new_position);
-  void set_position(GLfloat new_position_x, GLfloat new_position_y);
+  void set_position(coordcomponent new_position_x, coordcomponent new_position_y);
   void set_position_nodpiscale(coordtype const &new_position);
-  void set_position_nodpiscale(GLfloat new_position_x, GLfloat new_position_y);
+  void set_position_nodpiscale(coordcomponent new_position_x, coordcomponent new_position_y);
   void set_size(coordtype const &new_size);
-  void set_size(GLfloat new_size_x, GLfloat new_size_y);
+  void set_size(coordcomponent new_size_x, coordcomponent new_size_y);
   void set_size_nodpiscale(coordtype const &new_size);
-  void set_size_nodpiscale(GLfloat new_size_x, GLfloat new_size_y);
+  void set_size_nodpiscale(coordcomponent new_size_x, coordcomponent new_size_y);
   void move(  coordtype const &offset);
   void grow(  coordtype const &increase);
   void shrink(coordtype const &decrease);

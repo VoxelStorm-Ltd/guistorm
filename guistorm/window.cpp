@@ -44,16 +44,16 @@ base *window::get_picked(coordtype const &cursor_position) {
 
 coordtype const window::get_absolute_position() const {
   /// Return the absolute screen coords of the origin of this element
-  return base::get_absolute_position();                                         // this is needed since container class has its own function to retrieve absolute position that we must override
+  return coordtype(base::get_absolute_position());                              // this is needed since container class has its own function to retrieve absolute position that we must override
 }
 
-void window::stretch_vertical(GLfloat margin) {
+void window::stretch_vertical(coordcomponent margin) {
   /// Expand or shrink this window to include all its elements if fitted in layout_vertical()
   stretch_vertical(elements.begin(), elements.end(), margin);                   // wrapper: adding element range
 }
 void window::stretch_vertical(std::vector<base*>::const_iterator first,
                               std::vector<base*>::const_iterator last,
-                              GLfloat margin) {
+                              coordcomponent margin) {
   /// Expand or shrink this window to include the selected elements if fitted in layout_vertical()
   coordtype newsize(0.0f, margin);
   for(auto const &it : boost::make_iterator_range(first, last)) {
@@ -63,13 +63,13 @@ void window::stretch_vertical(std::vector<base*>::const_iterator first,
   newsize.x += margin * 2.0f;
   set_size(newsize);
 }
-void window::stretch_horizontal(GLfloat margin) {
+void window::stretch_horizontal(coordcomponent margin) {
   /// Expand or shrink this window to include all its elements if fitted in layout_horizontal()
   stretch_horizontal(elements.begin(), elements.end(), margin);                 // wrapper: adding element range
 }
 void window::stretch_horizontal(std::vector<base*>::const_iterator first,
                                 std::vector<base*>::const_iterator last,
-                                GLfloat margin) {
+                                coordcomponent margin) {
   /// Expand or shrink this window to include the selected elements if fitted in layout_horizontal()
   coordtype newsize(margin, 0.0f);
   for(auto const &it : boost::make_iterator_range(first, last)) {
@@ -80,7 +80,7 @@ void window::stretch_horizontal(std::vector<base*>::const_iterator first,
   set_size(newsize);
 }
 
-void window::layout_vertical(GLfloat margin,
+void window::layout_vertical(coordcomponent margin,
                              aligntype alignment) {
   /// Distribute all contained elements to fill the whole available space vertically with a set margin
   layout_vertical(elements.begin(), elements.end(), margin, alignment);         // wrapper: adding element range
@@ -97,7 +97,7 @@ void window::layout_vertical(coordtype const &bottomleft,
 }
 void window::layout_vertical(std::vector<base*>::const_iterator first,
                              std::vector<base*>::const_iterator last,
-                             GLfloat margin,
+                             coordcomponent margin,
                              aligntype alignment) {
   /// Distribute the selected contained elements to fill the whole available space vertically with a set margin
   layout_vertical(first, last, coordtype(margin, margin), get_size() - margin, alignment); // wrapper: convert margin to coords
@@ -138,7 +138,7 @@ void window::layout_vertical(std::vector<base*>::const_iterator first,
   }                                                                             // note: this is not optimal (the loop should be inside the switch) but -funswitch-loops should hoist this for us, so save duplicate copy-pasting
 }
 
-void window::layout_horizontal(GLfloat margin,
+void window::layout_horizontal(coordcomponent margin,
                                aligntype alignment) {
   /// Distribute all contained elements to fill the whole available space horizontally with a set margin
   layout_horizontal(elements.begin(), elements.end(), margin, alignment);       // wrapper: adding element range
@@ -155,7 +155,7 @@ void window::layout_horizontal(coordtype const &bottomleft,
 }
 void window::layout_horizontal(std::vector<base*>::const_iterator first,
                                std::vector<base*>::const_iterator last,
-                               GLfloat margin,
+                               coordcomponent margin,
                                aligntype alignment) {
   /// Distribute the selected contained elements to fill the whole available space horizontally with a set margin
   layout_horizontal(first, last, coordtype(margin, margin), get_size() - margin, alignment); // wrapper: convert margin to coords

@@ -27,16 +27,16 @@ using targettype = guistorm::base&;
 using rule = std::function<void()>;
 
 void centre_horizontally(targettype target);
-void centre_vertically(targettype target);
-void centre(targettype target);
-void offset_left(     targettype target, GLfloat distance = 0.0f);
-void offset_bottom(   targettype target, GLfloat distance = 0.0f);
-void offset_right(    targettype target, GLfloat distance = 0.0f);
-void offset_top(      targettype target, GLfloat distance = 0.0f);
-void fit_horizontally(targettype target, GLfloat margin   = 0.0f);
-void fit_vertically(  targettype target, GLfloat margin   = 0.0f);
-void fit(             targettype target, GLfloat margin   = 0.0f);
-void move(            targettype target, coordtype offset);
+void centre_vertically(  targettype target);
+void centre(             targettype target);
+void offset_left(        targettype target, coordcomponent distance = 0.0f);
+void offset_bottom(      targettype target, coordcomponent distance = 0.0f);
+void offset_right(       targettype target, coordcomponent distance = 0.0f);
+void offset_top(         targettype target, coordcomponent distance = 0.0f);
+void fit_horizontally(   targettype target, coordcomponent margin   = 0.0f);
+void fit_vertically(     targettype target, coordcomponent margin   = 0.0f);
+void fit(                targettype target, coordcomponent margin   = 0.0f);
+void move(               targettype target, coordcomponent offset_x, coordcomponent offset_y);
 #ifndef NDEBUG
   void test_null(targettype target);
   void test_text(targettype target, std::string text);

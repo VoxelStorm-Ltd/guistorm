@@ -72,7 +72,7 @@ void base::set_position(coordtype const &new_position) {
   set_position_nodpiscale(new_position * parent_gui->get_dpi_scale());
   refresh_position_only();
 }
-void base::set_position(GLfloat new_position_x, GLfloat new_position_y) {
+void base::set_position(coordcomponent new_position_x, coordcomponent new_position_y) {
   set_position(coordtype(new_position_x, new_position_y));                      // wrapper
 }
 void base::set_position_nodpiscale(coordtype const &new_position) {
@@ -84,7 +84,7 @@ void base::set_position_nodpiscale(coordtype const &new_position) {
   #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
-void base::set_position_nodpiscale(GLfloat new_position_x, GLfloat new_position_y) {
+void base::set_position_nodpiscale(coordcomponent new_position_x, coordcomponent new_position_y) {
   set_position_nodpiscale(coordtype(new_position_x, new_position_y));           // wrapper
 }
 void base::set_size(coordtype const &new_size) {
@@ -92,7 +92,7 @@ void base::set_size(coordtype const &new_size) {
   set_size_nodpiscale(new_size * parent_gui->get_dpi_scale());
   refresh_position_only();
 }
-void base::set_size(GLfloat new_size_x, GLfloat new_size_y) {
+void base::set_size(coordcomponent new_size_x, coordcomponent new_size_y) {
   set_size(coordtype(new_size_x, new_size_y));                                  // wrapper
 }
 void base::set_size_nodpiscale(coordtype const &new_size) {
@@ -104,7 +104,7 @@ void base::set_size_nodpiscale(coordtype const &new_size) {
   #endif // GUISTORM_ROUND_NEAREST_ALL
   refresh_position_only();
 }
-void base::set_size_nodpiscale(GLfloat new_size_x, GLfloat new_size_y) {
+void base::set_size_nodpiscale(coordcomponent new_size_x, coordcomponent new_size_y) {
   set_size_nodpiscale(coordtype(new_size_x, new_size_y));                       // wrapper
 }
 void base::move(coordtype const &offset) {
@@ -279,7 +279,7 @@ coordtype const base::get_absolute_position() const {
   if(parent_base) {
     return position + parent_base->get_absolute_position();                     // obtain its parent position recursively
   } else {
-    return position;                                                            // its parent is not a base type so has no position of its own
+    return coordtype(position);                                                  // its parent is not a base type so has no position of its own
   }
 }
 coordtype base::get_position() const {
@@ -288,7 +288,7 @@ coordtype base::get_position() const {
 }
 coordtype base::get_position_nodpiscale() const {
   /// Return the relative position without dpi scaling
-  return position;
+  return coordtype(position);
 }
 coordtype base::get_size() const {
   /// Return the size
@@ -296,7 +296,7 @@ coordtype base::get_size() const {
 }
 coordtype base::get_size_nodpiscale() const {
   /// Return the size without dpi scaling
-  return size;
+  return coordtype(size);
 }
 bool const &base::is_visible() const {
   /// Return whether it's currently visible
@@ -637,7 +637,7 @@ void base::setup_label() {
   // compose the VBO from the text positioning
   std::vector<vertex> vbodata;
   std::vector<GLuint> ibodata;
-  coordtype pen = label_origin;
+  coordtype pen(label_origin);
   #ifdef GUISTORM_NO_UTF
     char charcode_last = '\0';
   #else

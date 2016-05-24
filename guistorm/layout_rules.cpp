@@ -52,15 +52,15 @@ void centre(layout::targettype target) {
     target.set_position_nodpiscale((target.parent_gui->windowsize - target.get_size_nodpiscale()) / 2.0f);
   }
 }
-void offset_left(layout::targettype target, GLfloat distance) {
+void offset_left(layout::targettype target, coordcomponent distance) {
   /// Position this element in from the left edge of the parent by the specified optional distance
   target.set_position_nodpiscale(distance, target.get_position_nodpiscale().y);
 }
-void offset_bottom(layout::targettype target, GLfloat distance) {
+void offset_bottom(layout::targettype target, coordcomponent distance) {
   /// Position this element in from the bottom edge of the parent by the specified optional distance
   target.set_position_nodpiscale(target.get_position_nodpiscale().x, distance);
 }
-void offset_right(layout::targettype target, GLfloat distance) {
+void offset_right(layout::targettype target, coordcomponent distance) {
   /// Position this element in from the right edge of the parent by the specified optional distance
   base *parent_base = dynamic_cast<base*>(target.parent);
   if(parent_base) {
@@ -75,7 +75,7 @@ void offset_right(layout::targettype target, GLfloat distance) {
     target.set_position_nodpiscale((target.parent_gui->windowsize.x - target.get_size_nodpiscale().x) - distance, target.get_position_nodpiscale().y);
   }
 }
-void offset_top(layout::targettype target, GLfloat distance) {
+void offset_top(layout::targettype target, coordcomponent distance) {
   /// Position this element in from the bottom top of the parent by the specified optional distance
   base *parent_base = dynamic_cast<base*>(target.parent);
   if(parent_base) {
@@ -91,7 +91,7 @@ void offset_top(layout::targettype target, GLfloat distance) {
   }
 }
 
-void fit_horizontally(targettype target, GLfloat margin) {
+void fit_horizontally(targettype target, coordcomponent margin) {
   /// Position and scale this element to take up the full width of its parent minus the specified optional margin
   base *parent_base = dynamic_cast<base*>(target.parent);
   target.set_position_nodpiscale(margin, target.get_position_nodpiscale().y);
@@ -107,7 +107,7 @@ void fit_horizontally(targettype target, GLfloat margin) {
     target.set_size_nodpiscale(target.parent_gui->windowsize.x - (margin * 2.0f), target.get_size_nodpiscale().y);
   }
 }
-void fit_vertically(targettype target, GLfloat margin) {
+void fit_vertically(targettype target, coordcomponent margin) {
   /// Position and scale this element to take up the full height of its parent minus the specified optional margin
   base *parent_base = dynamic_cast<base*>(target.parent);
   target.set_position_nodpiscale(target.get_position_nodpiscale().x, margin);
@@ -123,7 +123,7 @@ void fit_vertically(targettype target, GLfloat margin) {
     target.set_size_nodpiscale(target.get_size_nodpiscale().x, target.parent_gui->windowsize.y - (margin * 2.0f));
   }
 }
-void fit(targettype target, GLfloat margin) {
+void fit(targettype target, coordcomponent margin) {
   /// Position and scale this element to take up the full size of its parent minus the specified optional margin
   base *parent_base = dynamic_cast<base*>(target.parent);
   target.set_position_nodpiscale(margin, margin);
@@ -139,9 +139,9 @@ void fit(targettype target, GLfloat margin) {
     target.set_size_nodpiscale(target.parent_gui->windowsize - (margin * 2.0f));
   }
 }
-void move(targettype target, coordtype offset) {
+void move(targettype target, coordcomponent offset_x, coordcomponent offset_y) {
   /// Offset the element's position relative to what it previously was
-  target.set_position_nodpiscale(target.get_position_nodpiscale() + offset);
+  target.set_position_nodpiscale(target.get_position_nodpiscale() + coordtype(offset_x, offset_y));
 }
 #ifndef NDEBUG
   void test_null(targettype target __attribute__((__unused__))) {
