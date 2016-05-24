@@ -279,7 +279,7 @@ coordtype const base::get_absolute_position() const {
   if(parent_base) {
     return position + parent_base->get_absolute_position();                     // obtain its parent position recursively
   } else {
-    return coordtype(position);                                                  // its parent is not a base type so has no position of its own
+    return coordtype(position);                                                 // its parent is not a base type so has no position of its own
   }
 }
 coordtype base::get_position() const {
