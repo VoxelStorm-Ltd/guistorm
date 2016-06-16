@@ -32,7 +32,7 @@ protected:
   GLuint ibo_label      = 0;                                                    // index buffer for label text
   GLuint numverts       = 0;                                                    // number of vertices to render for the main shape
   GLuint numverts_label = 0;                                                    // number of vertices to render for the label
-  //GLuint font_atlas_id  = 0;                                                  // font atlas ID for this label
+  //GLuint font_atlas_id  = 0;                                                    // font atlas ID for this label
 
 public:
   // relations

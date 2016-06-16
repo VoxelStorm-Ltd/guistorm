@@ -185,7 +185,7 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
   /// Load a glyph specified by one UTF32 codepoint
   FT_UInt glyph_index = FT_Get_Char_Index(face, thischar);
   FT_Int32 flags = 0;
-  //flags |= FT_LOAD_NO_BITMAP;                                                 // freetype-gl default when using outlines
+  //flags |= FT_LOAD_NO_BITMAP;                                                   // freetype-gl default when using outlines
   flags |= FT_LOAD_RENDER;                                                      // freetype-gl default when using normal rendering
   if(force_autohint) {
     flags |= FT_LOAD_FORCE_AUTOHINT;                                            // freetype-gl default when hinting enabled
@@ -245,7 +245,7 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
   #endif // GUISTORM_NO_UTF
     tempglyph->is_blank = true;
     tempglyph->linebreak = true;
-    //tempglyph->advance.x = 0.0f;                                              // newlines do not advance the cursor
+    //tempglyph->advance.x = 0.0f;                                                // newlines do not advance the cursor
   }
 
   {
@@ -297,7 +297,7 @@ void font::update_kerning(FT_Face const &face, glyph &this_glyph, glyph const &l
     #ifdef GUISTORM_LOAD_MISSING_GLYPHS
       std::cout << "GUIStorm: loading glyph for character \"" << charcode << "\" (ascii " << static_cast<unsigned int>(charcode) << ")" << std::endl;
       ///unload();
-      ///__sync_synchronize();                                                  // memory barrier
+      ///__sync_synchronize();                                                    // memory barrier
       charcodes += charcode;
       parent_gui->load_fonts();                                                 // request a full font reload - expensive!
       tempglyph = glyphs[charcode];

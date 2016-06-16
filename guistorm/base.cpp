@@ -260,7 +260,7 @@ font &base::get_label_font() {
   #ifdef DEBUG_GUISTORM
     //std::cout << "GUIStorm: DEBUG: parent_gui->font_atlas->id() = " << parent_gui->font_atlas->id() << std::endl;
   #endif // DEBUG_GUISTORM
-  //font_atlas_id = parent_gui->font_atlas->id();                               // cache the font atlas ID for this font
+  //font_atlas_id = parent_gui->font_atlas->id();                                 // cache the font atlas ID for this font
   return *thisfont;
 }
 
