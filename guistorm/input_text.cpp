@@ -4,6 +4,9 @@
 #endif // GUISTORM_NO_UTF
 #include "cast_if_required.h"
 #include "gui.h"
+#ifdef DEBUG_GUISTORM
+  #include <iostream>
+#endif // DEBUG_GUISTORM
 
 namespace guistorm {
 

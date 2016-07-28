@@ -515,7 +515,7 @@ void base::arrange_label() {
   for(auto const &thisword : words) {
     GLfloat wordlength = thisword.length();
     hpos += wordlength;
-    if(label_wordwrap) {
+    if(label_wordwrap && words.size() > 1) {                                    // don't try to wrap single word labels
       if(hpos > text_area.x) {                                                  // this word would break out of the permissible box area, so start a new line
         if(hpos > label_size.x) {
           label_size.x = hpos -  wordlength;                                    // this line is the longest (for centering calculations)

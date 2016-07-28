@@ -44,7 +44,8 @@ base *window::get_picked(coordtype const &cursor_position) {
 
 coordtype const window::get_absolute_position() const {
   /// Return the absolute screen coords of the origin of this element
-  return coordtype(base::get_absolute_position());                              // this is needed since container class has its own function to retrieve absolute position that we must override
+  coordtype this_coord(base::get_absolute_position());                          // we need to copy
+  return this_coord;                                                            // this is needed since container class has its own function to retrieve absolute position that we must override
 }
 
 void window::stretch_vertical(coordcomponent margin) {
@@ -224,8 +225,8 @@ void window::shrink_to_labels() {
   /// Shrink all inner elements horizontally to the widest required unless they're narrower
   shrink_to_labels(elements.begin(), elements.end());                           // wrapper: adding element range
 }
-void window::shrink_to_labels(std::vector<base*>::const_iterator first,
-                              std::vector<base*>::const_iterator last) {
+void window::shrink_to_labels(std::vector<base*>::const_iterator first __attribute__((__unused__)),
+                              std::vector<base*>::const_iterator last __attribute__((__unused__))) {
   /// Shrink selected elements horizontally to the widest required unless they're narrower
   set_size(0, get_size().y);
   stretch_to_labels();
