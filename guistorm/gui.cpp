@@ -6,7 +6,6 @@
 #include "cast_if_required.h"
 #include "shader_load.h"
 #include "rounding.h"
-#include "lineshape.h"
 #include "input_text.h"
 
 namespace guistorm {
