@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <mutex>
+#include <memory>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <freetype-gl++/freetype-gl++.hpp>
