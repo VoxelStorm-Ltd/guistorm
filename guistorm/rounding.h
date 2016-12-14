@@ -1,6 +1,5 @@
 #if defined(GUISTORM_ROUND_NEAREST_OUT) || defined(GUISTORM_ROUND_NEAREST_ALL)
   #if defined(GUISTORM_ROUND_NEARBYINT)
-#if defined(GUISTORM_ROUND_NEAREST_OUT) || defined(GUISTORM_ROUND_NEAREST_ALL)
     #pragma message "GUIStorm rounding mode: std::nearbyint"
     #define GUISTORM_ROUND(x) std::nearbyint(x)
   #elif defined(GUISTORM_ROUND_RINT)

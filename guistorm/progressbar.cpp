@@ -98,3 +98,62 @@ void progressbar::render() {
                   colours.current.background.a);
       glDrawElements(GL_TRIANGLE_FAN, numverts, GL_UNSIGNED_INT, 0);            // background
     }
+    if(colours.current.outline.a != 0.0f) {                                     // skip drawing fully transparent parts
+      glBindBuffer(GL_ARRAY_BUFFER,         vbo);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+      glVertexAttribPointer(parent_gui->attrib_coords,    2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
+      glVertexAttribPointer(parent_gui->attrib_texcoords, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::texcoords)));
+      glUniform4f(parent_gui->uniform_colour,
+                  colours.current.outline.r,
+                  colours.current.outline.g,
+                  colours.current.outline.b,
+                  colours.current.outline.a);
+      glDrawElements(GL_LINE_LOOP,    numverts, GL_UNSIGNED_INT, 0);            // outline
+    }
+  }
+
+  update();
+}
+
+void progressbar::set_value(float new_value) {
+  /// update the value displayed by this progress bar, and refresh the buffer if it's changed
+  if(value == new_value) {
+    return;
+  }
+  value = new_value;
+  setup_buffer();
+}
+float const &progressbar::get_value() const {
+  return value;
+}
+
+void progressbar::set_scale(float new_scale) {
+  /// update the scale on which the progress bar displays, and refresh the buffer if it's changed
+  if(scale == new_scale) {
+    return;
+  }
+  scale = new_scale;
+  setup_buffer();
+}
+float const &progressbar::get_scale() const {
+  return scale;
+}
+void progressbar::set_value_and_scale(float new_value, float new_scale) {
+  /// Convenience function to avoid double buffer adjusts
+  if(scale == new_scale && value == new_value) {
+    return;
+  }
+  value = new_value;
+  scale = new_scale;
+  setup_buffer();
+}
+void progressbar::set_percentage(float new_percentage) {
+  /// Wrapper for dealing with percentages
+  set_value(new_percentage / 100.0f);
+}
+float progressbar::get_percentage() const {
+  /// Wrapper for dealing with percentages
+  return get_value() * 100.0f;
+}
+
+}

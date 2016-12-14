@@ -119,3 +119,19 @@ public:
   void set_dpi_scale(GLfloat newscale);
   void set_cursor_position(coordtype const &new_cursor_position);
   void update_cursor_pick();
+  void set_mouse_pressed();
+  void set_mouse_released();
+
+  // helpers
+  coordtype coord_transform(coordtype const &coord);
+
+  #ifndef GUISTORM_NO_TEXT
+    // input field management
+    void select_input_field(input_text *new_input_field);
+    void deselect_input_field();
+  #endif // GUISTORM_NO_TEXT
+};
+
+}
+
+#endif // GUISTORM_GUI_H_INCLUDED

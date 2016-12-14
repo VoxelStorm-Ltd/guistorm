@@ -1,4 +1,3 @@
-  class colourgroup;
 #ifndef GUISTORM_FORWARD_H_INCLUDED
 #define GUISTORM_FORWARD_H_INCLUDED
 
@@ -22,13 +21,6 @@ namespace guistorm {
   #endif // GUISTORM_NO_TEXT
 
   class colourgroup;
-  class colourset;
-  #ifndef GUISTORM_NO_TEXT
-    class font;
-  #endif // GUISTORM_NO_TEXT
-}
-
-#endif // GUISTORM_FORWARD_H_INCLUDED
   class colourset;
   #ifndef GUISTORM_NO_TEXT
     class font;
