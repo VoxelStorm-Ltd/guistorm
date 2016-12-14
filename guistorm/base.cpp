@@ -1,26 +1,34 @@
 #include "base.h"
 #include <iostream>
-#ifndef GUISTORM_NO_UTF
-  #include "utf8/utf8.h"
-#endif // GUISTORM_NO_UTF
 #include "cast_if_required.h"
 #include "rounding.h"
 #include "gui.h"
+#if ! (defined(GUISTORM_NO_UTF) || defined(GUISTORM_NO_TEXT))
+  #include "utf8/utf8.h"
+#endif // ! (defined(GUISTORM_NO_UTF) || defined(GUISTORM_NO_TEXT))
 
 namespace guistorm {
 
 base::base(container *newparent,
            colourset const &newcolours,
            std::string const &thislabel,
-           font *this_font,
+           #ifdef GUISTORM_NO_TEXT
+             font *this_font __attribute__((__unused__)),
+           #else
+             font *this_font,
+           #endif // GUISTORM_NO_TEXT
            coordtype const &thissize,
            coordtype const &thisposition)
   : parent(newparent),
     position(thisposition),
     size(thissize),
     colours(newcolours),
-    label_text(thislabel),
-    label_font(this_font) {
+    #ifdef GUISTORM_NO_TEXT
+      label_text(thislabel) {
+    #else
+      label_text(thislabel),
+      label_font(this_font) {
+    #endif // GUISTORM_NO_TEXT
   /// Specific constructor
   #ifndef NDEBUG
     if(!parent) {
@@ -48,11 +56,6 @@ base::base(container *newparent,
 base::~base() {
   /// Default destructor
   destroy_buffer();
-}
-
-void base::operator delete(void *p __attribute__((__unused__))) {
-  /// guistorm garbage-collects all owned entities, so warn the user on attempting to delete directly
-  std::cout << "GUIStorm: WARNING: GUIStorm owned objects should not be deleted manually!" << std::endl;
 }
 
 void base::show() {
@@ -144,6 +147,7 @@ void base::scale(coordtype const &factor) {
   refresh_position_only();
 }
 
+#ifndef GUISTORM_NO_TEXT
 void base::stretch_to_label() {
   /// Expand the size of this object to encompass its label contents plus margin
   stretch_to_label_horizontally();
@@ -205,6 +209,7 @@ void base::shrink_to_label_vertically() {
     refresh_position_only();
   }
 }
+#endif // GUISTORM_NO_TEXT
 
 void base::set_colours(colourset const &new_colours) {
   /// Update the full set of current colours from an existing colourset
@@ -231,6 +236,7 @@ void base::set_colour_active(colourtype const &background, colourtype const &out
   colours.active.assign(background, outline, content);
 }
 
+#ifndef GUISTORM_NO_TEXT
 font &base::get_label_font() {
   /// Safely return a reference to the font we use for this object, whether it's
   /// its own specific label font or the gui's default or another fallback
@@ -263,6 +269,7 @@ font &base::get_label_font() {
   //font_atlas_id = parent_gui->font_atlas->id();                                 // cache the font atlas ID for this font
   return *thisfont;
 }
+#endif // GUISTORM_NO_TEXT
 
 void base::set_label(std::string const &newlabel) {
   if(newlabel == label_text) {
@@ -329,7 +336,9 @@ std::string const &base::get_label() {
 }
 
 void base::select_as_input() {
-  parent_gui->deselect_input_field();                                           // not selectable by default
+  #ifndef GUISTORM_NO_TEXT
+    parent_gui->deselect_input_field();                                         // not selectable by default
+  #endif // GUISTORM_NO_TEXT
 }
 
 void base::update() {
@@ -432,11 +441,14 @@ void base::setup_buffer() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   #endif // GUISTORM_UNBIND
 
-  setup_label();                                                                // set up the label buffer
+  #ifndef GUISTORM_NO_TEXT
+    setup_label();                                                              // set up the label buffer
+  #endif
 
   initialised = true;
 }
 
+#ifndef GUISTORM_NO_TEXT
 void base::arrange_label() {
   /// Called by setup_label, but can be called manually to just update text.
   font &this_label_font(get_label_font());
@@ -705,6 +717,7 @@ void base::setup_label() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   #endif // GUISTORM_UNBIND
 }
+#endif // GUISTORM_NO_TEXT
 
 void base::update_layout() {
   /// Reposition this object in accordance with any layout rules given to it
@@ -721,7 +734,9 @@ void base::update_layout() {
 
 void base::refresh() {
   /// Refresh this object's visual state
-  label_lines.clear();                                                          // ensure the label buffer arrangement also gets refreshed
+  #ifndef GUISTORM_NO_TEXT
+    label_lines.clear();                                                        // ensure the label buffer arrangement also gets refreshed
+  #endif // GUISTORM_NO_TEXT
   refresh_position_only();                                                      // refresh the outline shape
 }
 

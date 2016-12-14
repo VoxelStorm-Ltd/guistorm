@@ -1,3 +1,5 @@
+#ifndef GUISTORM_NO_TEXT
+
 #include "label.h"
 
 namespace guistorm {
@@ -60,3 +62,5 @@ base *label::get_picked(coordtype const &cursor_position __attribute__((__unused
 #endif // DEBUG_GUISTORM
 
 }
+
+#endif // GUISTORM_NO_TEXT

@@ -1,34 +1,36 @@
-#include "graph_line.h"
-#include <boost/algorithm/clamp.hpp>
+#include "graph_ringbuffer_line.h"
 #include "cast_if_required.h"
+#include <boost/algorithm/clamp.hpp>
 #include "gui.h"
 
 namespace guistorm {
 
-graph_line::graph_line(container *newparent,
+graph_ringbuffer_line::graph_ringbuffer_line(container *newparent,
                        colourset const &newcolours,
+                       size_t num_entries,
                        float thismin,
                        float thismax,
                        coordtype const &thissize,
                        coordtype const &thisposition)
   : base(newparent, newcolours, "", nullptr, thissize, thisposition),
     min(thismin),
-    max(thismax) {
+    max(thismax),
+    data(num_entries) {
   /// Specific constructor
   focusable = false;
 }
-graph_line::~graph_line() {
+graph_ringbuffer_line::~graph_ringbuffer_line() {
   /// Default destructor
 }
 
-void graph_line::init_buffer() {
+void graph_ringbuffer_line::init_buffer() {
   /// Generate the buffers for this object
   glGenBuffers(1, &vbo);
   glGenBuffers(1, &vbo_fill);
   glGenBuffers(1, &ibo);
   glGenBuffers(1, &ibo_fill);
 }
-void graph_line::destroy_buffer() {
+void graph_ringbuffer_line::destroy_buffer() {
   /// Clean up the buffers in preparation for exit or context switch
   glDeleteBuffers(1, &vbo);
   glDeleteBuffers(1, &vbo_fill);
@@ -43,8 +45,11 @@ void graph_line::destroy_buffer() {
   initialised = false;
 }
 
-void graph_line::setup_buffer() {
+void graph_ringbuffer_line::setup_buffer() {
   /// Create or update the buffer for this element
+  if(data.empty()) {
+    return;                                                                     // don't try to draw empty graphs
+  }
   if(__builtin_expect(vbo == 0, 0)) {                                           // if the buffer hasn't been generated yet (unlikely)
     init_buffer();
   }
@@ -54,7 +59,7 @@ void graph_line::setup_buffer() {
   vbodata.reserve(data.size());
   ibodata.reserve(data.size());
 
-  float const xstep = size.x / static_cast<float>(data.size());
+  float const xstep = size.x / static_cast<float>(data.capacity());
   float vertical_scale;
   if(max == min) {
     vertical_scale = 0.0;
@@ -85,7 +90,7 @@ void graph_line::setup_buffer() {
   initialised = true;
 }
 
-void graph_line::render() {
+void graph_ringbuffer_line::render() {
   /// Draw this element
   if(!visible) {
     return;
@@ -123,30 +128,30 @@ void graph_line::render() {
   update();
 }
 
-void graph_line::set_min(float new_min) {
+void graph_ringbuffer_line::set_min(float new_min) {
   if(min != new_min) {
     min = new_min;
     initialised = false;                                                        // mark the buffer as needing a refresh
   }
 }
-float const &graph_line::get_min() const {
+float const &graph_ringbuffer_line::get_min() const {
   return min;
 }
-void graph_line::set_max(float new_max) {
+void graph_ringbuffer_line::set_max(float new_max) {
   if(max != new_max) {
     max = new_max;
     initialised = false;                                                        // mark the buffer as needing a refresh
   }
 }
-float const &graph_line::get_max() const {
+float const &graph_ringbuffer_line::get_max() const {
   return max;
 }
-void graph_line::set_min_and_max(float new_min, float new_max) {
+void graph_ringbuffer_line::set_min_and_max(float new_min, float new_max) {
   set_min(new_min);
   set_max(new_max);
 }
 
-void graph_line::set_min_auto() {
+void graph_ringbuffer_line::set_min_auto() {
   /// Automatically scale the graph to fit the lowest element of the data
   if(__builtin_expect(data.empty(), 0)) {                                       // branch prediction hint: unlikely
     min = 0.0;
@@ -154,7 +159,7 @@ void graph_line::set_min_auto() {
   }
   min = *std::min_element(data.begin(), data.end());
 }
-void graph_line::set_max_auto() {
+void graph_ringbuffer_line::set_max_auto() {
   /// Automatically scale the graph to fit the highest element of the data
   if(__builtin_expect(data.empty(), 0)) {                                       // branch prediction hint: unlikely
     max = 0.0;
@@ -162,7 +167,7 @@ void graph_line::set_max_auto() {
   }
   max = *std::max_element(data.begin(), data.end());
 }
-void graph_line::set_min_and_max_auto() {
+void graph_ringbuffer_line::set_min_and_max_auto() {
   /// Automatically scale the graph to fit all elements of the data
   if(__builtin_expect(data.empty(), 0)) {                                       // branch prediction hint: unlikely
     min = 0.0;
@@ -172,6 +177,15 @@ void graph_line::set_min_and_max_auto() {
   auto minmax(std::minmax_element(data.begin(), data.end()));
   min = *minmax.first;
   max = *minmax.second;
+}
+
+void graph_ringbuffer_line::clear() {
+  data.clear();
+}
+void graph_ringbuffer_line::push(float value) {
+  /// Upload a new data point to the graph
+  data.push_back(value);
+  initialised = false;                                                          // mark the buffer as needing a refresh
 }
 
 }

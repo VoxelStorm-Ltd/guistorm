@@ -203,6 +203,7 @@ void window::layout_horizontal(std::vector<base*>::const_iterator first,
   }
 }
 
+#ifndef GUISTORM_NO_TEXT
 void window::stretch_to_labels() {
   /// Stretch all inner elements horizontally to the widest required unless they're wider
   stretch_to_labels(elements.begin(), elements.end());                          // wrapper: adding element range
@@ -231,6 +232,7 @@ void window::shrink_to_labels(std::vector<base*>::const_iterator first __attribu
   set_size(0, get_size().y);
   stretch_to_labels();
 }
+#endif // GUISTORM_NO_TEXT
 
 void window::destroy_buffer() {
   base::destroy_buffer();

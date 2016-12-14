@@ -8,18 +8,23 @@ namespace guistorm {
 
   class button;
   class graph_line;
+  class graph_ringbuffer_line;
   class group;
-  class input_text;
-  class label;
   class line;
   class lineshape;
   class progressbar;
   class widget;
   class window;
+  #ifndef GUISTORM_NO_TEXT
+    class input_text;
+    class label;
+  #endif // GUISTORM_NO_TEXT
 
   class colourgroup;
   class colourset;
-  class font;
+  #ifndef GUISTORM_NO_TEXT
+    class font;
+  #endif // GUISTORM_NO_TEXT
 }
 
 #endif // GUISTORM_FORWARD_H_INCLUDED

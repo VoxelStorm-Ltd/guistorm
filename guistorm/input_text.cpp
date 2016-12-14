@@ -1,12 +1,14 @@
+#ifndef GUISTORM_NO_TEXT
+
 #include "input_text.h"
-#ifndef GUISTORM_NO_UTF
-  #include "utf8/utf8.h"
-#endif // GUISTORM_NO_UTF
 #include "cast_if_required.h"
 #include "gui.h"
 #ifdef DEBUG_GUISTORM
   #include <iostream>
 #endif // DEBUG_GUISTORM
+#ifndef GUISTORM_NO_UTF
+  #include "utf8/utf8.h"
+#endif // GUISTORM_NO_UTF
 
 namespace guistorm {
 
@@ -110,11 +112,13 @@ void input_text::setup_buffer() {
 
 void input_text::setup_label() {
   /// Wrapper around uploading the label that also appends a cursor update
-  bool update_required = label_lines.empty();
-  base::setup_label();
-  if(update_required) {
-    update_cursor();
-  }
+  #ifndef GUISTORM_NO_TEXT
+    bool update_required = label_lines.empty();
+    base::setup_label();
+    if(update_required) {
+      update_cursor();
+    }
+  #endif // GUISTORM_NO_TEXT
 }
 
 void input_text::render() {
@@ -391,3 +395,5 @@ void input_text::update_cursor() {
 }
 
 }
+
+#endif // GUISTORM_NO_TEXT

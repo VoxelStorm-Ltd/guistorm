@@ -9,6 +9,7 @@
 ///          GUISTORM_NO_UTF - do not use utf8 and utf32 at all, limit all characters to ascii
 ///          GUISTORM_UNSAFEUTF - do not check UTF8 input for validity when iterating; this assumes you guarantee all strings are safe
 ///          GUISTORM_LOAD_MISSING_GLYPHS - add any new characters we encounter dynamically to the texture atlas (can be costly at runtime)
+///          GUISTORM_NO_TEXT - do not enable any text rendering components at all; removes all dependencies on freetype
 ///          GUISTORM_ROUND_NEAREST_OUT - round screen positions and sizes to the nearest pixel when transforming to screen space
 ///          GUISTORM_ROUND_NEAREST_ALL - round all element screen positions and sizes to the nearest pixel at all stages
 ///            GUISTORM_ROUND_NEARBYINT - when rounding use std::nearbyint
@@ -27,6 +28,7 @@
 
 #include "button.h"
 #include "graph_line.h"
+#include "graph_ringbuffer_line.h"
 #include "group.h"
 #include "input_text.h"
 #include "label.h"

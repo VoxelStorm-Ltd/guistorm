@@ -1,6 +1,8 @@
 #ifndef GUISTORM_INPUT_TEXT_H_INCLUDED
 #define GUISTORM_INPUT_TEXT_H_INCLUDED
 
+#ifndef GUISTORM_NO_TEXT
+
 #include "widget.h"
 #include <string>
 #include <functional>
@@ -75,5 +77,7 @@ private:
 };
 
 }
+
+#endif // GUISTORM_NO_TEXT
 
 #endif // GUISTORM_INPUT_TEXT_H_INCLUDED

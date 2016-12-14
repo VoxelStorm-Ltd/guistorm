@@ -62,11 +62,13 @@ public:
   // label
 protected:
   std::string label_text;                                                       // the text for the label of this object
-  std::vector<font::line> label_lines;                                          // the actual organised label content
-  coordtype label_origin;                                                       // where to reset the pen to
-  coordtype label_size;                                                         // maximum size of the label, width and height
-  coordcomponent label_line_spacing = 0;                                        // how far apart the label lines are vertically
-  unsigned int label_glyphs = 0;                                                // cached count of label glyphs (to assist in fast buffer reservation)
+  #ifndef GUISTORM_NO_TEXT
+    std::vector<font::line> label_lines;                                        // the actual organised label content
+    coordtype label_origin;                                                     // where to reset the pen to
+    coordtype label_size;                                                       // maximum size of the label, width and height
+    coordcomponent label_line_spacing = 0;                                      // how far apart the label lines are vertically
+    unsigned int label_glyphs = 0;                                              // cached count of label glyphs (to assist in fast buffer reservation)
+  #endif // GUISTORM_NO_TEXT
 
 public:
   aligntype label_alignment = aligntype::CENTRE;
@@ -78,7 +80,9 @@ public:
   bool label_justify_vertical   = false;                                        // whether to justify the whole text to fill the vertical space
   bool label_stretch_vertical   = false;                                        // whether to stretch the container vertically to fit the label if the label is taller
   bool label_shrink_vertical    = false;                                        // whether to shrink the container vertically to fit the label if the label is shorter
-  font *label_font = nullptr;                                                   // the font chosen for this label - this may be nullptr, use get_label_font() to get one safely
+  #ifndef GUISTORM_NO_TEXT
+    font *label_font = nullptr;                                                 // the font chosen for this label - this may be nullptr, use get_label_font() to get one safely
+  #endif // GUISTORM_NO_TEXT
 
   // layout rules
   std::vector<layout::rule> layout_rules;                                       // container for layout rules in the order in which they're applied to determine the element's position
@@ -91,8 +95,6 @@ protected:
        coordtype const &size     = coordtype(),
        coordtype const &position = coordtype());
   virtual ~base();
-public:
-  static void operator delete(void *p);
 
 public:
   // control
@@ -111,19 +113,23 @@ public:
   void grow(  coordtype const &increase);
   void shrink(coordtype const &decrease);
   void scale( coordtype const &factor);
-  void stretch_to_label();
-  void stretch_to_label_horizontally();
-  void stretch_to_label_vertically();
-  void shrink_to_label();
-  void shrink_to_label_horizontally();
-  void shrink_to_label_vertically();
+  #ifndef GUISTORM_NO_TEXT
+    void stretch_to_label();
+    void stretch_to_label_horizontally();
+    void stretch_to_label_vertically();
+    void shrink_to_label();
+    void shrink_to_label_horizontally();
+    void shrink_to_label_vertically();
+  #endif // GUISTORM_NO_TEXT
   void set_colours(colourset const &new_colours);
   void set_colour(        colourtype const &background, colourtype const &outline, colourtype const &content);
   void set_colour_default(colourtype const &background, colourtype const &outline, colourtype const &content);
   void set_colour_hover(  colourtype const &background, colourtype const &outline, colourtype const &content);
   void set_colour_focus(  colourtype const &background, colourtype const &outline, colourtype const &content);
   void set_colour_active( colourtype const &background, colourtype const &outline, colourtype const &content);
-  font &get_label_font();
+  #ifndef GUISTORM_NO_TEXT
+    font &get_label_font();
+  #endif // GUISTORM_NO_TEXT
   virtual void set_label(std::string const &newlabel);
 protected:
   virtual coordtype const get_absolute_position() const;
@@ -139,7 +145,11 @@ public:
   template<typename T, class ...Args> void add_layout_rule(T thisrule, Args &&...args);
 
   // input handling
-  virtual void select_as_input();
+  #ifdef GUISTORM_NO_TEXT
+    virtual void select_as_input() __attribute__((__const__));
+  #else
+    virtual void select_as_input();
+  #endif // GUISTORM_NO_TEXT
 
   // updating
   virtual void update();
@@ -153,10 +163,14 @@ public:
 protected:
   virtual void setup_buffer();
 public:
-  void arrange_label();
-  void update_label_alignment();
+  #ifndef GUISTORM_NO_TEXT
+    void arrange_label();
+    void update_label_alignment();
+  #endif // GUISTORM_NO_TEXT
 protected:
-  virtual void setup_label();
+  #ifndef GUISTORM_NO_TEXT
+    virtual void setup_label();
+  #endif // GUISTORM_NO_TEXT
 public:
   virtual void update_layout();
   virtual void refresh();

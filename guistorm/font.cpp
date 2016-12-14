@@ -1,3 +1,5 @@
+#ifndef GUISTORM_NO_TEXT
+
 //#include "font.h"
 #include <iostream>
 #include "gui.h"
@@ -309,3 +311,5 @@ void font::update_kerning(FT_Face const &face, glyph &this_glyph, glyph const &l
 }
 
 }
+
+#endif // GUISTORM_NO_TEXT

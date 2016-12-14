@@ -3,7 +3,9 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <freetype-gl++/texture-atlas.hpp>
+#ifndef GUISTORM_NO_TEXT
+  #include <freetype-gl++/texture-atlas.hpp>
+#endif // GUISTORM_NO_TEXT
 #include <guistorm/types.h>
 #include <guistorm/container.h>
 #include <guistorm/font.h>
@@ -20,13 +22,18 @@ class gui : public container {
   friend class lineshape;
   friend class progressbar;
   friend class graph_line;
+  friend class graph_ringbuffer_line;
 protected:
   static GLuint shader;                                                         // the shader for rendering all gui elements
-  freetypeglxx::TextureAtlas *font_atlas = nullptr;                             // texture atlas containing all font glyphs we use
+  #ifndef GUISTORM_NO_TEXT
+    freetypeglxx::TextureAtlas *font_atlas = nullptr;                           // texture atlas containing all font glyphs we use
+  #endif // GUISTORM_NO_TEXT
 public:
   bool font_atlas_filtering = true;                                             // whether to filter the font atlas linearly or use nearest neighbour - for subpixel offsets
-  std::vector<font*> fonts;                                                     // the list of fonts we contain
-  font *font_default = nullptr;                                                 // which font to recommend as default to child objects
+  #ifndef GUISTORM_NO_TEXT
+    std::vector<font*> fonts;                                                   // the list of fonts we contain
+    font *font_default = nullptr;                                               // which font to recommend as default to child objects
+  #endif // GUISTORM_NO_TEXT
 protected:
   // per-vertex attribute indices
   GLuint attrib_coords    = 0;
@@ -51,11 +58,12 @@ public:
 
   base *cursor = nullptr;                                                       // what entity is acting as this gui's current cursor, if any
 
-  // input field management
-  std::function<void(input_text&)> function_select_input   = [](input_text &this_input __attribute__((__unused__))){}; // what to call on a selected input field, for binding text input callbacks etc
-  std::function<void(input_text&)> function_deselect_input = [](input_text &this_input __attribute__((__unused__))){}; // what to call on a deselected input field, for unbinding etc
-  input_text *current_input_field = nullptr;                                    // what input field we have selected, if any
-
+  #ifndef GUISTORM_NO_TEXT
+    // input field management
+    std::function<void(input_text&)> function_select_input   = [](input_text &this_input __attribute__((__unused__))){}; // what to call on a selected input field, for binding text input callbacks etc
+    std::function<void(input_text&)> function_deselect_input = [](input_text &this_input __attribute__((__unused__))){}; // what to call on a deselected input field, for unbinding etc
+    input_text *current_input_field = nullptr;                                  // what input field we have selected, if any
+  #endif // GUISTORM_NO_TEXT
 
 public:
   gui();
@@ -67,46 +75,41 @@ public:
   virtual void destroy_buffer() override final;
   void load_shader();
   void destroy_shader();
-  void load_fonts();
-  void upload_fonts();
-  void destroy_fonts();
+  #ifndef GUISTORM_NO_TEXT
+    void load_fonts();
+    void upload_fonts();
+    void destroy_fonts();
+  #endif // GUISTORM_NO_TEXT
   void refresh() override final;
 
   void render() override final;
 
   void add_to_gui(base *element) override final;
-  void add_font(std::string const &name,
-                unsigned char const *memory_offset,
-                size_t memory_size,
-                float font_size,
-                #ifdef GUISTORM_NO_UTF
-                  std::string const &glyphs_to_load = ""
-                #else
-                  std::u32string const &glyphs_to_load = U""
-                #endif // GUISTORM_NO_UTF
-                );
-  void add_font(font *thisfont);
-  void clear_fonts();
-  font *get_font_by_size(           float size)
-  #ifndef DEBUG_GUISTORM
-    __attribute__((__pure__))
-  #endif // DEBUG_GUISTORM
-  ;
-  font *get_font_by_size_or_nearest(float size)
-  #ifndef DEBUG_GUISTORM
-    __attribute__((__pure__))
-  #endif // DEBUG_GUISTORM
-  ;
-  font *get_font_by_size_or_smaller(float size)
-  #ifndef DEBUG_GUISTORM
-    __attribute__((__pure__))
-  #endif // DEBUG_GUISTORM
-  ;
-  font *get_font_by_size_or_bigger( float size)
-  #ifndef DEBUG_GUISTORM
-    __attribute__((__pure__))
-  #endif // DEBUG_GUISTORM
-  ;
+  #ifndef GUISTORM_NO_TEXT
+    void add_font(std::string const &name,
+                  unsigned char const *memory_offset,
+                  size_t memory_size,
+                  float font_size,
+                  #ifdef GUISTORM_NO_UTF
+                    std::string const &glyphs_to_load = ""
+                  #else
+                    std::u32string const &glyphs_to_load = U""
+                  #endif // GUISTORM_NO_UTF
+                  );
+    void add_font(font *thisfont);
+    void clear_fonts();
+    #ifdef DEBUG_GUISTORM
+      font *get_font_by_size(           float size);
+      font *get_font_by_size_or_nearest(float size);
+      font *get_font_by_size_or_smaller(float size);
+      font *get_font_by_size_or_bigger( float size);
+    #else
+      font *get_font_by_size(           float size) __attribute__((__pure__));
+      font *get_font_by_size_or_nearest(float size) __attribute__((__pure__));
+      font *get_font_by_size_or_smaller(float size) __attribute__((__pure__));
+      font *get_font_by_size_or_bigger( float size) __attribute__((__pure__));
+    #endif // DEBUG_GUISTORM
+  #endif // GUISTORM_NO_TEXT
 
   // environment and input control
   void set_windowsize(coordtype const &new_windowsize);
@@ -122,9 +125,11 @@ public:
   // helpers
   coordtype coord_transform(coordtype const &coord);
 
-  // input field management
-  void select_input_field(input_text *new_input_field);
-  void deselect_input_field();
+  #ifndef GUISTORM_NO_TEXT
+    // input field management
+    void select_input_field(input_text *new_input_field);
+    void deselect_input_field();
+  #endif // GUISTORM_NO_TEXT
 };
 
 }

@@ -1,6 +1,8 @@
 #ifndef GUISTORM_LABEL_H_INCLUDED
 #define GUISTORM_LABEL_H_INCLUDED
 
+#ifndef GUISTORM_NO_TEXT
+
 #include "widget.h"
 #include <string>
 
@@ -31,5 +33,7 @@ public:
 };
 
 }
+
+#endif // GUISTORM_NO_TEXT
 
 #endif // GUISTORM_LABEL_H_INCLUDED

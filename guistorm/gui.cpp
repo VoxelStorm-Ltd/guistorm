@@ -1,12 +1,18 @@
 #include "gui.h"
 #include <iostream>
 #include <boost/algorithm/clamp.hpp>
-#include <freetype-gl/texture-atlas.h>
+#ifndef GUISTORM_NO_TEXT
+  #include <freetype-gl/texture-atlas.h>
+#endif // GUISTORM_NO_TEXT
 #include "blob_loader.h"
 #include "cast_if_required.h"
 #include "shader_load.h"
 #include "rounding.h"
-#include "input_text.h"
+#ifdef GUISTORM_NO_TEXT
+  #include "base.h"
+#else
+  #include "input_text.h"
+#endif // GUISTORM_NO_TEXT
 
 namespace guistorm {
 
@@ -22,7 +28,9 @@ gui::gui() {
 gui::~gui() {
   /// Default destructor
   clear();
-  clear_fonts();
+  #ifndef GUISTORM_NO_TEXT
+    clear_fonts();
+  #endif // GUISTORM_NO_TEXT
   destroy();
 }
 
@@ -30,14 +38,18 @@ void gui::init() {
   /// Wrapper function to call all initialisations
   init_buffer();
   load_shader();
-  load_fonts();
+  #ifndef GUISTORM_NO_TEXT
+    load_fonts();
+  #endif // GUISTORM_NO_TEXT
 }
 
 void gui::destroy() {
   /// Wrapper function to call all cleanup functions in preparation for exit or context switch
   destroy_buffer();
   destroy_shader();
-  destroy_fonts();
+  #ifndef GUISTORM_NO_TEXT
+    destroy_fonts();
+  #endif // GUISTORM_NO_TEXT
 }
 
 void gui::init_buffer() {
@@ -103,6 +115,7 @@ void gui::destroy_shader() {
   shader = 0;
 }
 
+#ifndef GUISTORM_NO_TEXT
 void gui::load_fonts() {
   /// Initialise the font atlas and any font associated objects
   /// Note: TextureAtlas depth == 1 uses format GL_RED by default which is not available on older hardware, so we need to upload manually in those cases
@@ -190,6 +203,7 @@ void gui::destroy_fonts() {
   delete font_atlas;
   font_atlas = nullptr;
 }
+#endif // GUISTORM_NO_TEXT
 
 void gui::refresh() {
   /// Re-create the buffers of all elements in this gui
@@ -207,7 +221,9 @@ void gui::render() {
   glUseProgram(shader);
   glEnableVertexAttribArray(attrib_coords);
   glEnableVertexAttribArray(attrib_texcoords);
-  glBindTexture(GL_TEXTURE_2D, font_atlas->id());
+  #ifndef GUISTORM_NO_TEXT
+    glBindTexture(GL_TEXTURE_2D, font_atlas->id());
+  #endif // GUISTORM_NO_TEXT
 
   container::render();
 
@@ -217,7 +233,9 @@ void gui::render() {
     glBindBuffer(GL_ARRAY_BUFFER,         0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glUseProgram(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    #ifndef GUISTORM_NO_TEXT
+      glBindTexture(GL_TEXTURE_2D, 0);
+    #endif // GUISTORM_NO_TEXT
   #endif // GUISTORM_UNBIND
   glEnable(GL_DEPTH_TEST);
 
@@ -237,6 +255,7 @@ void gui::add_to_gui(base *element) {
   element->parent_gui = this;
 }
 
+#ifndef GUISTORM_NO_TEXT
 void gui::add_font(std::string const &name,
                    unsigned char const *memory_offset,
                    size_t memory_size,
@@ -267,26 +286,6 @@ void gui::clear_fonts() {
     delete it;
   }
   fonts.clear();
-}
-
-void gui::set_windowsize(coordtype const &new_windowsize) {
-  /// Cache the window size and refresh buffers if it's changed
-  #ifdef DEBUG_GUISTORM
-    std::cout << "GUIStorm: Window resized to " << new_windowsize << std::endl;
-  #endif // DEBUG_GUISTORM
-  if(windowsize == new_windowsize) {
-    return;
-  }
-  windowsize = new_windowsize;
-  update_layout();                                                              // reposition any window-relative GUI elements
-  // update all buffers
-  if(glfwGetCurrentContext() != NULL) {                                         // make sure we're in a valid opengl context before we try to refresh
-    refresh();
-  } else {
-    #ifdef DEBUG_GUISTORM
-      std::cout << "GUIStorm: Window resize called outside opengl context" << std::endl;
-    #endif
-  }
 }
 
 font *gui::get_font_by_size(float size) {
@@ -380,7 +379,27 @@ font *gui::get_font_by_size_or_bigger(float size) {
   }
   return f;
 }
+#endif // GUISTORM_NO_TEXT
 
+void gui::set_windowsize(coordtype const &new_windowsize) {
+  /// Cache the window size and refresh buffers if it's changed
+  #ifdef DEBUG_GUISTORM
+    std::cout << "GUIStorm: Window resized to " << new_windowsize << std::endl;
+  #endif // DEBUG_GUISTORM
+  if(windowsize == new_windowsize) {
+    return;
+  }
+  windowsize = new_windowsize;
+  update_layout();                                                              // reposition any window-relative GUI elements
+  // update all buffers
+  if(glfwGetCurrentContext() != NULL) {                                         // make sure we're in a valid opengl context before we try to refresh
+    refresh();
+  } else {
+    #ifdef DEBUG_GUISTORM
+      std::cout << "GUIStorm: Window resize called outside opengl context" << std::endl;
+    #endif
+  }
+}
 
 GLfloat gui::get_dpi() const {
   return dpi;
@@ -420,9 +439,11 @@ void gui::set_mouse_pressed() {
 void gui::set_mouse_released() {
   /// Tell the gui the mouse is being released
   mouse_pressed = false;
-  if(!picked_element) {
-    deselect_input_field();
-  }
+  #ifndef GUISTORM_NO_TEXT
+    if(!picked_element) {
+      deselect_input_field();
+    }
+  #endif // GUISTORM_NO_TEXT
 }
 
 coordtype gui::coord_transform(coordtype const &coord) {
@@ -436,6 +457,7 @@ coordtype gui::coord_transform(coordtype const &coord) {
   #endif // GUISTORM_ROUND_NEAREST_OUT
 }
 
+#ifndef GUISTORM_NO_TEXT
 void gui::select_input_field(input_text *new_input_field) {
   /// Select an input field
   if(current_input_field == new_input_field) {                                  // skip if already selected
@@ -464,5 +486,6 @@ void gui::deselect_input_field() {
   /// Helper wrapper function to deselect any input field
   select_input_field(nullptr);
 }
+#endif // GUISTORM_NO_TEXT
 
 }

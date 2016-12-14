@@ -81,8 +81,8 @@ void container::clear() {
       abort();
     }
   #endif
-  for(auto & element : elements) {
-    ::delete element;                                                           // call the default delete operator explicitly to avoid our overridden warning deleter
+  for(auto &element : elements) {
+    delete element;
   }
   elements.clear();
 }
@@ -118,7 +118,7 @@ void container::destroy_buffer() {
   #ifndef NDEBUG
     lock_iterating = true;
   #endif
-  for(auto & element : elements) {
+  for(auto &element : elements) {
     element->destroy_buffer();
   }
   #ifndef NDEBUG
@@ -131,7 +131,7 @@ void container::update_layout() {
   #ifndef NDEBUG
     lock_iterating = true;
   #endif
-  for(auto & element : elements) {
+  for(auto &element : elements) {
     element->update_layout();
   }
   #ifndef NDEBUG
@@ -144,7 +144,7 @@ void container::refresh() {
   #ifndef NDEBUG
     lock_iterating = true;
   #endif
-  for(auto & element : elements) {
+  for(auto &element : elements) {
     element->refresh();
   }
   #ifndef NDEBUG
@@ -157,7 +157,7 @@ void container::render() {
   #ifndef NDEBUG
     lock_iterating = true;
   #endif
-  for(auto & element : elements) {
+  for(auto &element : elements) {
     element->render();
   }
   #ifndef NDEBUG

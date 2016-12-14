@@ -1,20 +1,25 @@
 #ifndef GUISTORM_FONT_H_INCLUDED
 #define GUISTORM_FONT_H_INCLUDED
 
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <mutex>
-#include <memory>
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include <freetype-gl++/freetype-gl++.hpp>
-#include "types.h"
+#ifndef GUISTORM_NO_TEXT
+  #include <string>
+  #include <vector>
+  #include <unordered_map>
+  #include <mutex>
+  #include <memory>
+  #include <ft2build.h>
+  #include FT_FREETYPE_H
+  #include <freetype-gl++/freetype-gl++.hpp>
+  #include "types.h"
+#endif // GUISTORM_NO_TEXT
 
 namespace guistorm {
 
 class gui;
 
+#ifdef GUISTORM_NO_TEXT
+  using font = void;
+#else
 class font {
   /// Container class to hold a font object and metadata about it
 public:
@@ -127,6 +132,7 @@ public:
     std::shared_ptr<font::glyph> const getglyph(char32_t charcode);
   #endif // GUISTORM_NO_UTF
 };
+#endif // GUISTORM_NO_TEXT
 
 }
 

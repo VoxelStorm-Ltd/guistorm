@@ -1,13 +1,13 @@
-#ifndef GUISTORM_GRAPH_LINE_H_INCLUDED
-#define GUISTORM_GRAPH_LINE_H_INCLUDED
+#ifndef GUISTORM_GRAPH_RINGBUFFER_LINE_H_INCLUDED
+#define GUISTORM_GRAPH_RINGBUFFER_LINE_H_INCLUDED
 
 #include "base.h"
-#include <vector>
-#include <boost/range/iterator_range.hpp>
+#include <boost/circular_buffer.hpp>
+//#include <boost/range/iterator_range.hpp>
 
 namespace guistorm {
 
-class graph_line : public base {
+class graph_ringbuffer_line : public base {
   /// A horizontal line graph populated from an iteraterable container
 private:
   GLuint vbo_fill = 0;                                                          // vertex buffer for the fill, in format compatible with GL_TRIANGLES
@@ -17,17 +17,18 @@ private:
   float min = 0.0;                                                              // the minimum value shown on the graph
   float max = 1.0;                                                              // the maximum value shown on the graph
 
-  std::vector<float> data;                                                      // the set of individual graph points
+  boost::circular_buffer<float> data;                                           // the set of individual graph points
 
 public:
-  graph_line(container *parent,
-              colourset const &colours,
-              float min = 0.0,
-              float max = 1.0,
-              coordtype const &size     = coordtype(),
-              coordtype const &position = coordtype());
+  graph_ringbuffer_line(container *parent,
+                        colourset const &colours,
+                        size_t num_entries,
+                        float min = 0.0,
+                        float max = 1.0,
+                        coordtype const &size     = coordtype(),
+                        coordtype const &position = coordtype());
 protected:
-  virtual ~graph_line() override;
+  virtual ~graph_ringbuffer_line() override;
 
 public:
   void init_buffer()    override final;
@@ -44,18 +45,10 @@ public:
   void set_max_auto();
   void set_min_and_max_auto();
 
-  template<typename T> void upload(T const &begin, T const &end);
+  void clear();
+  void push(float value);
 };
 
-template<typename T> void graph_line::upload(T const &begin, T const &end) {
-  /// Upload a new set of data points to this graph
-  data.clear();
-  for(auto const &it : boost::make_iterator_range(begin, end)) {
-    data.emplace_back(it);
-  }
-  initialised = false;                                                          // mark the buffer as needing a refresh
 }
 
-}
-
-#endif // GUISTORM_GRAPH_LINE_H_INCLUDED
+#endif // GUISTORM_GRAPH_RINGBUFFER_LINE_H_INCLUDED
