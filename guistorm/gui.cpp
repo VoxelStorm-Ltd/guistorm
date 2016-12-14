@@ -1,124 +1,271 @@
+          #endif // DEBUG_GUISTORM
+        }
+      } else {
+        f = thisfont;
+        #ifdef DEBUG_GUISTORM
+          std::cout << "GUIStorm: defaulted to font size " << f->font_size << " (" << f->name << ")" << std::endl;
+        #endif // DEBUG_GUISTORM
+      }
+    }
+  }
+  return f;
+}
+font *gui::get_font_by_size_or_bigger(float size) {
+  /// Attempt to find a font of the specified size, and return the next biggest in size, or nullptr if none bigger found
+  #ifdef DEBUG_GUISTORM
+    std::cout << "GUIStorm: requested font same or bigger than size " << size << std::endl;
+  #endif // DEBUG_GUISTORM
+  font *f = nullptr;
+  for(auto const &thisfont : fonts) {
+    if(thisfont->font_size >= size) {                                           // filter for same size or bigger fonts only
+      if(f) {
+        if(thisfont->font_size < f->font_size) {                                // compare to get the smalleset font size of the filtered fonts
+          f = thisfont;
+          #ifdef DEBUG_GUISTORM
+            std::cout << "GUIStorm: found new nearest font size " << f->font_size << " (" << f->name << ")" << std::endl;
+          #endif // DEBUG_GUISTORM
+        }
+      } else {
+        f = thisfont;
+        #ifdef DEBUG_GUISTORM
 #include "gui.h"
+          std::cout << "GUIStorm: defaulted to font size " << f->font_size << " (" << f->name << ")" << std::endl;
 #include <iostream>
+        #endif // DEBUG_GUISTORM
 #include <boost/algorithm/clamp.hpp>
+      }
 #ifndef GUISTORM_NO_TEXT
+    }
   #include <freetype-gl/texture-atlas.h>
+  }
 #endif // GUISTORM_NO_TEXT
+  return f;
 #include "blob_loader.h"
+}
 #include "cast_if_required.h"
-#include "shader_load.h"
-#include "rounding.h"
-#ifdef GUISTORM_NO_TEXT
-  #include "base.h"
-#else
-  #include "input_text.h"
 #endif // GUISTORM_NO_TEXT
+#include "shader_load.h"
+
+#include "rounding.h"
+void gui::set_windowsize(coordtype const &new_windowsize) {
+#ifdef GUISTORM_NO_TEXT
+  /// Cache the window size and refresh buffers if it's changed
+  #include "base.h"
+  #ifdef DEBUG_GUISTORM
+#else
+    std::cout << "GUIStorm: Window resized to " << new_windowsize << std::endl;
+  #include "input_text.h"
+  #endif // DEBUG_GUISTORM
+#endif // GUISTORM_NO_TEXT
+  if(windowsize == new_windowsize) {
 
 namespace guistorm {
+    return;
 
+  }
 GLuint gui::shader = 0;
+  windowsize = new_windowsize;
 GLfloat constexpr gui::dpi_default;
+  update_layout();                                                              // reposition any window-relative GUI elements
 GLfloat constexpr gui::dpi_min;
+  // update all buffers
 GLfloat constexpr gui::dpi_max;
+  if(glfwGetCurrentContext() != NULL) {                                         // make sure we're in a valid opengl context before we try to refresh
 
+    refresh();
 gui::gui() {
   /// Default constructor
+  } else {
 }
+    #ifdef DEBUG_GUISTORM
 
+      std::cout << "GUIStorm: Window resize called outside opengl context" << std::endl;
 gui::~gui() {
+    #endif
   /// Default destructor
+  }
   clear();
+}
   #ifndef GUISTORM_NO_TEXT
+
     clear_fonts();
+GLfloat gui::get_dpi() const {
   #endif // GUISTORM_NO_TEXT
+  return dpi;
   destroy();
 }
-
-void gui::init() {
-  /// Wrapper function to call all initialisations
-  init_buffer();
-  load_shader();
-  #ifndef GUISTORM_NO_TEXT
-    load_fonts();
-  #endif // GUISTORM_NO_TEXT
 }
 
+GLfloat gui::get_dpi_scale() const {
+void gui::init() {
+  return dpi_scale;
+  /// Wrapper function to call all initialisations
+}
+  init_buffer();
+void gui::set_dpi(GLfloat newdpi) {
+  load_shader();
+  /// Update dpi and update the cached value of dpi scale
+  #ifndef GUISTORM_NO_TEXT
+  dpi = boost::algorithm::clamp(newdpi, dpi_min, dpi_max);
+    load_fonts();
+  dpi_scale = newdpi / dpi_default;
+  #endif // GUISTORM_NO_TEXT
+}
+}
+void gui::set_dpi_scale(GLfloat newscale) {
+
+  /// Update desired dpi scale factor and calculate new dpi from that
 void gui::destroy() {
+  set_dpi(dpi_default * newscale);
   /// Wrapper function to call all cleanup functions in preparation for exit or context switch
+}
   destroy_buffer();
+
   destroy_shader();
+void gui::set_cursor_position(coordtype const &new_cursor_position) {
   #ifndef GUISTORM_NO_TEXT
     destroy_fonts();
+  /// Update the cursor position
   #endif // GUISTORM_NO_TEXT
+  cursor_position = new_cursor_position;
 }
+  if(cursor) {
 
+    cursor->set_position_nodpiscale(cursor_position);                           // don't call the dpi scaler function
 void gui::init_buffer() {
+    cursor->refresh_position_only();
   /// Generate the buffers for this object
-  std::cout << "GUIStorm: Initialising " << elements.size() << " top level buffers..." << std::endl;
-  for(auto & element : elements) {
-    element->init_buffer();
   }
+  std::cout << "GUIStorm: Initialising " << elements.size() << " top level buffers..." << std::endl;
+  update_cursor_pick();
+  for(auto & element : elements) {
 }
-void gui::destroy_buffer() {
-  /// Clean up the buffers in preparation for exit or context switch
-  container::destroy_buffer();
-}
+    element->init_buffer();
 
+  }
+void gui::update_cursor_pick() {
+}
+  /// Update what the cursor is picking, for instance if windows have changed under the cursor without it having moved
+void gui::destroy_buffer() {
+  picked_element = get_picked(cursor_position);                                 // traverse the tree to update the currently picked element
+  /// Clean up the buffers in preparation for exit or context switch
+}
+  container::destroy_buffer();
+
+}
+void gui::set_mouse_pressed() {
+
+  /// Tell the gui the mouse has been pressed
 void gui::load_shader() {
+  mouse_pressed = true;
   /// Load and initialise the gui shader
+}
   if(shader != 0) {
+void gui::set_mouse_released() {
     return;                                                                     // shader already initialised elsewhere
+  /// Tell the gui the mouse is being released
   }
   std::cout << "GUIStorm: ";
+  mouse_pressed = false;
   shader = shader_load(std::string(R"(#version 120
+  #ifndef GUISTORM_NO_TEXT
                                       #pragma optimize(on)
+    if(!picked_element) {
                                       #pragma debug(off)
+      deselect_input_field();
 
+    }
+  #endif // GUISTORM_NO_TEXT
                                       attribute vec4 coords;                    // we only input a vec3, so w defaults to 1.0
+}
                                       attribute vec2 texcoords;
 
-                                      varying vec2 texcoords_frag;
 
+coordtype gui::coord_transform(coordtype const &coord) {
+                                      varying vec2 texcoords_frag;
+  /// Helper to transform screen coordinates into screen space suitable for feeding to the shader without further transformation
+
+  #ifdef GUISTORM_ROUND_NEAREST_OUT
                                       void main() {
+    return coordtype((GUISTORM_ROUND(coord.x) * 2 / windowsize.x) - 1.0f,
                                         texcoords_frag = texcoords;
+                     (GUISTORM_ROUND(coord.y) * 2 / windowsize.y) - 1.0f);
                                         gl_Position = coords;
+  #else
                                       }
+    return coordtype((coord.x * 2 / windowsize.x) - 1.0f,
 
+                     (coord.y * 2 / windowsize.y) - 1.0f);
                                    )"),
+  #endif // GUISTORM_ROUND_NEAREST_OUT
                        std::string(R"(#version 120
+}
                                       #pragma optimize(on)
+
                                       #pragma debug(off)
-
-                                      uniform vec4 colour;
-                                      uniform sampler2D texture;
-
-                                      varying vec2 texcoords_frag;
-
-                                      void main() {
-                                        float a = texture2D(texture, texcoords_frag).a;
-                                        gl_FragColor = vec4(colour.rgb, colour.a * a);
-                                      }
-                                   )"));
-  if(shader == GL_FALSE) {
-    std::cout << "GUIStorm: ERROR: " << __PRETTY_FUNCTION__ << ": Failed to load shaders, exiting." << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  // cache attribute and uniform indices
-  attrib_coords    = glGetAttribLocation(shader, "coords");
-  attrib_texcoords = glGetAttribLocation(shader, "texcoords");
-  uniform_colour   = glGetUniformLocation(shader, "colour");
-}
-
-void gui::destroy_shader() {
-  /// Clean up the shader in preparation for exit or context switch
-  glDeleteProgram(shader);
-  shader = 0;
-}
-
 #ifndef GUISTORM_NO_TEXT
+
+void gui::select_input_field(input_text *new_input_field) {
+                                      uniform vec4 colour;
+  /// Select an input field
+                                      uniform sampler2D texture;
+  if(current_input_field == new_input_field) {                                  // skip if already selected
+
+    return;
+                                      varying vec2 texcoords_frag;
+  }
+
+  if(current_input_field != nullptr) {                                          // first deselect anything we have selected already
+                                      void main() {
+    try {
+                                        float a = texture2D(texture, texcoords_frag).a;
+      function_deselect_input(*current_input_field);                            // call the deselect (unbind) function
+                                        gl_FragColor = vec4(colour.rgb, colour.a * a);
+    } catch(std::bad_function_call const &e) {
+                                      }
+      std::cout << "GUIStorm: ERROR: input deselect for \"" << current_input_field->get_label() << "\" threw exception " << e.what() << std::endl;
+                                   )"));
+    }
+  if(shader == GL_FALSE) {
+    current_input_field->deselected_as_input();                                 // tell the old one it it's been deselected
+    std::cout << "GUIStorm: ERROR: " << __PRETTY_FUNCTION__ << ": Failed to load shaders, exiting." << std::endl;
+  }
+    exit(EXIT_FAILURE);
+  current_input_field = new_input_field;
+  }
+  if(current_input_field != nullptr) {                                          // only call selection function on non-null object
+  // cache attribute and uniform indices
+    try {
+  attrib_coords    = glGetAttribLocation(shader, "coords");
+      function_select_input(*current_input_field);                              // call the select (bind) function
+  attrib_texcoords = glGetAttribLocation(shader, "texcoords");
+    } catch(std::bad_function_call const &e) {
+  uniform_colour   = glGetUniformLocation(shader, "colour");
+      std::cout << "GUIStorm: ERROR: input select for \"" << current_input_field->get_label() << "\" threw exception " << e.what() << std::endl;
+}
+    }
+
+    current_input_field->selected_as_input();                                   // tell the new one it it's been selected
+void gui::destroy_shader() {
+  }
+  /// Clean up the shader in preparation for exit or context switch
+}
+  glDeleteProgram(shader);
+
+  shader = 0;
+void gui::deselect_input_field() {
+}
+  /// Helper wrapper function to deselect any input field
+
+  select_input_field(nullptr);
+#ifndef GUISTORM_NO_TEXT
+}
 void gui::load_fonts() {
+#endif // GUISTORM_NO_TEXT
   /// Initialise the font atlas and any font associated objects
+
   /// Note: TextureAtlas depth == 1 uses format GL_RED by default which is not available on older hardware, so we need to upload manually in those cases
+}
   vec2<size_t> newsize(256, 256);
   bool atlas_complete;
   do {

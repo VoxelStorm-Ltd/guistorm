@@ -41,7 +41,6 @@ void move(               targettype target, coordcomponent offset_x, coordcompon
   void test_null(targettype target);
   void test_text(targettype target, std::string text);
 #endif
-
 }
 
 }

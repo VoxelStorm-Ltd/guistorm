@@ -1,3 +1,96 @@
+void container::clear() {
+  /// Clear the elements container and destroy each element
+  #ifndef NDEBUG
+    if(lock_iterating) {
+      std::cout << "GUIStorm: ERROR: attempting to clear a container while iterating through it!  This must never happen!" << std::endl;
+      abort();
+    }
+  #endif
+  for(auto &element : elements) {
+    delete element;
+  }
+  elements.clear();
+}
+
+base *container::get_picked(coordtype const &cursor_position) {
+  /// Return true if the mouse is over any element in this container
+  #ifndef NDEBUG
+    lock_iterating = true;
+  #endif
+  for(auto &element : boost::adaptors::reverse(elements)) {                     // we iterate in reverse so most on-top object from equal tiers appears first
+    base *picked_element(element->get_picked(cursor_position));
+    if(picked_element) {
+      #ifndef NDEBUG
+        lock_iterating = false;
+      #endif
+      return picked_element;                                                    // early exit on the first positive result
+    }
+  }
+  #ifndef NDEBUG
+    lock_iterating = false;
+  #endif
+  return nullptr;
+}
+
+coordtype const container::get_absolute_position() const {
+  /// Return the absolute screen coords of the origin of this element
+  /// This function is only called on a container that is not also an element, so it is always going to be top level
+  return coordtype(0, 0);
+}
+
+void container::destroy_buffer() {
+  /// Clean up the buffers in preparation for exit or context switch
+  #ifndef NDEBUG
+    lock_iterating = true;
+  #endif
+  for(auto &element : elements) {
+    element->destroy_buffer();
+  }
+  #ifndef NDEBUG
+    lock_iterating = false;
+  #endif
+}
+
+void container::update_layout() {
+  /// Reorganise any child elements within this container to the appropriate layout
+  #ifndef NDEBUG
+    lock_iterating = true;
+  #endif
+  for(auto &element : elements) {
+    element->update_layout();
+  }
+  #ifndef NDEBUG
+    lock_iterating = false;
+  #endif
+}
+
+void container::refresh() {
+  /// Re-create the buffers of all elements in this container
+  #ifndef NDEBUG
+    lock_iterating = true;
+  #endif
+  for(auto &element : elements) {
+    element->refresh();
+  }
+  #ifndef NDEBUG
+    lock_iterating = false;
+  #endif
+}
+
+void container::render() {
+  /// Recursively render the contents of this container
+  #ifndef NDEBUG
+    lock_iterating = true;
+  #endif
+  for(auto &element : elements) {
+    element->render();
+  }
+  #ifndef NDEBUG
+    lock_iterating = false;
+  #endif
+}
+
+}
 #include "container.h"
 #include <boost/range/adaptor/reversed.hpp>
 #include "cast_if_required.h"

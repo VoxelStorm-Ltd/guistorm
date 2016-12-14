@@ -1,3 +1,51 @@
+    setup_buffer();
+  }
+  if(numverts != 0) {
+    glBindBuffer(GL_ARRAY_BUFFER,         vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glVertexAttribPointer(parent_gui->attrib_coords,    2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
+    glVertexAttribPointer(parent_gui->attrib_texcoords, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::texcoords)));
+
+    if(colours.current.background.a != 0.0f) {                                  // skip drawing fully transparent parts
+      glUniform4f(parent_gui->uniform_colour,
+                  colours.current.background.r,
+                  colours.current.background.g,
+                  colours.current.background.b,
+                  colours.current.background.a);
+      glDrawElements(GL_TRIANGLE_FAN, numverts, GL_UNSIGNED_INT, 0);            // background
+    }
+    if(colours.current.outline.a != 0.0f) {                                     // skip drawing fully transparent parts
+      glUniform4f(parent_gui->uniform_colour,
+                  colours.current.outline.r,
+                  colours.current.outline.g,
+                  colours.current.outline.b,
+                  colours.current.outline.a);
+      glDrawElements(GL_LINE_LOOP,    numverts, GL_UNSIGNED_INT, 0);            // outline
+    }
+  }
+  // draw the label
+  if(numverts_label != 0) {
+    glBindBuffer(GL_ARRAY_BUFFER,         vbo_label);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_label);
+    glVertexAttribPointer(parent_gui->attrib_coords,    2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
+    glVertexAttribPointer(parent_gui->attrib_texcoords, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::texcoords)));
+
+    glUniform4f(parent_gui->uniform_colour,
+                colours.current.content.r,
+                colours.current.content.g,
+                colours.current.content.b,
+                colours.current.content.a);
+    #ifdef GUISTORM_AVOIDQUADS
+      glDrawElements(GL_TRIANGLES, numverts_label, GL_UNSIGNED_INT, 0);
+    #else
+      glDrawElements(GL_QUADS, numverts_label, GL_UNSIGNED_INT, 0);
+    #endif // GUISTORM_AVOIDQUADS
+  }
+
+  update();
+}
+
+}
 #include "base.h"
 #include <iostream>
 #include "cast_if_required.h"
@@ -535,267 +583,3 @@ void base::arrange_label() {
         label_lines.emplace_back();                                             // line feed
         hpos = wordlength;                                                      // because we're pushing the wrapped word onto the new line our cursor starts after it
         label_size.y += label_line_spacing;
-      }
-    }
-    label_lines.back().words.emplace_back(thisword);
-    if(thisword.linebreak) {
-      if(hpos > label_size.x) {
-        label_size.x = hpos;                                                    // this line is the longest (for centering calculations)
-      }
-      label_lines.back().linebreak = true;
-      label_lines.emplace_back();                                               // line feed
-      hpos = 0.0f;                                                              // carriage return
-      label_size.y += label_line_spacing;
-    }
-  }
-  if(hpos > label_size.x) {
-    label_size.x = hpos;                                                        // this line is the longest (for centering calculations)
-  }
-  #ifdef DEBUG_GUISTORM
-    //std::cout << "GUIStorm: DEBUG: words wrapped to " << label_lines.size() << " lines max size " << label_size << std::endl;
-  #endif // DEBUG_GUISTORM
-
-  // calculate and cache the max line length of each line and the max overall
-  for(auto &thisline : label_lines) {
-    thisline.size.x = thisline.length();                                        // relatively expensive calculation, so we cache the result
-    if(thisline.size.x > label_size.x) {
-      label_size.x = thisline.size.x;
-    }
-  }
-
-  // carry out justification if required
-  if(label_justify_horizontal && label_lines.size() > 1) {                      // don't justify anything consisting of one line (or none)
-    for(auto &thisline : boost::make_iterator_range(label_lines.begin(), --label_lines.end())) { // don't justify the last line
-      if(!thisline.linebreak && thisline.words.size() > 1) {                    // don't try to justify one-word lines or lines that are intentionally split
-        thisline.spacing = (label_size.x - thisline.size.x) / static_cast<float>(thisline.words.size() - 1);
-      }
-      #ifdef DEBUG_GUISTORM
-        //std::cout << "GUIStorm: DEBUG: line justification spacing " << thisline.spacing << std::endl;
-      #endif // DEBUG_GUISTORM
-    }
-  }
-  if(label_stretch_vertical) {
-    stretch_to_label_vertically();
-  }
-  if(label_shrink_vertical) {
-    shrink_to_label_vertically();
-  }
-}
-
-void base::update_label_alignment() {
-  /// decide on label positioning and reshuffle the layout for justifications
-  coordtype const label_position(get_absolute_position());
-  switch(label_alignment) {                                                     // horizontal
-  case aligntype::CENTRE:
-  case aligntype::TOP:
-  case aligntype::BOTTOM:
-    label_origin.x = label_position.x + ((size.x - label_size.x) / 2.0f);       // the margins simplify out
-    #ifdef GUISTORM_ROUND_NEAREST_ALL
-      label_origin.x = GUISTORM_ROUND(label_origin.x);
-    #endif // GUISTORM_ROUND_NEAREST_ALL
-    break;
-  case aligntype::LEFT:
-  case aligntype::TOP_LEFT:
-  case aligntype::BOTTOM_LEFT:
-    label_origin.x = label_position.x + (label_margin.x * parent_gui->dpi_scale);
-    #ifdef GUISTORM_ROUND_NEAREST_ALL
-      label_origin.x = GUISTORM_ROUND(label_origin.x);
-    #endif // GUISTORM_ROUND_NEAREST_ALL
-    break;
-  case aligntype::RIGHT:
-  case aligntype::TOP_RIGHT:
-  case aligntype::BOTTOM_RIGHT:
-    label_origin.x = label_position.x - (label_margin.x * parent_gui->dpi_scale) + size.x - label_size.x;
-    #ifdef GUISTORM_ROUND_NEAREST_ALL
-      label_origin.x = GUISTORM_ROUND(label_origin.x);
-    #endif // GUISTORM_ROUND_NEAREST_ALL
-    break;
-  }
-  switch(label_alignment) {                                                     // vertical
-  case aligntype::CENTRE:
-  case aligntype::LEFT:
-  case aligntype::RIGHT:
-    label_origin.y = label_position.y + ((size.y + label_size.y) / 2.0f);       // the margins simplify out
-    #ifdef GUISTORM_ROUND_NEAREST_ALL
-      label_origin.y = GUISTORM_ROUND(label_origin.y);
-    #endif // GUISTORM_ROUND_NEAREST_ALL
-    break;
-  case aligntype::TOP:
-  case aligntype::TOP_LEFT:
-  case aligntype::TOP_RIGHT:
-    label_origin.y = label_position.y - (label_margin.y * parent_gui->dpi_scale) + size.y - get_label_font().metrics_height;
-    #ifdef GUISTORM_ROUND_NEAREST_ALL
-      label_origin.y = GUISTORM_ROUND(label_origin.y);
-    #endif // GUISTORM_ROUND_NEAREST_ALL
-    break;
-  case aligntype::BOTTOM:
-  case aligntype::BOTTOM_LEFT:
-  case aligntype::BOTTOM_RIGHT:
-    label_origin.y = label_position.y + (label_margin.y * parent_gui->dpi_scale);
-    #ifdef GUISTORM_ROUND_NEAREST_ALL
-      label_origin.y = GUISTORM_ROUND(label_origin.y);
-    #endif // GUISTORM_ROUND_NEAREST_ALL
-    break;
-  }
-}
-
-void base::setup_label() {
-  /// Upload just the label portion of the buffer
-  if(label_lines.empty()) {
-    arrange_label();                                                            // only rearrange label if it hasn't already been laid out as this does not require GL context
-  }
-  update_label_alignment();                                                     // update position in all cases
-
-  // compose the VBO from the text positioning
-  std::vector<vertex> vbodata;
-  std::vector<GLuint> ibodata;
-  coordtype pen(label_origin);
-  #ifdef GUISTORM_NO_UTF
-    char charcode_last = '\0';
-  #else
-    char32_t charcode_last = U'\0';
-  #endif // GUISTORM_NO_UTF
-  vbodata.reserve(label_glyphs * 4);
-  #ifdef GUISTORM_AVOIDQUADS
-    ibodata.reserve(label_glyphs + 6);
-  #else
-    ibodata.reserve(label_glyphs + 4);
-  #endif // GUISTORM_AVOIDQUADS
-  for(auto const &thisline : label_lines) {
-    for(auto const &thisword : thisline.words) {
-      for(auto const &thisglyph : thisword.glyphs) {
-        pen.x += thisglyph->get_kerning(charcode_last);
-        charcode_last = thisglyph->charcode;
-        if(!thisglyph->is_blank) {                                              // whitespace glyphs don't get added but still take up horizontal space
-          #ifdef GUISTORM_ROUND_NEAREST_ALL
-            coordtype const corner0(GUISTORM_ROUND(pen.x + thisglyph->offset.x),
-                                    GUISTORM_ROUND(pen.y + thisglyph->offset.y));
-          #else
-            coordtype const corner0(pen + thisglyph->offset);
-          #endif // GUISTORM_ROUND_NEAREST_ALL
-          coordtype const corner1(corner0 + thisglyph->size);
-          unsigned int ibo_offset = cast_if_required<GLuint>(vbodata.size());
-          vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner0.x, corner0.y)), coordtype(thisglyph->texcoord0.x, thisglyph->texcoord0.y));
-          vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner1.x, corner0.y)), coordtype(thisglyph->texcoord1.x, thisglyph->texcoord0.y));
-          vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner1.x, corner1.y)), coordtype(thisglyph->texcoord1.x, thisglyph->texcoord1.y));
-          vbodata.emplace_back(parent_gui->coord_transform(coordtype(corner0.x, corner1.y)), coordtype(thisglyph->texcoord0.x, thisglyph->texcoord1.y));
-          ibodata.emplace_back(ibo_offset + 0);
-          ibodata.emplace_back(ibo_offset + 1);
-          ibodata.emplace_back(ibo_offset + 2);
-          #ifdef GUISTORM_AVOIDQUADS
-            ibodata.emplace_back(ibo_offset + 0);                               // doing this as indexed triangles instead of deprecated quads costs 50% more index entries
-            ibodata.emplace_back(ibo_offset + 2);
-          #endif // GUISTORM_AVOIDQUADS
-          ibodata.emplace_back(ibo_offset + 3);
-        }
-        pen += thisglyph->advance;
-      }
-      pen.x += thisline.spacing;                                                // justification inter-word space expansion
-    }
-    pen.x = label_origin.x;                                                     // carriage return
-    pen.y -= label_line_spacing;                                                // line feed
-  }
-  numverts_label = cast_if_required<GLuint>(ibodata.size());
-
-  #ifdef DEBUG_GUISTORM
-    /*
-    std::cout << "GUIStorm: Uploading " << vbodata.size() << " " << sizeof(vertex) << "B verts, " << numverts_label << " indices to vbo ("
-              << (vbodata.size() * sizeof(vertex)) << "B, "
-              << (numverts_label * sizeof(GLuint)) << "B) "
-              << "atlas " << parent_gui->font_atlas->id() << std::endl;
-    */
-  #endif // DEBUG_GUISTORM
-
-  glBindBuffer(GL_ARRAY_BUFFER,         vbo_label);
-  glBufferData(GL_ARRAY_BUFFER,         vbodata.size() * sizeof(vertex), &vbodata[0], GL_STATIC_DRAW);
-  #ifdef GUISTORM_UNBIND
-    glBindBuffer(GL_ARRAY_BUFFER,         0);
-  #endif // GUISTORM_UNBIND
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_label);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, numverts_label * sizeof(GLuint), &ibodata[0], GL_STATIC_DRAW);
-  #ifdef GUISTORM_UNBIND
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  #endif // GUISTORM_UNBIND
-}
-#endif // GUISTORM_NO_TEXT
-
-void base::update_layout() {
-  /// Reposition this object in accordance with any layout rules given to it
-  #ifdef DEBUG_GUISTORM
-    std::cout << "GUIStorm: DEBUG: updating layout for " << get_label() << " with " << layout_rules.size() << " rules..." << std::endl;
-  #endif // DEBUG_GUISTORM
-  for(auto const &thisrule : layout_rules) {
-    thisrule();
-  }
-  if(!layout_rules.empty()) {
-    refresh_position_only();
-  }
-}
-
-void base::refresh() {
-  /// Refresh this object's visual state
-  #ifndef GUISTORM_NO_TEXT
-    label_lines.clear();                                                        // ensure the label buffer arrangement also gets refreshed
-  #endif // GUISTORM_NO_TEXT
-  refresh_position_only();                                                      // refresh the outline shape
-}
-
-void base::refresh_position_only() {
-  /// Refresh this object's position and size only, don't refresh text content
-  initialised = false;
-}
-
-void base::render() {
-  /// Draw this element
-  if(!visible) {
-    return;
-  }
-  if(__builtin_expect(!initialised, 0)) {                                       // if the buffer hasn't been initialised yet (unlikely)
-    setup_buffer();
-  }
-  if(numverts != 0) {
-    glBindBuffer(GL_ARRAY_BUFFER,         vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glVertexAttribPointer(parent_gui->attrib_coords,    2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
-    glVertexAttribPointer(parent_gui->attrib_texcoords, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::texcoords)));
-
-    if(colours.current.background.a != 0.0f) {                                  // skip drawing fully transparent parts
-      glUniform4f(parent_gui->uniform_colour,
-                  colours.current.background.r,
-                  colours.current.background.g,
-                  colours.current.background.b,
-                  colours.current.background.a);
-      glDrawElements(GL_TRIANGLE_FAN, numverts, GL_UNSIGNED_INT, 0);            // background
-    }
-    if(colours.current.outline.a != 0.0f) {                                     // skip drawing fully transparent parts
-      glUniform4f(parent_gui->uniform_colour,
-                  colours.current.outline.r,
-                  colours.current.outline.g,
-                  colours.current.outline.b,
-                  colours.current.outline.a);
-      glDrawElements(GL_LINE_LOOP,    numverts, GL_UNSIGNED_INT, 0);            // outline
-    }
-  }
-  // draw the label
-  if(numverts_label != 0) {
-    glBindBuffer(GL_ARRAY_BUFFER,         vbo_label);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_label);
-    glVertexAttribPointer(parent_gui->attrib_coords,    2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::coords)));
-    glVertexAttribPointer(parent_gui->attrib_texcoords, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<GLvoid*>(offsetof(vertex, vertex::texcoords)));
-
-    glUniform4f(parent_gui->uniform_colour,
-                colours.current.content.r,
-                colours.current.content.g,
-                colours.current.content.b,
-                colours.current.content.a);
-    #ifdef GUISTORM_AVOIDQUADS
-      glDrawElements(GL_TRIANGLES, numverts_label, GL_UNSIGNED_INT, 0);
-    #else
-      glDrawElements(GL_QUADS, numverts_label, GL_UNSIGNED_INT, 0);
-    #endif // GUISTORM_AVOIDQUADS
-  }
-
-  update();
-}
-
-}

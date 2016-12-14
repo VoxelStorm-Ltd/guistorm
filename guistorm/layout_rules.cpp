@@ -78,7 +78,6 @@ void offset_right(layout::targettype target, coordcomponent distance) {
 void offset_top(layout::targettype target, coordcomponent distance) {
   /// Position this element in from the bottom top of the parent by the specified optional distance
   base *parent_base = dynamic_cast<base*>(target.parent);
-  if(parent_base) {
     target.set_position_nodpiscale(target.get_position_nodpiscale().x, (parent_base->get_size_nodpiscale().y - target.get_size_nodpiscale().y) - distance);
   } else {
     #ifndef NDEBUG

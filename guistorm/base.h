@@ -50,7 +50,6 @@ protected:
   bool mouseover = false;                                                       // only works on focusable items
   bool active    = false;                                                       // clicked - only true while clicking / typing / dragging
 
-protected:
   // positions
   coordtype position;                                                           // the relative coordinates of this to its parent
   coordtype size;                                                               // the distance of the furthest corner
