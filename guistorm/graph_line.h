@@ -3,6 +3,9 @@
 
 #include "base.h"
 #include <vector>
+#ifndef GUISTORM_SINGLETHREADED
+  #include <shared_mutex>
+#endif // GUISTORM_SINGLETHREADED
 #include <boost/range/iterator_range.hpp>
 
 namespace guistorm {
@@ -18,14 +21,17 @@ private:
   float max = 1.0;                                                              // the maximum value shown on the graph
 
   std::vector<float> data;                                                      // the set of individual graph points
+  #ifndef GUISTORM_SINGLETHREADED
+    std::shared_mutex data_mutex;
+  #endif // GUISTORM_SINGLETHREADED
 
 public:
   graph_line(container *parent,
-              colourset const &colours,
-              float min = 0.0,
-              float max = 1.0,
-              coordtype const &size     = coordtype(),
-              coordtype const &position = coordtype());
+             colourset const &colours,
+             float min = 0.0,
+             float max = 1.0,
+             coordtype const &size     = coordtype(),
+             coordtype const &position = coordtype());
 protected:
   virtual ~graph_line() override;
 
@@ -49,6 +55,9 @@ public:
 
 template<typename T> void graph_line::upload(T const &begin, T const &end) {
   /// Upload a new set of data points to this graph
+  #ifndef GUISTORM_SINGLETHREADED
+    std::unique_lock<std::shared_mutex> lock(data_mutex);                       // lock for writing (unique)
+  #endif // GUISTORM_SINGLETHREADED
   data.clear();
   for(auto const &it : boost::make_iterator_range(begin, end)) {
     data.emplace_back(it);

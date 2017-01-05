@@ -113,7 +113,13 @@ void input_text::setup_buffer() {
 void input_text::setup_label() {
   /// Wrapper around uploading the label that also appends a cursor update
   #ifndef GUISTORM_NO_TEXT
+    #ifndef GUISTORM_SINGLETHREADED
+      std::shared_lock<std::shared_mutex> lock(label_lines_mutex);              // lock for reading (shared)
+    #endif // GUISTORM_SINGLETHREADED
     bool update_required = label_lines.empty();
+    #ifndef GUISTORM_SINGLETHREADED
+      lock.unlock();
+    #endif // GUISTORM_SINGLETHREADED
     base::setup_label();
     if(update_required) {
       update_cursor();
@@ -164,6 +170,9 @@ unsigned int input_text::get_length_limit() const {
   return length_limit;
 }
 void input_text::set_length_limit(unsigned int new_limit) {
+  #ifndef GUISTORM_SINGLETHREADED
+    std::unique_lock<std::shared_mutex> lock(label_text_mutex);                 // lock for writing (unique)
+  #endif // GUISTORM_SINGLETHREADED
   length_limit = new_limit;
   #ifdef GUISTORM_NO_UTF
     size_t const length = label_text.length();
@@ -195,6 +204,9 @@ bool input_text::is_multiline_allowed() const {
 }
 void input_text::set_multiline_allowed(bool new_allowed) {
   if(multiline_allowed == true && new_allowed == false) {
+    #ifndef GUISTORM_SINGLETHREADED
+      std::unique_lock<std::shared_mutex> lock(label_text_mutex);               // lock for writing (unique)
+    #endif // GUISTORM_SINGLETHREADED
     // multiline was previously allowed and is now disabled, so we need to check for and remove any line breaks
     for(auto it = label_text.begin(); it != label_text.end();) {                // iterate through the string by utf8 chars
       #ifdef GUISTORM_NO_UTF
@@ -219,17 +231,26 @@ void input_text::set_multiline_allowed(bool new_allowed) {
 
 void input_text::insert(char character) {
   /// insert the character at the selected position
+  #ifndef GUISTORM_SINGLETHREADED
+    std::unique_lock<std::shared_mutex> lock(label_text_mutex);                 // lock for writing (unique)
+  #endif // GUISTORM_SINGLETHREADED
   if(cursor == label_text.length()) {                                           // are we at the end of the string?
     label_text += character;                                                    // just append to the end
   } else {
     label_text.insert(cursor, &character, 1);                                   // insert mid-string (buffer insert mode)
   }
   ++cursor;                                                                     // advance the cursor, no need to worry about unicode
+  #ifndef GUISTORM_SINGLETHREADED
+    lock.unlock();
+  #endif // GUISTORM_SINGLETHREADED
   refresh();                                                                    // we've altered the label text so refresh it
 }
 #ifndef GUISTORM_NO_UTF
 void input_text::insert(char32_t codepoint) {
   /// insert the UTF32 codepoint at the selected position
+  #ifndef GUISTORM_SINGLETHREADED
+    std::unique_lock<std::shared_mutex> lock(label_text_mutex);                 // lock for writing (unique)
+  #endif // GUISTORM_SINGLETHREADED
   if(label_text.length() == length_limit) {
     #ifdef DEBUG_GUISTORM
       std::cout << "GUIStorm: DEBUG: text input " << get_label() << " reached its length limit of " << length_limit << std::endl;
@@ -266,6 +287,9 @@ void input_text::cursor_left() {
   #ifdef GUISTORM_NO_UTF
     --cursor;
   #else
+    #ifndef GUISTORM_SINGLETHREADED
+      std::shared_lock<std::shared_mutex> lock(label_text_mutex);               // lock for reading (shared)
+    #endif // GUISTORM_SINGLETHREADED
     auto it = label_text.begin() + cursor;
     #ifdef GUISTORM_UNSAFEUTF
       utf8::unchecked::prior(it);                                               // shift the cursor backwards
@@ -273,14 +297,23 @@ void input_text::cursor_left() {
       utf8::prior(it, label_text.begin());
     #endif // GUISTORM_UNSAFEUTF
     cursor = cast_if_required<unsigned int>(it - label_text.begin());
+    #ifndef GUISTORM_SINGLETHREADED
+      lock.unlock();
+    #endif // GUISTORM_SINGLETHREADED
   #endif // GUISTORM_NO_UTF
   update_cursor();
 }
 void input_text::cursor_right() {
+  #ifndef GUISTORM_SINGLETHREADED
+    std::shared_lock<std::shared_mutex> lock(label_text_mutex);                 // lock for reading (shared)
+  #endif // GUISTORM_SINGLETHREADED
   if(cursor == label_text.length()) {
     return;
   }
   #ifdef GUISTORM_NO_UTF
+    #ifndef GUISTORM_SINGLETHREADED
+      lock.unlock();
+    #endif // GUISTORM_SINGLETHREADED
     ++cursor;
   #else
     auto it = label_text.begin() + cursor;
@@ -290,6 +323,9 @@ void input_text::cursor_right() {
       utf8::next(it, label_text.end());
     #endif // GUISTORM_UNSAFEUTF
     cursor = cast_if_required<unsigned int>(it - label_text.begin());
+    #ifndef GUISTORM_SINGLETHREADED
+      lock.unlock();
+    #endif // GUISTORM_SINGLETHREADED
   #endif // GUISTORM_NO_UTF
   update_cursor();
 }
@@ -306,7 +342,13 @@ void input_text::cursor_home() {
   update_cursor();
 }
 void input_text::cursor_end() {
+  #ifndef GUISTORM_SINGLETHREADED
+    std::shared_lock<std::shared_mutex> lock(label_text_mutex);                 // lock for reading (shared)
+  #endif // GUISTORM_SINGLETHREADED
   cursor = cast_if_required<unsigned int>(label_text.length());
+  #ifndef GUISTORM_SINGLETHREADED
+    lock.unlock();
+  #endif // GUISTORM_SINGLETHREADED
   update_cursor();
 }
 void input_text::cursor_backspace() {
@@ -315,6 +357,9 @@ void input_text::cursor_backspace() {
     return;
   }
   unsigned int const cursor_last = cursor;
+  #ifndef GUISTORM_SINGLETHREADED
+    std::unique_lock<std::shared_mutex> lock(label_text_mutex);                 // lock for writing (unique)
+  #endif // GUISTORM_SINGLETHREADED
   #ifdef GUISTORM_NO_UTF
     --cursor;
   #else
@@ -327,10 +372,16 @@ void input_text::cursor_backspace() {
     cursor = cast_if_required<unsigned int>(it - label_text.begin());
   #endif // GUISTORM_NO_UTF
   label_text.erase(cursor, cursor_last - cursor);                               // erase that character, however wide it may have been
+  #ifndef GUISTORM_SINGLETHREADED
+    lock.unlock();
+  #endif // GUISTORM_SINGLETHREADED
   refresh();                                                                    // we've altered the label text so refresh it
 }
 void input_text::cursor_delete() {
   /// Delete the character after the cursor
+  #ifndef GUISTORM_SINGLETHREADED
+    std::unique_lock<std::shared_mutex> lock(label_text_mutex);                 // lock for writing (unique)
+  #endif // GUISTORM_SINGLETHREADED
   if(cursor == label_text.length()) {
     return;
   }
@@ -346,6 +397,9 @@ void input_text::cursor_delete() {
     unsigned int const cursor_last = cast_if_required<unsigned int>(it_last - label_text.begin()); // don't move the actual cursor position though
   #endif // GUISTORM_NO_UTF
   label_text.erase(cursor, cursor_last - cursor);                               // erase that character, however wide it may have been
+  #ifndef GUISTORM_SINGLETHREADED
+    lock.unlock();
+  #endif // GUISTORM_SINGLETHREADED
   refresh();                                                                    // we've altered the label text so refresh it
 }
 
@@ -361,6 +415,9 @@ coordtype input_text::get_cursor_position() const{
   #else
     char32_t charcode_last = U'\0';
   #endif // GUISTORM_NO_UTF
+  #ifndef GUISTORM_SINGLETHREADED
+    std::shared_lock<std::shared_mutex> lock(label_lines_mutex);                // lock for reading (shared)
+  #endif // GUISTORM_SINGLETHREADED
   for(auto const &thisline : label_lines) {
     for(auto const &thisword : thisline.words) {
       /*
@@ -389,7 +446,13 @@ void input_text::update_cursor() {
   /// Update the visible cursor position
   cursor_position = get_cursor_position();
   #ifdef DEBUG_GUISTORM
+    #ifndef GUISTORM_SINGLETHREADED
+      std::shared_lock<std::shared_mutex> lock(label_text_mutex);               // lock for reading (shared)
+    #endif // GUISTORM_SINGLETHREADED
     std::cout << "GUIStorm: DEBUG: updating cursor on string " << label_text << " position " << cursor << " of " << label_text.length() << " at " << cursor_position << std::endl;
+    #ifndef GUISTORM_SINGLETHREADED
+      lock.unlock();
+    #endif // GUISTORM_SINGLETHREADED
   #endif // DEBUG_GUISTORM
   setup_buffer();
 }

@@ -272,10 +272,16 @@ font &base::get_label_font() {
 #endif // GUISTORM_NO_TEXT
 
 void base::set_label(std::string const &newlabel) {
+  #ifndef GUISTORM_SINGLETHREADED
+    std::unique_lock<std::shared_mutex> lock(label_text_mutex);                 // lock for writing (unique)
+  #endif // GUISTORM_SINGLETHREADED
   if(newlabel == label_text) {
     return;                                                                     // skip updating if we're making no changes
   }
   label_text = newlabel;
+  #ifndef GUISTORM_SINGLETHREADED
+    lock.unlock();
+  #endif // GUISTORM_SINGLETHREADED
   refresh();                                                                    // refresh the buffer (this also clears label lines)
 }
 
@@ -455,6 +461,10 @@ void base::arrange_label() {
   // compose the text layout in the abstract first
   label_glyphs = 0;                                                             // reset the glyph count
   label_line_spacing = this_label_font.metrics_height;
+  #ifndef GUISTORM_SINGLETHREADED
+    std::unique_lock<std::shared_mutex> lock_label_lines(label_lines_mutex);    // lock for writing (unique)
+    std::shared_lock<std::shared_mutex> lock_label_text(label_text_mutex);      // lock for reading (shared)
+  #endif // GUISTORM_SINGLETHREADED
   label_lines.clear();
   label_lines.emplace_back();                                                   // create a default first line
 
@@ -519,6 +529,9 @@ void base::arrange_label() {
       #endif // DEBUG_GUISTORM
     }
   }
+  #ifndef GUISTORM_SINGLETHREADED
+    lock_label_text.unlock();
+  #endif // GUISTORM_SINGLETHREADED
 
   // carry out word-wrapping
   label_size.assign(0.0f, label_line_spacing * -0.5f);                          // start the height with 1 line thickess minimum
@@ -574,6 +587,9 @@ void base::arrange_label() {
       #endif // DEBUG_GUISTORM
     }
   }
+  #ifndef GUISTORM_SINGLETHREADED
+    lock_label_lines.unlock();
+  #endif // GUISTORM_SINGLETHREADED
   if(label_stretch_vertical) {
     stretch_to_label_vertically();
   }
@@ -641,8 +657,17 @@ void base::update_label_alignment() {
 
 void base::setup_label() {
   /// Upload just the label portion of the buffer
+  #ifndef GUISTORM_SINGLETHREADED
+    std::shared_lock<std::shared_mutex> lock_label_lines(label_lines_mutex);    // lock for reading (shared)
+  #endif // GUISTORM_SINGLETHREADED
   if(label_lines.empty()) {
+    #ifndef GUISTORM_SINGLETHREADED
+      lock_label_lines.unlock();
+    #endif // GUISTORM_SINGLETHREADED
     arrange_label();                                                            // only rearrange label if it hasn't already been laid out as this does not require GL context
+    #ifndef GUISTORM_SINGLETHREADED
+      lock_label_lines.lock();
+    #endif // GUISTORM_SINGLETHREADED
   }
   update_label_alignment();                                                     // update position in all cases
 
@@ -695,6 +720,9 @@ void base::setup_label() {
     pen.x = label_origin.x;                                                     // carriage return
     pen.y -= label_line_spacing;                                                // line feed
   }
+  #ifndef GUISTORM_SINGLETHREADED
+    lock_label_lines.unlock();
+  #endif // GUISTORM_SINGLETHREADED
   numverts_label = cast_if_required<GLuint>(ibodata.size());
 
   #ifdef DEBUG_GUISTORM
@@ -735,7 +763,13 @@ void base::update_layout() {
 void base::refresh() {
   /// Refresh this object's visual state
   #ifndef GUISTORM_NO_TEXT
+    #ifndef GUISTORM_SINGLETHREADED
+      std::unique_lock<std::shared_mutex> lock_label_lines(label_lines_mutex);  // lock for writing (unique)
+    #endif // GUISTORM_SINGLETHREADED
     label_lines.clear();                                                        // ensure the label buffer arrangement also gets refreshed
+    #ifndef GUISTORM_SINGLETHREADED
+      lock_label_lines.unlock();
+    #endif // GUISTORM_SINGLETHREADED
   #endif // GUISTORM_NO_TEXT
   refresh_position_only();                                                      // refresh the outline shape
 }

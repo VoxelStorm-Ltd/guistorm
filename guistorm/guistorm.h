@@ -5,6 +5,7 @@
 /// by Eugene Hopkinson (SlowRiot) for VoxelStorm 2014
 ///
 /// Defines: GUISTORM_AVOIDQUADS - use triangles instead of deprecated GL_QUADS primitives even if quads are cheaper
+///          GUISTORM_SINGLETHREADED - omit all thread safety features
 ///          GUISTORM_UNBIND - unbind shader and buffers after rendering
 ///          GUISTORM_NO_UTF - do not use utf8 and utf32 at all, limit all characters to ascii
 ///          GUISTORM_UNSAFEUTF - do not check UTF8 input for validity when iterating; this assumes you guarantee all strings are safe

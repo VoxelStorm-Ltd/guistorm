@@ -2,8 +2,10 @@
 #define GUISTORM_GRAPH_RINGBUFFER_LINE_H_INCLUDED
 
 #include "base.h"
+#ifndef GUISTORM_SINGLETHREADED
+  #include <shared_mutex>
+#endif // GUISTORM_SINGLETHREADED
 #include <boost/circular_buffer.hpp>
-//#include <boost/range/iterator_range.hpp>
 
 namespace guistorm {
 
@@ -18,6 +20,9 @@ private:
   float max = 1.0;                                                              // the maximum value shown on the graph
 
   boost::circular_buffer<float> data;                                           // the set of individual graph points
+  #ifndef GUISTORM_SINGLETHREADED
+    std::shared_mutex data_mutex;
+  #endif // GUISTORM_SINGLETHREADED
 
 public:
   graph_ringbuffer_line(container *parent,
