@@ -72,7 +72,7 @@ public:
   void cursor_delete();
 
 private:
-  coordtype get_cursor_position() const;
+  coordtype get_cursor_position();
   void update_cursor();
 };
 

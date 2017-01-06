@@ -403,7 +403,7 @@ void input_text::cursor_delete() {
   refresh();                                                                    // we've altered the label text so refresh it
 }
 
-coordtype input_text::get_cursor_position() const{
+coordtype input_text::get_cursor_position() {
   /// Fetch the cursor's visible coordinates
   coordtype pen(label_origin);
   if(cursor == 0) {
