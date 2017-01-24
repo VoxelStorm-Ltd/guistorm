@@ -165,11 +165,13 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
   return true;
 }
 
-#ifdef GUISTORM_NO_UTF
-  bool font::load_glyphs(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, std::string const &codes_to_load) {
-#else
-  bool font::load_glyphs(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, std::u32string const &codes_to_load) {
-#endif // GUISTORM_NO_UTF
+bool font::load_glyphs(freetypeglxx::TextureAtlas *font_atlas,
+                       FT_Face const &face,
+                       #ifdef GUISTORM_NO_UTF
+                         std::string const &codes_to_load) {
+                       #else
+                         std::u32string const &codes_to_load) {
+                       #endif // GUISTORM_NO_UTF
   /// Load all glyphs specified in a string
   for(auto const &thischar : codes_to_load) {
     if(!load_glyph(font_atlas, face, thischar)) {
@@ -179,11 +181,13 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
   }
   return true;
 }
-#ifdef GUISTORM_NO_UTF
-  bool font::load_glyph(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, char thischar) {
-#else
-  bool font::load_glyph(freetypeglxx::TextureAtlas *font_atlas, FT_Face const &face, char32_t thischar) {
-#endif // GUISTORM_NO_UTF
+bool font::load_glyph(freetypeglxx::TextureAtlas *font_atlas,
+                      FT_Face const &face,
+                      #ifdef GUISTORM_NO_UTF
+                        char thischar) {
+                      #else
+                        char32_t thischar) {
+                      #endif // GUISTORM_NO_UTF
   /// Load a glyph specified by one UTF32 codepoint
   FT_UInt glyph_index = FT_Get_Char_Index(face, thischar);
   FT_Int32 flags = 0;

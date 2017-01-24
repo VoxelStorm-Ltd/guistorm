@@ -66,12 +66,12 @@ public:
 protected:
   std::string label_text;                                                       // the text for the label of this object
   #ifndef GUISTORM_SINGLETHREADED
-    std::shared_mutex label_text_mutex;
+    mutable std::shared_mutex label_text_mutex;
   #endif // GUISTORM_SINGLETHREADED
   #ifndef GUISTORM_NO_TEXT
     std::vector<font::line> label_lines;                                        // the actual organised label content
     #ifndef GUISTORM_SINGLETHREADED
-      std::shared_mutex label_lines_mutex;
+      mutable std::shared_mutex label_lines_mutex;
     #endif // GUISTORM_SINGLETHREADED
     coordtype label_origin;                                                     // where to reset the pen to
     coordtype label_size;                                                       // maximum size of the label, width and height

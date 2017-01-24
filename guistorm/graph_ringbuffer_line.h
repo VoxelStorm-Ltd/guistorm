@@ -21,7 +21,7 @@ private:
 
   boost::circular_buffer<float> data;                                           // the set of individual graph points
   #ifndef GUISTORM_SINGLETHREADED
-    std::shared_mutex data_mutex;
+    mutable std::shared_mutex data_mutex;
   #endif // GUISTORM_SINGLETHREADED
 
 public:

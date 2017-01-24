@@ -73,7 +73,7 @@ private:
   #else
     std::unordered_map<char32_t, std::shared_ptr<glyph>> glyphs;                // library of unicode glyphs
   #endif // GUISTORM_NO_UTF
-  std::mutex glyph_map_mutex;                                                   // mutex to prevent glyphs being modified while being read
+  mutable std::mutex glyph_map_mutex;                                           // mutex to prevent glyphs being modified while being read
 public:
   std::string name;
   const unsigned char*  memory_offset = 0;                                      // offset in memory of the raw font data
