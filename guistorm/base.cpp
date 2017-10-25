@@ -734,6 +734,13 @@ void base::setup_label() {
     */
   #endif // DEBUG_GUISTORM
 
+  if(ibodata.empty() || vbodata.empty()) {
+    //#ifdef DEBUG_GUISTORM
+      std::cout << "GUIStorm: DEBUG: not uploading empty buffer" << std::endl;
+    //#endif // DEBUG_GUISTORM
+    return;
+  }
+
   glBindBuffer(GL_ARRAY_BUFFER,         vbo_label);
   glBufferData(GL_ARRAY_BUFFER,         vbodata.size() * sizeof(vertex), &vbodata[0], GL_STATIC_DRAW);
   #ifdef GUISTORM_UNBIND

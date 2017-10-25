@@ -48,7 +48,7 @@ private:
   GLfloat dpi = 72.0;                                                           // the dots per inch of the display - used to scale and all elements
   GLfloat dpi_scale = 1.0;                                                      // size multiplier to scale gui layout and fonts for the screen
 public:
-  coordtype windowsize;                                                         // cached value for the size of the window
+  coordtype windowsize{1, 1};                                                   // cached value for the size of the window - initialise as non-zero to avoid early divisions by zero
   coordtype cursor_position;                                                    // cached value for the window position of the cursor
   bool mouse_pressed = false;                                                   // whether we're holding down the mousebutton
   bool mouse_released = false;                                                  // whether the mouse was being held and has been released this frame
