@@ -1,6 +1,5 @@
 #include "gui.h"
 #include <iostream>
-#include <boost/algorithm/clamp.hpp>
 #ifndef GUISTORM_NO_TEXT
   #include <freetype-gl/texture-atlas.h>
 #endif // GUISTORM_NO_TEXT
@@ -409,7 +408,7 @@ GLfloat gui::get_dpi_scale() const {
 }
 void gui::set_dpi(GLfloat newdpi) {
   /// Update dpi and update the cached value of dpi scale
-  dpi = boost::algorithm::clamp(newdpi, dpi_min, dpi_max);
+  dpi = std::clamp(newdpi, dpi_min, dpi_max);
   dpi_scale = newdpi / dpi_default;
 }
 void gui::set_dpi_scale(GLfloat newscale) {

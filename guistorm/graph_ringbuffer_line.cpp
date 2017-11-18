@@ -1,6 +1,5 @@
 #include "graph_ringbuffer_line.h"
 #include "cast_if_required.h"
-#include <boost/algorithm/clamp.hpp>
 #include "gui.h"
 
 namespace guistorm {
@@ -79,7 +78,7 @@ void graph_ringbuffer_line::setup_buffer() {
   float x = position_absolute.x;
   for(auto const &it : data) {
     ibodata.emplace_back(vbodata.size());
-    float const val = position_absolute.y + boost::algorithm::clamp((it - min) * vertical_scale, 0.0f, size.y);
+    float const val = position_absolute.y + std::clamp((it - min) * vertical_scale, 0.0f, size.y);
     vbodata.emplace_back(parent_gui->coord_transform(coordtype(x, val)));
     x += xstep;
     // TODO: populate the fill buffer
