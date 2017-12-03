@@ -92,7 +92,7 @@ base *container::get_picked(coordtype const &cursor_position) {
   #ifndef NDEBUG
     lock_iterating = true;
   #endif
-  for(auto &element : boost::adaptors::reverse(elements)) {                     // we iterate in reverse so most on-top object from equal tiers appears first
+  for(auto &element : elements | boost::adaptors::reversed) {                   // we iterate in reverse so most on-top object from equal tiers appears first
     base *picked_element(element->get_picked(cursor_position));
     if(picked_element) {
       #ifndef NDEBUG
