@@ -60,8 +60,8 @@ public:
 
   #ifndef GUISTORM_NO_TEXT
     // input field management
-    std::function<void(input_text&)> function_select_input   = [](input_text &this_input __attribute__((__unused__))){}; // what to call on a selected input field, for binding text input callbacks etc
-    std::function<void(input_text&)> function_deselect_input = [](input_text &this_input __attribute__((__unused__))){}; // what to call on a deselected input field, for unbinding etc
+    std::function<void(input_text&)> function_select_input   = [](input_text &this_input [[maybe_unused]]){}; // what to call on a selected input field, for binding text input callbacks etc
+    std::function<void(input_text&)> function_deselect_input = [](input_text &this_input [[maybe_unused]]){}; // what to call on a deselected input field, for unbinding etc
     input_text *current_input_field = nullptr;                                  // what input field we have selected, if any
   #endif // GUISTORM_NO_TEXT
 

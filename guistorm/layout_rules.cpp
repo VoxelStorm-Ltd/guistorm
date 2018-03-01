@@ -144,11 +144,11 @@ void move(targettype target, coordcomponent offset_x, coordcomponent offset_y) {
   target.set_position_nodpiscale(target.get_position_nodpiscale() + coordtype(offset_x, offset_y));
 }
 #ifndef NDEBUG
-  void test_null(targettype target __attribute__((__unused__))) {
+  void test_null(targettype target [[maybe_unused]]) {
     /// Test action that reports and does nothing else
     std::cout << "GUIStorm: Layout: DEBUG: " << __PRETTY_FUNCTION__ << " called" << std::endl;
   }
-  void test_text(targettype target __attribute__((__unused__)), std::string text) {
+  void test_text(targettype target [[maybe_unused]], std::string text) {
     /// Test action that echoes a string parameter
     std::cout << "GUIStorm: Layout: DEBUG: " << __PRETTY_FUNCTION__ << " called with string: \"" << text << "\"" << std::endl;
   }

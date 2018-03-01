@@ -226,8 +226,8 @@ void window::shrink_to_labels() {
   /// Shrink all inner elements horizontally to the widest required unless they're narrower
   shrink_to_labels(elements.begin(), elements.end());                           // wrapper: adding element range
 }
-void window::shrink_to_labels(std::vector<base*>::const_iterator first __attribute__((__unused__)),
-                              std::vector<base*>::const_iterator last __attribute__((__unused__))) {
+void window::shrink_to_labels(std::vector<base*>::const_iterator first [[maybe_unused]],
+                              std::vector<base*>::const_iterator last [[maybe_unused]]) {
   /// Shrink selected elements horizontally to the widest required unless they're narrower
   set_size(0, get_size().y);
   stretch_to_labels();

@@ -13,7 +13,7 @@ base::base(container *newparent,
            colourset const &newcolours,
            std::string const &thislabel,
            #ifdef GUISTORM_NO_TEXT
-             font *this_font __attribute__((__unused__)),
+             font *this_font [[maybe_unused]],
            #else
              font *this_font,
            #endif // GUISTORM_NO_TEXT

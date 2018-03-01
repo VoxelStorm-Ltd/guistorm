@@ -22,7 +22,7 @@ label::~label() {
   /// Default destructor
 }
 
-base *label::get_picked(coordtype const &cursor_position __attribute__((__unused__))) {
+base *label::get_picked(coordtype const &cursor_position [[maybe_unused]]) {
   /// Labels are never clickable
   return nullptr;
 }
