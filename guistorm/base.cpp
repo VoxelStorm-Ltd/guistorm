@@ -273,7 +273,7 @@ font &base::get_label_font() {
 
 void base::set_label(std::string const &newlabel) {
   #ifndef GUISTORM_SINGLETHREADED
-    std::unique_lock<std::shared_mutex> lock(label_text_mutex);                 // lock for writing (unique)
+    std::unique_lock lock(label_text_mutex);                                    // lock for writing (unique)
   #endif // GUISTORM_SINGLETHREADED
   if(newlabel == label_text) {
     return;                                                                     // skip updating if we're making no changes
@@ -462,8 +462,8 @@ void base::arrange_label() {
   label_glyphs = 0;                                                             // reset the glyph count
   label_line_spacing = this_label_font.metrics_height;
   #ifndef GUISTORM_SINGLETHREADED
-    std::unique_lock<std::shared_mutex> lock_label_lines(label_lines_mutex);    // lock for writing (unique)
-    std::shared_lock<std::shared_mutex> lock_label_text(label_text_mutex);      // lock for reading (shared)
+    std::unique_lock lock_label_lines(label_lines_mutex);                       // lock for writing (unique)
+    std::shared_lock lock_label_text(label_text_mutex);                         // lock for reading (shared)
   #endif // GUISTORM_SINGLETHREADED
   label_lines.clear();
   label_lines.emplace_back();                                                   // create a default first line
@@ -658,7 +658,7 @@ void base::update_label_alignment() {
 void base::setup_label() {
   /// Upload just the label portion of the buffer
   #ifndef GUISTORM_SINGLETHREADED
-    std::shared_lock<std::shared_mutex> lock_label_lines(label_lines_mutex);    // lock for reading (shared)
+    std::shared_lock lock_label_lines(label_lines_mutex);                       // lock for reading (shared)
   #endif // GUISTORM_SINGLETHREADED
   if(label_lines.empty()) {
     #ifndef GUISTORM_SINGLETHREADED
@@ -771,7 +771,7 @@ void base::refresh() {
   /// Refresh this object's visual state
   #ifndef GUISTORM_NO_TEXT
     #ifndef GUISTORM_SINGLETHREADED
-      std::unique_lock<std::shared_mutex> lock_label_lines(label_lines_mutex);  // lock for writing (unique)
+      std::unique_lock lock_label_lines(label_lines_mutex);                     // lock for writing (unique)
     #endif // GUISTORM_SINGLETHREADED
     label_lines.clear();                                                        // ensure the label buffer arrangement also gets refreshed
     #ifndef GUISTORM_SINGLETHREADED

@@ -56,7 +56,7 @@ public:
 template<typename T> void graph_line::upload(T const &begin, T const &end) {
   /// Upload a new set of data points to this graph
   #ifndef GUISTORM_SINGLETHREADED
-    std::unique_lock<std::shared_mutex> lock(data_mutex);                       // lock for writing (unique)
+    std::unique_lock lock(data_mutex);                                          // lock for writing (unique)
   #endif // GUISTORM_SINGLETHREADED
   data.clear();
   for(auto const &it : boost::make_iterator_range(begin, end)) {

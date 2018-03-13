@@ -47,7 +47,7 @@ void graph_ringbuffer_line::destroy_buffer() {
 void graph_ringbuffer_line::setup_buffer() {
   /// Create or update the buffer for this element
   #ifndef GUISTORM_SINGLETHREADED
-    std::shared_lock<std::shared_mutex> lock(data_mutex);                       // lock for reading (shared)
+    std::shared_lock lock(data_mutex);                                          // lock for reading (shared)
   #endif // GUISTORM_SINGLETHREADED
   if(data.empty()) {
     initialised = true;
@@ -166,7 +166,7 @@ void graph_ringbuffer_line::set_min_and_max(float new_min, float new_max) {
 void graph_ringbuffer_line::set_min_auto() {
   /// Automatically scale the graph to fit the lowest element of the data
   #ifndef GUISTORM_SINGLETHREADED
-    std::shared_lock<std::shared_mutex> lock(data_mutex);                       // lock for reading (shared)
+    std::shared_lock lock(data_mutex);                                          // lock for reading (shared)
   #endif // GUISTORM_SINGLETHREADED
   if(__builtin_expect(data.empty(), 0)) {                                       // branch prediction hint: unlikely
     min = 0.0;
@@ -177,7 +177,7 @@ void graph_ringbuffer_line::set_min_auto() {
 void graph_ringbuffer_line::set_max_auto() {
   /// Automatically scale the graph to fit the highest element of the data
   #ifndef GUISTORM_SINGLETHREADED
-    std::shared_lock<std::shared_mutex> lock(data_mutex);                       // lock for reading (shared)
+    std::shared_lock lock(data_mutex);                                          // lock for reading (shared)
   #endif // GUISTORM_SINGLETHREADED
   if(__builtin_expect(data.empty(), 0)) {                                       // branch prediction hint: unlikely
     max = 0.0;
@@ -188,7 +188,7 @@ void graph_ringbuffer_line::set_max_auto() {
 void graph_ringbuffer_line::set_min_and_max_auto() {
   /// Automatically scale the graph to fit all elements of the data
   #ifndef GUISTORM_SINGLETHREADED
-    std::shared_lock<std::shared_mutex> lock(data_mutex);                       // lock for reading (shared)
+    std::shared_lock lock(data_mutex);                                          // lock for reading (shared)
   #endif // GUISTORM_SINGLETHREADED
   if(__builtin_expect(data.empty(), 0)) {                                       // branch prediction hint: unlikely
     min = 0.0;
@@ -202,14 +202,14 @@ void graph_ringbuffer_line::set_min_and_max_auto() {
 
 void graph_ringbuffer_line::clear() {
   #ifndef GUISTORM_SINGLETHREADED
-    std::unique_lock<std::shared_mutex> lock(data_mutex);                       // lock for writing (unique)
+    std::unique_lock lock(data_mutex);                                          // lock for writing (unique)
   #endif // GUISTORM_SINGLETHREADED
   data.clear();
 }
 void graph_ringbuffer_line::push(float value) {
   /// Upload a new data point to the graph
   #ifndef GUISTORM_SINGLETHREADED
-    std::unique_lock<std::shared_mutex> lock(data_mutex);                       // lock for writing (unique)
+    std::unique_lock lock(data_mutex);                                          // lock for writing (unique)
   #endif // GUISTORM_SINGLETHREADED
   data.push_back(value);
   initialised = false;                                                          // mark the buffer as needing a refresh

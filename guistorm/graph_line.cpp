@@ -51,7 +51,7 @@ void graph_line::setup_buffer() {
   std::vector<vertex> vbodata;
   std::vector<GLuint> ibodata;
   #ifndef GUISTORM_SINGLETHREADED
-    std::shared_lock<std::shared_mutex> lock(data_mutex);                       // lock for reading (shared)
+    std::shared_lock lock(data_mutex);                                          // lock for reading (shared)
   #endif // GUISTORM_SINGLETHREADED
   vbodata.reserve(data.size());
   ibodata.reserve(data.size());
@@ -154,7 +154,7 @@ void graph_line::set_min_and_max(float new_min, float new_max) {
 void graph_line::set_min_auto() {
   /// Automatically scale the graph to fit the lowest element of the data
   #ifndef GUISTORM_SINGLETHREADED
-    std::shared_lock<std::shared_mutex> lock(data_mutex);                       // lock for reading (shared)
+    std::shared_lock lock(data_mutex);                                          // lock for reading (shared)
   #endif // GUISTORM_SINGLETHREADED
   if(__builtin_expect(data.empty(), 0)) {                                       // branch prediction hint: unlikely
     min = 0.0;
@@ -165,7 +165,7 @@ void graph_line::set_min_auto() {
 void graph_line::set_max_auto() {
   /// Automatically scale the graph to fit the highest element of the data
   #ifndef GUISTORM_SINGLETHREADED
-    std::shared_lock<std::shared_mutex> lock(data_mutex);                       // lock for reading (shared)
+    std::shared_lock lock(data_mutex);                                          // lock for reading (shared)
   #endif // GUISTORM_SINGLETHREADED
   if(__builtin_expect(data.empty(), 0)) {                                       // branch prediction hint: unlikely
     max = 0.0;
@@ -176,7 +176,7 @@ void graph_line::set_max_auto() {
 void graph_line::set_min_and_max_auto() {
   /// Automatically scale the graph to fit all elements of the data
   #ifndef GUISTORM_SINGLETHREADED
-    std::shared_lock<std::shared_mutex> lock(data_mutex);                       // lock for reading (shared)
+    std::shared_lock lock(data_mutex);                                          // lock for reading (shared)
   #endif // GUISTORM_SINGLETHREADED
   if(__builtin_expect(data.empty(), 0)) {                                       // branch prediction hint: unlikely
     min = 0.0;

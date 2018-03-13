@@ -255,7 +255,7 @@ bool font::load_glyph(freetypeglxx::TextureAtlas *font_atlas,
   }
 
   {
-    std::lock_guard<std::mutex> lock(glyph_map_mutex);
+    std::lock_guard lock(glyph_map_mutex);
     glyphs.emplace(thischar, tempglyph);
   }
   return true;
@@ -264,7 +264,7 @@ bool font::load_glyph(freetypeglxx::TextureAtlas *font_atlas,
 void font::unload() {
   /// Unload this font from memory
   /// Note: it is not usually necessary to call this explicitly, as load() will unload first, and destruction will clean up properly
-  std::lock_guard<std::mutex> lock(glyph_map_mutex);
+  std::lock_guard lock(glyph_map_mutex);
   glyphs.clear();
 }
 
