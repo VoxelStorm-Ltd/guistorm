@@ -57,8 +57,7 @@ GLfloat font::line::length() const {
 
 font::font(gui *new_parent_gui,
            std::string const &new_name,
-           unsigned char const *new_memory_offset,
-           size_t new_memory_size,
+           std::string_view new_buffer,
            float new_font_size,
            #ifdef GUISTORM_NO_UTF
              std::string const &charcodes_to_load,
@@ -68,8 +67,7 @@ font::font(gui *new_parent_gui,
            bool new_suppress_horizontal_hint)
   : parent_gui(new_parent_gui),
     name(new_name),
-    memory_offset(new_memory_offset),
-    memory_size(new_memory_size),
+    buffer(new_buffer),
     font_size(new_font_size),
     charcodes(charcodes_to_load),
     suppress_horizontal_hint(new_suppress_horizontal_hint) {
@@ -122,7 +120,7 @@ bool font::load(freetypeglxx::TextureAtlas *font_atlas) {
   FT_Library library;
   FT_Init_FreeType(&library);                                                   // initialise library
   FT_Face face;
-  FT_New_Memory_Face(library, memory_offset, memory_size, 0, &face);            // load face
+  FT_New_Memory_Face(library, reinterpret_cast<unsigned char const *>(buffer.data()), buffer.size(), 0, &face); // load face
   FT_Select_Charmap(face, FT_ENCODING_UNICODE);                                 // select charmap
   if(suppress_horizontal_hint) {                                                // http://www.antigrain.com/research/font_rasterization/ http://jcgt.org/published/0002/01/04/
     FT_Set_Char_Size(face,

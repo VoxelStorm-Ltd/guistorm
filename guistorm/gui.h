@@ -87,8 +87,7 @@ public:
   void add_to_gui(base *element) override final;
   #ifndef GUISTORM_NO_TEXT
     void add_font(std::string const &name,
-                  unsigned char const *memory_offset,
-                  size_t memory_size,
+                  std::string_view buffer,
                   float font_size,
                   #ifdef GUISTORM_NO_UTF
                     std::string const &glyphs_to_load = ""

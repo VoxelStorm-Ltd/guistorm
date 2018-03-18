@@ -76,9 +76,8 @@ private:
   mutable std::mutex glyph_map_mutex;                                           // mutex to prevent glyphs being modified while being read
 public:
   std::string name;
-  const unsigned char*  memory_offset = 0;                                      // offset in memory of the raw font data
-  size_t                memory_size   = 0;                                      // size in memory of the raw font data
-  float                 font_size     = 0;                                      // font size to load this font at, in points
+  std::string_view buffer;                                                      // offset and size in memory of the raw font data
+  float font_size = 0;                                                          // font size to load this font at, in points
   GLfloat metrics_ascender  = 0.0;
   GLfloat metrics_descender = 0.0;
   GLfloat metrics_height    = 0.0;
@@ -100,8 +99,7 @@ private:
 public:
   font(gui *parent_gui,
        std::string const &name,
-       unsigned char const *memory_offset,
-       size_t memory_size,
+       std::string_view buffer,
        float font_size,
        #ifdef GUISTORM_NO_UTF
          std::string const &charcodes_to_load = "",

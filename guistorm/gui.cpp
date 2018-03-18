@@ -256,8 +256,7 @@ void gui::add_to_gui(base *element) {
 
 #ifndef GUISTORM_NO_TEXT
 void gui::add_font(std::string const &name,
-                   unsigned char const *memory_offset,
-                   size_t memory_size,
+                   std::string_view buffer,
                    float font_size,
                    #ifdef GUISTORM_NO_UTF
                      std::string const &glyphs_to_load
@@ -266,7 +265,7 @@ void gui::add_font(std::string const &name,
                    #endif // GUISTORM_NO_UTF
                    ) {
   /// Font factory that sets up font ownership with this GUI
-  fonts.emplace_back(new font(this, name, memory_offset, memory_size, font_size, glyphs_to_load));
+  fonts.emplace_back(new font(this, name, buffer, font_size, glyphs_to_load));
   #ifdef DEBUG_GUISTORM
     std::cout << "GUIStorm: added font " << name << " size " << font_size << ", " << fonts.size() << " total" << std::endl;
   #endif // DEBUG_GUISTORM
