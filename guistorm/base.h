@@ -162,8 +162,8 @@ public:
 
   // updating
   virtual void update();
-  virtual void on_press() __attribute__((__const__));
-  virtual void on_release() __attribute__((__const__));
+  virtual void on_press();
+  virtual void on_release();
   void centre_to_gui();
 
   // rendering

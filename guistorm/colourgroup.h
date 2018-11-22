@@ -15,7 +15,7 @@ public:
   colourgroup(colourtype const &background,
               colourtype const &outline,
               colourtype const &content);
-  ~colourgroup() __attribute__((__const__));
+  ~colourgroup();
 
   void assign(colourtype const &new_background,
               colourtype const &new_outline,

@@ -19,7 +19,7 @@ public:
   base *get_picked(coordtype const &cursor_position) override final;
 
   #ifndef DEBUG_GUISTORM
-    void init_buffer() override final __attribute__((__const__));
+    void init_buffer() override final;
     void destroy_buffer() override final;
   protected:
     void setup_buffer() override final;

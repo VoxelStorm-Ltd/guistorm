@@ -21,7 +21,7 @@ public:
             colourgroup const &hover,
             colourgroup const &focus,
             colourgroup const &active);
-  ~colourset() __attribute__((__const__));
+  ~colourset();
 
   void assign(colourgroup const &new_current,
               colourgroup const &new_idle,
