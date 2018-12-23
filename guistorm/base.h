@@ -154,11 +154,7 @@ public:
   template<typename T, class ...Args> void add_layout_rule(T thisrule, Args &&...args);
 
   // input handling
-  #ifdef GUISTORM_NO_TEXT
-    virtual void select_as_input() __attribute__((__const__));
-  #else
-    virtual void select_as_input();
-  #endif // GUISTORM_NO_TEXT
+  virtual void select_as_input();
 
   // updating
   virtual void update();
