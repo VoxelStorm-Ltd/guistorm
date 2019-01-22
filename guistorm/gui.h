@@ -15,7 +15,7 @@ namespace guistorm {
 class lineshape;
 class input_text;
 
-class gui : public container {
+class gui final : public container {
   friend class base;
   friend class input_text;
   friend class line;
