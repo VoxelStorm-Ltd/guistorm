@@ -110,6 +110,9 @@ void gui::load_shader() {
 
 void gui::destroy_shader() {
   /// Clean up the shader in preparation for exit or context switch
+  if(shader == 0) {
+    return;
+  }
   glDeleteProgram(shader);
   shader = 0;
 }
