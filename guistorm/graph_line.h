@@ -4,6 +4,7 @@
 #include "base.h"
 #include <vector>
 #ifndef GUISTORM_SINGLETHREADED
+  #include <mutex>
   #include <shared_mutex>
 #endif // GUISTORM_SINGLETHREADED
 #include <boost/range/iterator_range.hpp>

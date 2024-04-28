@@ -1,6 +1,9 @@
 #include "graph_ringbuffer_line.h"
 #include "cast_if_required.h"
 #include "gui.h"
+#ifndef GUISTORM_SINGLETHREADED
+  #include <mutex>
+#endif // GUISTORM_SINGLETHREADED
 
 namespace guistorm {
 
