@@ -176,7 +176,7 @@ void gui::upload_fonts() {
                atlas_self->data);
 
   // set the 1,0 to 1,1 texels of the font atlas texture to a 0.0-1.0 alpha gradient to use the shader for solid objects without texture switching
-  GLsizei constexpr const strip_height = 2;
+  constexpr GLsizei strip_height = 2;
   GLfloat data[strip_height][font_atlas->width()];
   for(GLsizei y = 0; y != strip_height; ++y) {
     for(GLsizei x = 0; x != cast_if_required<GLsizei>(font_atlas->width()); ++x) {

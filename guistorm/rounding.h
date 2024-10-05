@@ -15,7 +15,7 @@
   #elif defined(GUISTORM_ROUND_REAL2INT)
     #pragma message "GUIStorm rounding mode: REAL2INT"
     inline int32_t real2int(double val) {
-      double constexpr const double2fixmagic = 68719476736.0 * 1.5;             //2^36 * 1.5,  (52-_shiftamt=36) uses limited precisicion to floor
+      constexpr double double2fixmagic = 68719476736.0 * 1.5;                   // 2^36 * 1.5, (52-_shiftamt=36) uses limited precision to floor
       val = val + double2fixmagic;
       #if BigEndian_
         #define iman_ 1
