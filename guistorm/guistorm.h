@@ -1,5 +1,4 @@
-#ifndef GUISTORM_H_INCLUDED
-#define GUISTORM_H_INCLUDED
+#pragma once
 
 /// Extensible, fast, customisable window and widget display toolkit version 2.0
 /// by Eugene Hopkinson (SlowRiot) for VoxelStorm 2014
@@ -43,5 +42,3 @@
 #include "colourset.h"
 #include "font.h"
 #include "types.h"
-
-#endif // GUISTORM_H_INCLUDED

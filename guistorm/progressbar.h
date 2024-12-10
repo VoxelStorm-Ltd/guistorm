@@ -1,5 +1,4 @@
-#ifndef GUISTORM_PROGRESSBAR_H_INCLUDED
-#define GUISTORM_PROGRESSBAR_H_INCLUDED
+#pragma once
 
 #include "base.h"
 #include <vector>
@@ -39,5 +38,3 @@ public:
 };
 
 }
-
-#endif // GUISTORM_PROGRESSBAR_H_INCLUDED

@@ -1,5 +1,4 @@
-#ifndef GUISTORM_GUI_H_INCLUDED
-#define GUISTORM_GUI_H_INCLUDED
+#pragma once
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -132,5 +131,3 @@ public:
 };
 
 }
-
-#endif // GUISTORM_GUI_H_INCLUDED

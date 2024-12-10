@@ -1,5 +1,4 @@
-#ifndef GUISTORM_BASE_H_INCLUDED
-#define GUISTORM_BASE_H_INCLUDED
+#pragma once
 
 #include <vector>
 #ifndef GUISTORM_SINGLETHREADED
@@ -196,5 +195,3 @@ template<typename T, class ...Args> void base::add_layout_rule(T thisrule, Args 
 }
 
 }
-
-#endif // GUISTORM_BASE_H_INCLUDED

@@ -1,3 +1,5 @@
+#pragma once
+
 #if defined(GUISTORM_ROUND_NEAREST_OUT) || defined(GUISTORM_ROUND_NEAREST_ALL)
   #if defined(GUISTORM_ROUND_NEARBYINT)
     #pragma message "GUIStorm rounding mode: std::nearbyint"

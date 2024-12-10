@@ -1,5 +1,4 @@
-#ifndef GUISTORM_TYPES_H_INCLUDED
-#define GUISTORM_TYPES_H_INCLUDED
+#pragma once
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -30,5 +29,3 @@ enum class aligntype : char {                                                   
 };
 
 }
-
-#endif // GUISTORM_TYPES_H_INCLUDED

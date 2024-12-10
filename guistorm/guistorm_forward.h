@@ -1,5 +1,4 @@
-#ifndef GUISTORM_FORWARD_H_INCLUDED
-#define GUISTORM_FORWARD_H_INCLUDED
+#pragma once
 
 /// Forward declaration header, for inclusion in other headers when using pointers
 
@@ -26,5 +25,3 @@ namespace guistorm {
     class font;
   #endif // GUISTORM_NO_TEXT
 }
-
-#endif // GUISTORM_FORWARD_H_INCLUDED

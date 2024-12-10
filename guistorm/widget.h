@@ -1,5 +1,4 @@
-#ifndef GUISTORM_WIDGET_H_INCLUDED
-#define GUISTORM_WIDGET_H_INCLUDED
+#pragma once
 
 #include "base.h"
 
@@ -18,5 +17,3 @@ protected:
 };
 
 }
-
-#endif // GUISTORM_WIDGET_H_INCLUDED

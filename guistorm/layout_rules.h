@@ -1,5 +1,4 @@
-#ifndef GUISTORM_LAYOUT_RULES_H_INCLUDED
-#define GUISTORM_LAYOUT_RULES_H_INCLUDED
+#pragma once
 
 #include <functional>
 #include <GL/glew.h>
@@ -45,5 +44,3 @@ void move(               targettype target, coordcomponent offset_x, coordcompon
 }
 
 }
-
-#endif // GUISTORM_LAYOUT_RULES_H_INCLUDED

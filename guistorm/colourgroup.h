@@ -1,5 +1,4 @@
-#ifndef GUISTORM_COLOURGROUP_H_INCLUDED
-#define GUISTORM_COLOURGROUP_H_INCLUDED
+#pragma once
 
 #include "types.h"
 
@@ -25,5 +24,3 @@ public:
 };
 
 }
-
-#endif // GUISTORM_COLOURGROUP_H_INCLUDED

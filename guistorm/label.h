@@ -1,5 +1,4 @@
-#ifndef GUISTORM_LABEL_H_INCLUDED
-#define GUISTORM_LABEL_H_INCLUDED
+#pragma once
 
 #ifndef GUISTORM_NO_TEXT
 
@@ -35,5 +34,3 @@ public:
 }
 
 #endif // GUISTORM_NO_TEXT
-
-#endif // GUISTORM_LABEL_H_INCLUDED

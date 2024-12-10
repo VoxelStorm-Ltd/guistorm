@@ -1,5 +1,4 @@
-#ifndef GUISTORM_FONT_H_INCLUDED
-#define GUISTORM_FONT_H_INCLUDED
+#pragma once
 
 #ifndef GUISTORM_NO_TEXT
   #include <string>
@@ -133,5 +132,3 @@ public:
 #endif // GUISTORM_NO_TEXT
 
 }
-
-#endif // GUISTORM_FONT_H_INCLUDED

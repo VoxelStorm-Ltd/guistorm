@@ -1,5 +1,4 @@
-#ifndef GUISTORM_LINE_H_INCLUDED
-#define GUISTORM_LINE_H_INCLUDED
+#pragma once
 
 #include "base.h"
 
@@ -25,6 +24,3 @@ public:
 };
 
 }
-
-
-#endif // GUISTORM_LINE_H_INCLUDED

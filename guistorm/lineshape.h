@@ -1,5 +1,4 @@
-#ifndef GUISTORM_LINESHAPE_H_INCLUDED
-#define GUISTORM_LINESHAPE_H_INCLUDED
+#pragma once
 
 #include "base.h"
 #include <vector>
@@ -37,5 +36,3 @@ public:
 };
 
 }
-
-#endif // GUISTORM_LINESHAPE_H_INCLUDED

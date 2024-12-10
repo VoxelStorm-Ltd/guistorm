@@ -1,5 +1,4 @@
-#ifndef GUISTORM_WINDOW_H_INCLUDED
-#define GUISTORM_WINDOW_H_INCLUDED
+#pragma once
 
 #include "base.h"
 #include "container.h"
@@ -55,5 +54,3 @@ public:
 };
 
 }
-
-#endif // GUISTORM_WINDOW_H_INCLUDED
